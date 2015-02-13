@@ -1,5 +1,6 @@
 var start, stop, solveIndex, isTiming = 0, updateTimer = 0, allowedToUpdate = 0, typingComment = 0, fired = 0;
 var scrambleType = 3, scrambleLength = 20, sessionNumber = 1;
+var solvesAttempted, solvesCompleted, sessionMean, sessionBest, sessionWorst;
 
 $(document).ready(function()
 {
@@ -55,16 +56,17 @@ $(document).ready(function()
     	printTimes();
 	});
 	$("#statsButton").click(function () {
+		updateSessionInfo();
 		$("#myModal").css("top","15%");
 		$("#myModalTitle").text("Statistics ");
 		$("#myModalTitle").append("<small> (This feature is currently under devlopment)</small>");
 		$("#myModalBody").text("");
 		$("#myModalFooter").html("<p>" + new Date() + "</p>");
 		modalBody = "";
-		modalBody = modalBody.concat("<p>Solves:</p>");
-		modalBody = modalBody.concat("<p>Average:</p>");
-		modalBody = modalBody.concat("<p>Best:</p>");
-		modalBody = modalBody.concat("<p>Worst:</p>");
+		modalBody = modalBody.concat("<p>Solves: " + solvesCompleted + "/" + solvesAttempted + "</p>");
+		modalBody = modalBody.concat("<p>Mean: " + sessionMean + "</p>");
+		modalBody = modalBody.concat("<p>Best: " + sessionBest + "</p>");
+		modalBody = modalBody.concat("<p>Worst: " + sessionWorst + "</p>");
 		modalBody = modalBody.concat("<div class=\"table-responsive\"><table class=\"table table-bordered table-hover\" id=\"statsTable\"><thead><th></th><th>Current</th><th>Best</th></thead><tbody>");
 		modalBody = modalBody.concat("<tr><td>Mean of 3</td><td></td><td></td></tr>");
 		modalBody = modalBody.concat("<tr><td>Average of 5</td><td></td><td></td></tr>");
@@ -152,6 +154,7 @@ $(document).ready(function()
 	{
 		if (e.keyCode === 32)
 		{
+			e.preventDefault();
 			if ((isTiming == 0) && (typingComment == 0))
 				$("#timer").css('color', 'green');
 			else if (allowedToUpdate == 1)
@@ -290,6 +293,7 @@ function printScramble()
 function printTimes()
 {
 	updateAverages();
+	updateSessionInfo();
 	$("#times").text("");
 	var sessionObj = JSON.parse(localStorage.getItem("session" + sessionNumber));
 	var dataContent = "";
@@ -549,6 +553,49 @@ function printTimes()
 			}
 		}
 	});
+}
+
+function updateSessionInfo()
+{
+	var sessionObj = JSON.parse(localStorage.getItem("session" + sessionNumber));
+	var sum = 0;
+	sessionBest = 9999999999, sessionWorst = -1;
+	solvesAttempted = sessionObj.list.length;
+	solvesCompleted = sessionObj.list.length;
+	for (i = 0; i < solvesAttempted; i++)
+	{
+		if (sessionObj.list[i].penalty == 2)
+			solvesCompleted--;
+		else if (sessionObj.list[i].penalty == 1)
+		{
+			sum += (+sessionObj.list[i].time + 2);
+			if (sessionObj.list[i].time < sessionBest)
+				sessionBest = (+sessionObj.list[i].time + 2).toFixed(3);
+			if (sessionObj.list[i].time > sessionWorst)
+				sessionWorst = (+sessionObj.list[i].time + 2).toFixed(3);
+		}
+		else
+		{
+			sum += +sessionObj.list[i].time;
+			if (sessionObj.list[i].time < sessionBest)
+				sessionBest = sessionObj.list[i].time;
+			if (sessionObj.list[i].time > sessionWorst)
+				sessionWorst = sessionObj.list[i].time;
+		}
+	}
+	if (sum == 0)
+		mean = "N/A";
+	else
+		mean = (sum / solvesAttempted).toFixed(3);
+	sessionMean = mean;
+	if (sessionBest == 9999999999)
+		sessionBest = "N/A";
+	if (sessionWorst == -1)
+		sessionWorst = "N/A";
+	$("#sessionSolves").text("");
+	$("#sessionMean").text("");
+	$("#sessionSolves").append("<b>Solves: " + solvesCompleted + "/" + solvesAttempted + "</b>");
+	$("#sessionMean").append("<b>Mean: " + mean + "</b>");
 }
 
 function updateAverages()
