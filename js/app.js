@@ -409,7 +409,7 @@ function printTimes()
     			typingComment = 0;
     		}
 			localStorage.setItem("session" + sessionNumber, JSON.stringify(sessionObj));
-			printTimes();
+			location.reload();
 		}
 	});
 	$(document).on("click", ".avg5Cell", function () {
