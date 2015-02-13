@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="../css/style.css">
+	<script src="../js/app.js"></script>
+    <link rel="shortcut icon" type="image/x-icon" href="../images/cubeLogo.png"/>
+    <title>OP Corners</title>
+</head>
+<body>
+	<nav class="navbar navbar-inverse">
+		<div class="container">
+			<div class="container-fluid">
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        				<span class="sr-only">Toggle navigation</span>
+        				<span class="icon-bar"></span>
+        				<span class="icon-bar"></span>
+        				<span class="icon-bar"></span>
+      				</button>
+					<a class="navbar-brand" href="../index.html">
+						<img class="logo" alt="Tim Wong" src="../images/cubeLogo.png">
+					</a>
+				</div>
+				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+					<ul class="nav navbar-nav">
+						<li><a href="../index.html">Home</a></li>
+						<li><a href="cornerComms.html">3-Cycle Corners</a></li>
+						<li><a href="edgeComms.html">3-Cycle Edges</a></li>
+						<li class="active"><a href="">OP Corners<span class="sr-only">(current)</span></a></li>
+						<li><a href="M2Algs.html">M2 Edges</a></li>
+						<li><a href="otherAlgs.html">Other Algorithms</a></li>
+						<li><a href="notation.html">Notation</a></li>
+						<li><a href="../timer.html">gjTimer</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</nav>
+	<div class="container">
+		<div class="page-header">
+			<h1>Old Pochmann Corners <small>(UBL Buffer)</small></h1>
+		</div>
+        <div class="table-responsive">
+        	<table class="table table-hover table-bordered">
+        		<thead>
+        			<tr>
+	        			<th>Target</th>
+    	    			<th>Algorithm</th>
+        				<th># Moves</th>
+        				<th>Notes</th>
+        			</tr>
+        		</thead>
+        		<tbody>
+        			<tr>
+        				<td>UFR</td>
+        				<td>F R U' R' U' R U R' F' R U R' U' R' F R F'</td>
+        				<td>17</td>
+        				<td>Y Perm</td>
+        			</tr>
+        			<tr>
+        				<td>RUF</td>
+        				<td>U' R' U' R U R' F' R U R' U' R' F R2</td>
+        				<td>14</td>
+        				<td>Y Perm</td>
+        			</tr>
+        			<tr>
+        				<td>FRU</td>
+        				<td>U L' U2 R U' R' U2 L R U' R'</td>
+        				<td>10</td>
+        				<td>J Perm</td>
+        			</tr>
+        			<tr>
+        				<td>UFL</td>
+        				<td>U2 R U R' F' R U R' U' R' F R2 U' R' U</td>
+        				<td>15</td>
+        				<td>J Perm</td>
+        			</tr>
+        			<tr>
+        				<td>FLU</td>
+        				<td>F U L' U2 R U' R' U2 L R U' R' F'</td>
+        				<td>13</td>
+        				<td>J Perm</td>
+        			</tr>
+        			<tr>
+        				<td>LUF</td>
+        				<td>F2 R U' R' U' R U R' F' R U R' U' R' F R F2</td>
+        				<td>17</td>
+        				<td>Y Perm</td>
+        			</tr>
+        			<tr>
+        				<td>UBR</td>
+        				<td>R' U L' U2 R U' R' U2 L R U'</td>
+        				<td>11</td>
+        				<td>J Perm</td>
+        			</tr>
+					<tr>
+        				<td>BRU</td>
+        				<td>R' F R U' R' U' R U R' F' R U R' U' R' F R F' R</td>
+        				<td>19</td>
+        				<td>Y Perm</td>
+        			</tr>
+        			<tr>
+        				<td>RUB</td>
+        				<td>R' U' R' U' R U R' F' R U R' U' R' F R'</td>
+        				<td>15</td>
+        				<td>Y Perm</td>
+        			</tr>
+        			<tr>
+        				<td>DFR</td>
+        				<td>D R2 F R U' R' U' R U R' F' R U R' U' R' F R F' R2 D'</td>
+        				<td>21</td>
+        				<td>Y Perm</td>
+        			</tr>
+        			<tr>
+        				<td>FRD</td>
+        				<td>R F R U' R' U' R U R' F' R U R' U' R' F R F' R'</td>
+        				<td>19</td>
+        				<td>Y Perm</td>
+        			</tr>
+        			<tr>
+        				<td>RDF</td>
+        				<td>R U' R' U' R U R' F' R U R' U' R' F R</td>
+        				<td>15</td>
+        				<td>Y Perm</td>
+        			</tr>
+        			<tr>
+        				<td>DFL</td>
+        				<td>F' R U' R' U' R U R' F' R U R' U' R' F R F</td>
+        				<td>17</td>
+        				<td>Y Perm</td>
+        			</tr>
+        			<tr>
+        				<td>LDF</td>
+        				<td>D R F R U' R' U' R U R' F' R U R' U' R' F R F' R' D'</td>
+        				<td>21</td>
+        				<td>Y Perm</td>
+        			</tr>
+        			<tr>
+        				<td>FDL</td>
+        				<td>D R U' R' U' R U R' F' R U R' U' R' F R D'</td>
+        				<td>19</td>
+        				<td>Y Perm</td>
+        			</tr>
+        			<tr>
+        				<td>DBL</td>
+        				<td>D' R2 F R U' R' U' R U R' F' R U R' U' R' F R F' R2 D</td>
+        				<td>21</td>
+        				<td>Y Perm</td>
+        			</tr>
+        			<tr>
+        				<td>BLD</td>
+        				<td>D2 R F R U' R' U' R U R' F' R U R' U' R' F R F' R' D2</td>
+        				<td>21</td>
+        				<td>Y Perm</td>
+        			</tr>
+        			<tr>
+        				<td>LDB</td>
+        				<td>D2 R U' R' U' R U R' F' R U R' U' R' F R D2</td>
+        				<td>17</td>
+        				<td>Y Perm</td>
+        			</tr>
+        			<tr>
+        				<td>DBR</td>
+        				<td>R2 F R U' R' U' R U R' F' R U R' U' R' F R F' R2</td>
+        				<td>19</td>
+        				<td>Y Perm</td>
+        			</tr>
+        			<tr>
+        				<td>RDB</td>
+        				<td>D' R F R U' R' U' R U R' F' R U R' U' R' F R F' R' D</td>
+        				<td>21</td>
+        				<td>Y Perm</td>
+        			</tr>
+        			<tr>
+        				<td>BRD</td>
+        				<td>D' R U' R' U' R U R' F' R U R' U' R' F R D</td>
+        				<td>17</td>
+        				<td>Y Perm</td>
+        			</tr>
+        		</tbody>
+        	</table>
+        </div>
+	</div>
+	<div class="nav navbar-default">
+		<div class="container">
+			<a href="https://chrome.google.com/webstore/detail/ncage/hnbmfljfohghaepamnfokgggaejlmfol?hl=en" class="navbar-button btn-danger btn pull-left" target="_blank">dose bj</a>
+			<a href="https://chrome.google.com/webstore/detail/dose-gj-or-bj/elhpineiddpbmngkmdmgknidakpfikbd" class="navbar-button btn-success btn pull-right" target="_blank">dose gj</a>
+		</div>
+	</div>
+</body>
+</html>

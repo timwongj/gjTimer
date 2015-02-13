@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="../css/style.css">
+	<script src="../js/app.js"></script>
+    <link rel="shortcut icon" type="image/x-icon" href="../images/cubeLogo.png"/>
+    <title>M2 Edges</title>
+</head>
+<body>
+	<nav class="navbar navbar-inverse">
+		<div class="container">
+			<div class="container-fluid">
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        				<span class="sr-only">Toggle navigation</span>
+        				<span class="icon-bar"></span>
+        				<span class="icon-bar"></span>
+        				<span class="icon-bar"></span>
+      				</button>
+					<a class="navbar-brand" href="../index.html">
+						<img class="logo" alt="Tim Wong" src="../images/cubeLogo.png">
+					</a>
+				</div>
+				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+					<ul class="nav navbar-nav">
+						<li><a href="../index.html">Home</a></li>
+						<li><a href="cornerComms.html">3-Cycle Corners</a></li>
+						<li><a href="edgeComms.html">3-Cycle Edges</a></li>
+						<li><a href="OPAlgs.html">OP Corners</a></li>
+						<li class="active"><a href="">M2 Edges<span class="sr-only">(current)</span></a></li>
+						<li><a href="otherAlgs.html">Other Algorithms</a></li>
+						<li><a href="notation.html">Notation</a></li>
+						<li><a href="../timer.html">gjTimer</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</nav>
+	<div class="container">
+		<div class="page-header">
+			<h1>M2 Edges <small>(DF Buffer)</small></h1>
+		</div>
+        <div class="table-responsive">
+        	<table class="table table-hover table-bordered">
+        		<thead>
+        			<tr>
+	        			<th>Target</th>
+    	    			<th>Algorithm</th>
+        				<th># Moves</th>
+        				<th>Notes</th>
+        			</tr>
+        		</thead>
+        		<tbody>
+        			<tr>
+        				<td>UR</td>
+        				<td>(R' U R U') M2 (U R' U' R)</td>
+        				<td>9</td>
+        				<td></td>
+        			</tr>
+					<tr>
+        				<td>RU</td>
+        				<td>(B' R B) M2 (B' R' B)</td>
+        				<td>7</td>
+        				<td></td>
+        			</tr>
+        			<tr>
+        				<td>UF</td>
+        				<td>U2 M' U2 M'</td>
+        				<td>4</td>
+        				<td></td>
+        			</tr>
+        			<tr>
+        				<td>FU</td>
+        				<td>D [M' (U R2 U') M (U R2 U')] D' M2</td>
+        				<td>11</td>
+        				<td></td>
+        			</tr>
+        			<tr>
+        				<td>UL</td>
+        				<td>(L U' L' U) M2 (U' L U L')</td>
+        				<td>9</td>
+        				<td></td>
+        			</tr>
+        			<tr>
+        				<td>LU</td>
+        				<td>(B L' B') M2 (B L B')</td>
+        				<td>7</td>
+        				<td></td>
+        			</tr>
+        			<tr>
+        				<td>UB</td>
+        				<td>M2</td>
+        				<td>1</td>
+        				<td></td>
+        			</tr>
+        			<tr>
+        				<td>BU</td>
+        				<td>(B' R B U R2 U') M2 (U R2 U' B' R' B)</td>
+        				<td>13</td>
+        				<td></td>
+        			</tr>
+        			<tr>
+        				<td>DR</td>
+        				<td>(U R2 U') M2 (U R2 U')</td>
+        				<td>7</td>
+        				<td></td>
+        			</tr>
+        			<tr>
+        				<td>RD</td>
+        				<td>(B' R' B) M2 (B' R B)</td>
+        				<td>7</td>
+        				<td></td>
+        			</tr>
+        			<tr>
+        				<td>DL</td>
+        				<td>(U' L2 U) M2 (U' L2 U)</td>
+        				<td>7</td>
+        				<td></td>
+        			</tr>
+        			<tr>
+        				<td>LD</td>
+        				<td>(B L B') M2 (B L' B)</td>
+        				<td>7</td>
+        				<td></td>
+        			</tr>
+        			<tr>
+        				<td>DB</td>
+        				<td>M U2 M U2</td>
+        				<td>4</td>
+        				<td></td>
+        			</tr>
+        			<tr>
+        				<td>BD</td>
+        				<td>M2 D [(U R2 U') M' (U R2 U') M] D'</td>
+        				<td>11</td>
+        				<td></td>
+        			</tr>
+        			<tr>
+        				<td>FL</td>
+        				<td>(U' L' U) M2 (U' L U)</td>
+        				<td>7</td>
+        				<td></td>
+        			</tr>
+        			<tr>
+        				<td>LF</td>
+        				<td>(B L2 B') M2 (B L2 B')</td>
+        				<td>7</td>
+        				<td></td>
+        			</tr>
+        			<tr>
+        				<td>FR</td>
+        				<td>(U R U') M2 (U R' U')</td>
+        				<td>7</td>
+        				<td></td>
+        			</tr>
+        			<tr>
+        				<td>RF</td>
+        				<td>(B' R2 B) M2 (B' R2 B)</td>
+        				<td>7</td>
+        				<td></td>
+        			</tr>
+        			<tr>
+        				<td>BL</td>
+        				<td>(U' L U) M2 (U' L' U)</td>
+        				<td>7</td>
+        				<td></td>
+        			</tr>
+        			<tr>
+        				<td>LB</td>
+        				<td>(L' B L B') M2 (B L' B' L)</td>
+        				<td>9</td>
+        				<td></td>
+        			</tr>
+        			<tr>
+        				<td>BR</td>
+        				<td>(U R' U') M2 (U R U')</td>
+        				<td>7</td>
+        				<td></td>
+        			</tr>
+        			<tr>
+        				<td>RB</td>
+        				<td>(R B' R' B) M2 (B' R B R')</td>
+        				<td>9</td>
+        				<td></td>
+        			</tr>
+        		</tbody>
+        	</table>
+        </div>
+	</div>
+	<div class="nav navbar-default">
+		<div class="container">
+			<a href="https://chrome.google.com/webstore/detail/ncage/hnbmfljfohghaepamnfokgggaejlmfol?hl=en" class="navbar-button btn-danger btn pull-left" target="_blank">dose bj</a>
+			<a href="https://chrome.google.com/webstore/detail/dose-gj-or-bj/elhpineiddpbmngkmdmgknidakpfikbd" class="navbar-button btn-success btn pull-right" target="_blank">dose gj</a>
+		</div>
+	</div>
+</body>
+</html>

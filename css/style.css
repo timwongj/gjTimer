@@ -1,0 +1,122 @@
+.navbar {
+	border-radius:0px;
+}
+
+.navbar-inverse {
+	border-radius:0px;
+}
+
+.navbar-button {
+	margin:10px;
+}
+
+.logo {
+	width:25px;
+	height:25px;
+	text-align:center;
+	vertical-align:middle
+}
+
+.col-md-3 {
+	text-align:center;
+	vertical-align:middle;
+}
+
+#timerJumbotron {
+	height:calc(100vh - 150px);
+	max-height:800px;
+	padding:30px;
+	overflow-y:scroll;
+}
+
+#scramble {
+	font-size:18pt;
+	text-align:center;
+	margin:5px;
+}
+
+#timer {
+	font-size:120pt;
+	text-align:center;
+	margin:5px;
+}
+
+#avg5 {
+	text-align:center;
+	margin:5px;
+}
+
+#avg12 {
+	text-align:center;
+	margin:5px;
+}
+
+#scrambleTypeButtonGroup {
+	margin:5px;
+}
+
+#scrambleLengthInputGroup {
+	margin:5px;
+}
+
+#scrambleLength {
+	width:50px;
+}
+
+#scrambleTypeDiv {
+	text-align:center;
+}
+
+#scrambleLengthDiv {
+	text-align:center;
+}
+
+#times {
+	font-size:10pt;
+	padding:0px;
+	margin:0px;
+}
+
+#tableDiv {
+	display:inline-block;
+    overflow-y:scroll;
+	height:calc(100vh - 150px);
+	max-height:800px;
+	padding:10px;
+    border-radius:5px;
+    background-color:#eee;
+    text-align:center;
+}
+
+#sessionButtonToolbar {
+	text-align:center;
+	padding-bottom:5px;
+}
+
+#sessionDropdownButton {
+	margin:5px;
+}
+
+#resetButton {
+	margin:5px;
+}
+
+.popover {
+	width:145px;
+}
+
+.popover-title {
+    text-align:center;
+}
+.popover-content {
+	text-align:center;
+	padding:10px;
+}
+
+.commentInput {
+	margin-top:5px;
+}
+
+#myModal {
+	position: absolute;
+}

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+	<link rel="stylesheet" href="jQuery/jQuery-ui.css">
+	<script src="jQuery/jquery-ui.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <script src="js/app.js"></script>
+    <link rel="shortcut icon" type="image/x-icon" href="images/cubeLogo.png"/>
+    <title>Tim Wong</title>
+</head>
+<body>
+	<nav class="navbar navbar-inverse">
+		<div class="container">
+			<div class="container-fluid">
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        				<span class="sr-only">Toggle navigation</span>
+        				<span class="icon-bar"></span>
+        				<span class="icon-bar"></span>
+        				<span class="icon-bar"></span>
+      				</button>
+					<a class="navbar-brand" href="">
+						<img class="logo" alt="Tim Wong" src="images/cubeLogo.png">
+					</a>
+				</div>
+				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+					<ul id="sortable" class="nav navbar-nav">
+						<li><a href="index.html">Home</a></li>
+						<li><a href="bldAlgorithms/cornerComms.html">3-Cycle Corners</a></li>
+						<li><a href="bldAlgorithms/edgeComms.html">3-Cycle Edges</a></li>
+						<li><a href="bldAlgorithms/OPAlgs.html">OP Corners</a></li>
+						<li><a href="bldAlgorithms/M2Algs.html">M2 Edges</a></li>
+						<li><a href="bldAlgorithms/otherAlgs.html">Other Algorithms</a></li>
+						<li><a href="bldAlgorithms/notation.html">Notation</a></li>
+						<li class="active"><a href="">gjTimer<span class="sr-only">(current)</span></a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</nav>
+	<div class="container">
+		<div class="row">
+			<div class="col-xs-9">
+				<div class="jumbotron" id="timerJumbotron">
+					<div class="row">
+						<div class="col-xs-6 col-xs-offset-1" id="scrambleTypeDiv">
+							<div class="btn-group" id="scrambleTypeButtonGroup" role="group" aria-label="..." id="scrambleType">
+  								<button type="button" class="btn btn-default" id="scramble2x2">2x2</button>
+  								<button type="button" class="btn btn-default" id="scramble3x3">3x3</button>
+  								<button type="button" class="btn btn-default" id="scramble4x4">4x4</button>
+  								<button type="button" class="btn btn-default" id="scramble5x5">5x5</button>
+  								<button type="button" class="btn btn-default" id="scramble6x6">6x6</button>
+  								<button type="button" class="btn btn-default" id="scramble7x7">7x7</button>
+							</div>
+						</div>
+						<div class="col-xs-2" id="scrambleLengthDiv">
+							<div class="input-group" id="scrambleLengthInputGroup">
+  								<span class="input-group-addon" id="basic-addon1">Scramble Length</span>
+  								<input type="text" class="form-control" value="20" aria-describedby="basic-addon1" id="scrambleLength">
+							</div>
+						</div>
+					</div>
+					<hr/>
+					<p id="scramble"></p>
+					<p id="timer"></p>
+					<p id="avg5"></p>
+					<p id="avg12"></p>
+				</div>
+			</div>
+			<div class="col-xs-3" id="tableDiv">
+				<div class="btn-toolbar" id="sessionButtonToolbar" role="toolbar" aria-label="...">
+					<div class="dropdown pull-left">
+  						<button class="btn btn-default dropdown-toggle" type="button" id="sessionDropdownButton" data-toggle="dropdown" aria-expanded="true"></button>
+  						<ul class="dropdown-menu" id="sessionDropdownMenu" role="menu" aria-labelledby="dropdownMenu1">
+    						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 1</a></li>
+    						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 2</a></li>
+    						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 3</a></li>
+    						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 4</a></li>
+    						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 5</a></li>
+    						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 6</a></li>
+    						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 7</a></li>
+    						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 8</a></li>
+    						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 9</a></li>
+    						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 10</a></li>
+    						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 11</a></li>
+    						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 12</a></li>
+    						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 13</a></li>
+    						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 14</a></li>
+    						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 15</a></li>
+  						</ul>
+					</div>
+					<div class="btn-group pull-right" role="group" aria-label="...">
+						<button type="button" class="btn btn-warning" id="resetButton">Clear Session</button>
+					</div>
+				</div>
+				<div class="table-responsive">
+					<table class="table table-condensed table-bordered table-hover" id="timesTable">
+						<thead>
+							<th>#</th>
+							<th>time</th>
+							<th>avg5</th>
+							<th>avg12</th>
+						</thead>
+						<tbody id="times"></tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        			<h4 class="modal-title" id="myModalTitle"></h4>
+      			</div>
+      			<div class="modal-body" id="myModalBody"></div>
+      			<div class="modal-footer" id="myModalFooter"></div>
+    		</div>
+  		</div>
+	</div>
+	<div class="nav navbar-default navbar-fixed-bottom">
+		<div class="container">
+			<a href="https://chrome.google.com/webstore/detail/ncage/hnbmfljfohghaepamnfokgggaejlmfol?hl=en" class="navbar-button btn-danger btn pull-left" target="_blank">dose bj</a>
+			<a href="https://chrome.google.com/webstore/detail/dose-gj-or-bj/elhpineiddpbmngkmdmgknidakpfikbd" class="navbar-button btn-success btn pull-right" target="_blank">dose gj</a>
+		</div>
+	</div>
+</body>
+</html>
