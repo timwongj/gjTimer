@@ -2,31 +2,12 @@
 	border-radius:0px;
 }
 
-.navbar-inverse {
-	border-radius:0px;
-}
-
-.navbar-button {
-	margin:10px;
-}
-
-.logo {
-	width:25px;
-	height:25px;
-	text-align:center;
-	vertical-align:middle
-}
-
-.col-md-3 {
-	text-align:center;
-	vertical-align:middle;
-}
-
 #timerJumbotron {
 	height:calc(100vh - 150px);
 	max-height:800px;
 	padding:30px;
 	overflow-y:scroll;
+	border-radius:5px;
 }
 
 #scramble {
@@ -88,17 +69,9 @@
     text-align:center;
 }
 
-#sessionButtonToolbar {
-	text-align:center;
-	padding-bottom:5px;
-}
-
-#sessionDropdownButton {
-	margin:5px;
-}
-
-#resetButton {
-	margin:5px;
+#sessionButtonGroup {
+	padding-top:5px;
+	padding-bottom:10px;
 }
 
 .popover {

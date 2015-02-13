@@ -3,7 +3,6 @@ var solveIndex, fired = 0, scrambleType = 3, scrambleLength = 20, sessionNumber 
 
 $(document).ready(function()
 {
-	//localStorage.clear();
 	if (localStorage.getItem("sessionNumber") == null)
 		localStorage.setItem("sessionNumber", sessionNumber);
 	else
@@ -54,6 +53,26 @@ $(document).ready(function()
     	}
     	localStorage.setItem("sessionNumber", sessionNumber);
     	printTimes();
+	});
+	$("#statsButton").click(function () {
+		$("#myModal").css("top","15%");
+		$("#myModalTitle").text("Statistics ");
+		$("#myModalTitle").append("<small> (This feature is currently under devlopment)</small>");
+		$("#myModalBody").text("");
+		$("#myModalFooter").html("<p>" + new Date() + "</p>");
+		modalBody = "";
+		modalBody = modalBody.concat("<p>Solves:</p>");
+		modalBody = modalBody.concat("<p>Average:</p>");
+		modalBody = modalBody.concat("<p>Best:</p>");
+		modalBody = modalBody.concat("<p>Worst:</p>");
+		modalBody = modalBody.concat("<div class=\"table-responsive\"><table class=\"table table-bordered table-hover\" id=\"statsTable\"><thead><th></th><th>Current</th><th>Best</th></thead><tbody>");
+		modalBody = modalBody.concat("<tr><td>Mean of 3</td><td></td><td></td></tr>");
+		modalBody = modalBody.concat("<tr><td>Average of 5</td><td></td><td></td></tr>");
+		modalBody = modalBody.concat("<tr><td>Average of 12</td><td></td><td></td></tr>");
+		modalBody = modalBody.concat("<tr><td>Average of 50</td><td></td><td></td></tr>");
+		modalBody = modalBody.concat("<tr><td>Average of 100</td><td></td><td></td></tr>");
+		modalBody = modalBody.concat("</tbody></table></div>");
+		$("#myModalBody").append(modalBody);
 	});
 	$("#resetButton").click(function () {
 		if(confirm("Reset Session " + sessionNumber + "?"))
@@ -385,21 +404,21 @@ function printTimes()
 		sessionObj = JSON.parse(localStorage.getItem("session" + sessionNumber));
 		sessionObj.list[solveIndex - 1].penalty = 0;
 		localStorage.setItem("session" + sessionNumber, JSON.stringify(sessionObj));
-		printTimes();
+		location.reload();
 	})
 	$(document).on("click", ".plus2Button", function () {
 		solveIndex = this.id.substring(11);
 		sessionObj = JSON.parse(localStorage.getItem("session" + sessionNumber));
 		sessionObj.list[solveIndex - 1].penalty = 1;
 		localStorage.setItem("session" + sessionNumber, JSON.stringify(sessionObj));
-		printTimes();
+		location.reload();
 	});
 	$(document).on("click", ".DNFButton", function () {
 		solveIndex = this.id.substring(9);
 		sessionObj = JSON.parse(localStorage.getItem("session" + sessionNumber));
 		sessionObj.list[solveIndex - 1].penalty = 2;
 		localStorage.setItem("session" + sessionNumber, JSON.stringify(sessionObj));
-		printTimes();
+		location.reload();
 	});
 	$(document).on("click", ".deleteButton", function () {
 		if (confirm("How many times did you delete to get that average?"))
@@ -504,7 +523,7 @@ function printTimes()
 					modalBody = modalBody.concat(")");
 				modalBody = modalBody.concat(" " + sessionObj.list[solveNumber - 1 - i].scramble);
 				if (sessionObj.list[solveNumber - 1 - i].comment != null)
-					modalBody = modalBody.concat(" " + sessionObj.list[solveNumber - 1 - i].comment);
+					modalBody = modalBody.concat(" (" + sessionObj.list[solveNumber - 1 - i].comment + ")");
 				modalBody = modalBody.concat("</p>");
 				$("#myModalBody").append(modalBody);
 			}
