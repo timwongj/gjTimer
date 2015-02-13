@@ -209,7 +209,7 @@ $(document).ready(function()
 			scrambleLength = $("#scrambleLength").val();
 			localStorage.setItem("scrambleType", scrambleType);
 			localStorage.setItem("scrambleLength", scrambleLength);
-			printScramble();
+			location.reload();
 		}
 	});
 });
