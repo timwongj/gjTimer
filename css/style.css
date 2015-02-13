@@ -52,6 +52,11 @@
 	text-align:center;
 }
 
+#newScrambleDiv {
+	text-align:center;
+	margin:5px;
+}
+
 #times {
 	font-size:10pt;
 	padding:0px;

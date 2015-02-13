@@ -1,5 +1,5 @@
-var start, stop, isTiming = 0, updateTimer = 0, allowedToUpdate = 0, typingComment = 0;
-var solveIndex, fired = 0, scrambleType = 3, scrambleLength = 20, sessionNumber = 1;
+var start, stop, solveIndex, isTiming = 0, updateTimer = 0, allowedToUpdate = 0, typingComment = 0, fired = 0;
+var scrambleType = 3, scrambleLength = 20, sessionNumber = 1;
 
 $(document).ready(function()
 {
@@ -83,6 +83,8 @@ $(document).ready(function()
 				list: []
 			}
 			localStorage.setItem("session" + sessionNumber, JSON.stringify(newSession));
+			localStorage.setItem("scramble", $("#scramble").text());
+			localStorage.setItem("usePrevScramble", "1");
 			location.reload();
 		}
 	});
@@ -140,8 +142,12 @@ $(document).ready(function()
 		localStorage.setItem("scrambleType", scrambleType);
 		localStorage.setItem("scrambleLength", scrambleLength);
 	});
+	$("#newScrambleButton").click(function () {
+		printScramble();
+	})
 	var dt, timeElapsed, minutes, seconds, milliseconds, dtElapsed;
 	printScramble();
+	localStorage.setItem("usePrevScramble", "0");
 	$(document).on('keydown', function (e)
 	{
 		if (e.keyCode === 32)
@@ -209,6 +215,8 @@ $(document).ready(function()
 			scrambleLength = $("#scrambleLength").val();
 			localStorage.setItem("scrambleType", scrambleType);
 			localStorage.setItem("scrambleLength", scrambleLength);
+			localStorage.setItem("scramble", $("#scramble").text());
+			localStorage.setItem("usePrevScramble", "1");
 			location.reload();
 		}
 	});
@@ -238,7 +246,11 @@ function printScramble()
 	scrambleLength = $("#scrambleLength").val(scrambleLength);
 	scrambleType = localStorage.getItem("scrambleType");
 	scrambleLength = localStorage.getItem("scrambleLength");
-	if (scrambleType == 2)
+	var prevScramble = localStorage.getItem("scramble");
+	var usePrevScramble = localStorage.getItem("usePrevScramble");
+	if (usePrevScramble == 1)
+		$("#scramble").text(prevScramble);
+	else if (scrambleType == 2)
 	{
 		$("#scramble").text(generate2x2Scramble(scrambleLength))
 						.css('font-size','18pt');
@@ -404,6 +416,8 @@ function printTimes()
 		sessionObj = JSON.parse(localStorage.getItem("session" + sessionNumber));
 		sessionObj.list[solveIndex - 1].penalty = 0;
 		localStorage.setItem("session" + sessionNumber, JSON.stringify(sessionObj));
+		localStorage.setItem("scramble", $("#scramble").text());
+		localStorage.setItem("usePrevScramble", "1");
 		location.reload();
 	})
 	$(document).on("click", ".plus2Button", function () {
@@ -411,6 +425,8 @@ function printTimes()
 		sessionObj = JSON.parse(localStorage.getItem("session" + sessionNumber));
 		sessionObj.list[solveIndex - 1].penalty = 1;
 		localStorage.setItem("session" + sessionNumber, JSON.stringify(sessionObj));
+		localStorage.setItem("scramble", $("#scramble").text());
+		localStorage.setItem("usePrevScramble", "1");
 		location.reload();
 	});
 	$(document).on("click", ".DNFButton", function () {
@@ -418,6 +434,8 @@ function printTimes()
 		sessionObj = JSON.parse(localStorage.getItem("session" + sessionNumber));
 		sessionObj.list[solveIndex - 1].penalty = 2;
 		localStorage.setItem("session" + sessionNumber, JSON.stringify(sessionObj));
+		localStorage.setItem("scramble", $("#scramble").text());
+		localStorage.setItem("usePrevScramble", "1");
 		location.reload();
 	});
 	$(document).on("click", ".deleteButton", function () {
@@ -432,6 +450,8 @@ function printTimes()
     			typingComment = 0;
     		}
 			localStorage.setItem("session" + sessionNumber, JSON.stringify(sessionObj));
+			localStorage.setItem("scramble", $("#scramble").text());
+			localStorage.setItem("usePrevScramble", "1");
 			location.reload();
 		}
 	});
