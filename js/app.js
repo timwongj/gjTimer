@@ -382,18 +382,21 @@ function printTimes()
 	});
 	$(document).on("click", ".okButton", function () {
 		solveIndex = this.id.substring(8);
+		sessionObj = JSON.parse(localStorage.getItem("session" + sessionNumber));
 		sessionObj.list[solveIndex - 1].penalty = 0;
 		localStorage.setItem("session" + sessionNumber, JSON.stringify(sessionObj));
 		printTimes();
 	})
 	$(document).on("click", ".plus2Button", function () {
 		solveIndex = this.id.substring(11);
+		sessionObj = JSON.parse(localStorage.getItem("session" + sessionNumber));
 		sessionObj.list[solveIndex - 1].penalty = 1;
 		localStorage.setItem("session" + sessionNumber, JSON.stringify(sessionObj));
 		printTimes();
 	});
 	$(document).on("click", ".DNFButton", function () {
 		solveIndex = this.id.substring(9);
+		sessionObj = JSON.parse(localStorage.getItem("session" + sessionNumber));
 		sessionObj.list[solveIndex - 1].penalty = 2;
 		localStorage.setItem("session" + sessionNumber, JSON.stringify(sessionObj));
 		printTimes();
@@ -402,6 +405,7 @@ function printTimes()
 		if (confirm("How many times did you delete to get that average?"))
 		{
 			solveIndex = this.id.substring(12);
+			sessionObj = JSON.parse(localStorage.getItem("session" + sessionNumber));
 			if (solveIndex > -1)
 			{
     			sessionObj.list.splice(solveIndex - 1, 1);
