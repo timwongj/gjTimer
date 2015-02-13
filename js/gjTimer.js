@@ -353,7 +353,7 @@ function printTimes()
 		dataContent = dataContent.concat("<button type=\"button\" class=\"btn btn-default deleteButton\" id=\"deleteButton" + solveIndex + "\"><span class=\"glyphicon glyphicon-remove\" aria-hidden=\"true\"></span></button>");
 		dataContent = dataContent.concat("</div>");
 		dataContent = dataContent.concat("</div>");
-		dataContent = dataContent.concat("<input type=\"text\" class=\"form-control input-sm commentInput\" id=\"commentInput" + solveIndex + "\" placeholder=\"comment\">");
+		dataContent = dataContent.concat("<input type=\"text\" maxlength=\"50\" class=\"form-control input-sm commentInput\" id=\"commentInput" + solveIndex + "\" placeholder=\"comment\">");
 		$("#" + this.id).attr("data-content", dataContent);
 		$(document).on('keydown', function (e)
 		{
