@@ -152,7 +152,7 @@ $(document).ready(function()
 	localStorage.setItem("usePrevScramble", "0");
 	$(document).on('keydown', function (e)
 	{
-		if (e.keyCode === 32)
+		if (e.keyCode == 32)
 		{
 			e.preventDefault();
 			if ((isTiming == 0) && (typingComment == 0))
