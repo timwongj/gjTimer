@@ -254,12 +254,14 @@ $(document).ready(function()
 			{
 				$("#timer").css("color", "#2EB82E");
 				setTimeout(function () {
-					$("body").css("background-color", "rgba(0, 0 , 0, 0.8)")
+					$("body").css("background-color", "rgba(0, 0 , 0, 0.8)");
+					$("#tableDiv").hide();
 				}, 50);
 			}
 			else if (allowedToUpdate == 1)
 			{
 				$("body").css("background-color", "white");
+				$("#tableDiv").show();
 				updateTimer = 0;
 				allowedToUpdate = 0;
 				stop = new Date();
