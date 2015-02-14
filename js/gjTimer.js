@@ -198,7 +198,9 @@ $(document).ready(function()
 					seconds = pad2(seconds);
 					timeElapsed = minutes + ":" + seconds + "." + milliseconds;
 				}
-				$("#timer").text(timeElapsed);
+				var split = splitTime(timeElapsed);
+    			$("#timer").text("");
+    			$("#timer").append(split[0] + "<small>" + split[1] + "</small>");
 				var solveObj = {
 					time: timeElapsed,
 					avg5: "DNF",
@@ -261,7 +263,11 @@ function updateTime()
 		timeElapsed = minutes + ":" + seconds + "." + milliseconds;
 	}
     if (updateTimer == 1)
-    	$("#timer").text(timeElapsed);
+    {
+    	var split = splitTime(timeElapsed);
+    	$("#timer").text("");
+    	$("#timer").append(split[0] + "<small>" + split[1] + "</small>");
+    }
     setTimeout(updateTime, 10);
 }
 
@@ -1143,6 +1149,13 @@ function generate7x7Scramble(length)
             scramble = scramble.concat(" ");
     }
     return scramble;
+}
+
+function splitTime(timeEllapsed)
+{
+	var time = (+timeEllapsed).toFixed(2);
+	var lastDigit = ((+timeEllapsed * 1000) % 10).toFixed(0);
+	return [time, lastDigit];
 }
 
 function pad2(n)
