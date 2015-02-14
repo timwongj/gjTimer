@@ -256,12 +256,30 @@ $(document).ready(function()
 				setTimeout(function () {
 					$("body").css("background-color", "rgba(0, 0 , 0, 0.8)");
 					$("#tableDiv").hide();
+					$("#scramble2x2").attr("disabled", "true");
+					$("#scramble3x3").attr("disabled", "true");
+					$("#scramble4x4").attr("disabled", "true");
+					$("#scramble5x5").attr("disabled", "true");
+					$("#scramble6x6").attr("disabled", "true");
+					$("#scramble7x7").attr("disabled", "true");
+					$("#scrambleLength").attr("disabled", "true");
+					$("#newScrambleButton").attr("disabled", "true");
+					$("#optionsButton").attr("disabled", "true");
 				}, 50);
 			}
 			else if (allowedToUpdate == 1)
 			{
 				$("body").css("background-color", "white");
 				$("#tableDiv").show();
+				$("#scramble2x2").removeAttr("disabled");
+				$("#scramble3x3").removeAttr("disabled");
+				$("#scramble4x4").removeAttr("disabled");
+				$("#scramble5x5").removeAttr("disabled");
+				$("#scramble6x6").removeAttr("disabled");
+				$("#scramble7x7").removeAttr("disabled");
+				$("#scrambleLength").removeAttr("disabled");
+				$("#newScrambleButton").removeAttr("disabled");
+				$("#optionsButton").removeAttr("disabled");
 				updateTimer = 0;
 				allowedToUpdate = 0;
 				stop = new Date();
