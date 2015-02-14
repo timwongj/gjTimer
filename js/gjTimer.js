@@ -156,6 +156,7 @@ $(document).ready(function()
 	{
 		if (e.keyCode == 32)
 		{
+			$("#scrambleLength").blur();
 			e.preventDefault();
 			if ((isTiming == 0) && (typingComment == 0))
 				$("#timer").css('color', 'green');
@@ -195,6 +196,15 @@ $(document).ready(function()
 				printScramble();
 			}
 		}
+		else if ((e.keyCode === 13) && (typingComment == 0))
+		{
+			e.preventDefault();
+			scrambleLength = $("#scrambleLength").val();
+			localStorage.setItem("scrambleType", scrambleType);
+			localStorage.setItem("scrambleLength", scrambleLength);
+			$("#scrambleLength").blur();
+			printScramble();
+		}
 	});
 	$(document).on('keyup', function (e)
 	{
@@ -211,17 +221,6 @@ $(document).ready(function()
 			}
 			else
 				isTiming = 0;
-		}
-	});
-	$(document).on('keydown', function (e)
-	{
-		if ((e.keyCode === 13) && (typingComment == 0))
-		{
-			e.preventDefault();
-			scrambleLength = $("#scrambleLength").val();
-			localStorage.setItem("scrambleType", scrambleType);
-			localStorage.setItem("scrambleLength", scrambleLength);
-			printScramble();
 		}
 	});
 });
