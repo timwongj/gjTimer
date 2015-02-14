@@ -55,6 +55,7 @@ $(document).ready(function()
 			}
 			localStorage.setItem("session" + sessionNumber, JSON.stringify(newSession));
 			printTimes();
+			$("#timer").html("0.00<small>0</small>");
 		});
 	});
 	$("#myModal").on("hidden.bs.modal", function () {
@@ -734,10 +735,14 @@ function updateSessionInfo()
 		sessionWorstConverted = "N/A";
 	sessionBest = convertToTime(sessionBestConverted);
 	sessionWorst = convertToTime(sessionWorstConverted);
-	$("#sessionSolves").text("");
-	$("#sessionMean").text("");
-	$("#sessionSolves").append("<b>Solves: " + solvesCompleted + "/" + solvesAttempted + "</b>");
-	$("#sessionMean").append("<b>Mean: " + sessionMean + "</b>");
+	if (sessionObj.list.length == 0)
+	{
+		sessionMean = "N/A"
+		sessionBest = "N/A"
+		sessionWorst = "N/A"
+	}
+	$("#sessionSolves").html("<b>Solves: " + solvesCompleted + "/" + solvesAttempted + "</b>");
+	$("#sessionMean").html("<b>Mean: " + sessionMean + "</b>");
 }
 
 function updateAverages()
