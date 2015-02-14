@@ -134,20 +134,6 @@ $(document).ready(function()
 		$("#myModalBody").html("Reset Session " + sessionNumber + "?");
 		$("#myModalFooter").html("<button type=\"button\" class=\"btn btn-default\" id=\"cancelButton\">Cancel</button><button type=\"button\" class=\"btn btn-danger\" id=\"confirmResetButton\">Reset</button>");
 		$("#resetButton").blur();
-		if (scrambleType == 2)
-			$("#scramble2x2").focus();
-		else if (scrambleType == 3)
-			$("#scramble3x3").focus();
-		else if (scrambleType == 4)
-			$("#scramble4x4").focus();
-		else if (scrambleType == 5)
-			$("#scramble5x5").focus();
-		else if (scrambleType == 6)
-			$("#scramble6x6").focus();
-		else if (scrambleType == 7)
-			$("#scramble7x7").focus();
-		else
-			$("#scramble3x3").focus();
 	});
 	$("#scramble2x2").click(function () {
 		scrambleType = 2;
