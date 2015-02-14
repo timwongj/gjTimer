@@ -534,7 +534,7 @@ function printTimes()
 				if (((solveNumber - 1 - i) == minIndex) || ((solveNumber - 1 - i) == maxIndex))
 					modalBody = modalBody.concat(")");
 				modalBody = modalBody.concat(" " + sessionObj.list[solveNumber - 1 - i].scramble);
-				if (sessionObj.list[solveNumber - 1 - i].comment != null)
+				if ((sessionObj.list[solveNumber - 1 - i].comment != null) && (sessionObj.list[solveNumber - 1 - i].comment != ""))
 					modalBody = modalBody.concat(" (" + sessionObj.list[solveNumber - 1 - i].comment + ")");
 				modalBody = modalBody.concat("</p>");
 				$("#myModalBody").append(modalBody);
