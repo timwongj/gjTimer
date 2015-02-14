@@ -221,7 +221,7 @@ $(document).ready(function()
 		printScramble();
 	});
  	$("#optionsButton").click(function () {
- 		if (confirm("How many times did you delete to get that average?"))
+ 		if (confirm("Reset All?"))
 		{
 			localStorage.clear();
 			location.reload();
