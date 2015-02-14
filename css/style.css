@@ -1,7 +1,3 @@
-.navbar {
-	border-radius:0px;
-}
-
 #timerJumbotron {
 	height:calc(100vh - 150px);
 	max-height:800px;

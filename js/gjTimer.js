@@ -250,9 +250,15 @@ $(document).ready(function()
 			$("#scrambleLength").blur();
 			e.preventDefault();
 			if ((isTiming == 0) && (typingComment == 0))
+			{
 				$("#timer").css('color', 'green');
+				setTimeout(function () {
+					$("body").css("background-color", "rgba(0, 0 , 0, 0.8)");
+				}, 50);
+			}
 			else if (allowedToUpdate == 1)
 			{
+				$("body").css("background-color", "white");
 				updateTimer = 0;
 				allowedToUpdate = 0;
 				stop = new Date();
@@ -268,8 +274,11 @@ $(document).ready(function()
 					seconds = pad2(seconds);
 					timeElapsed = minutes + ":" + seconds + "." + milliseconds;
 				}
-				var split = splitTime(timeElapsed);
-    			$("#timer").html(split[0] + "<small>" + split[1] + "</small>");
+    			var split = splitTime(seconds + "." + milliseconds);
+    			if (minutes == 0)
+    				$("#timer").html(split[0] + "<small>" + split[1] + "</small>");
+    			else
+    				$("#timer").html(minutes + ":" + split[0] + "<small>" + split[1] + "</small>");
 				var solveObj = {
 					time: timeElapsed,
 					avg5: "DNF",
@@ -308,6 +317,7 @@ $(document).ready(function()
 			if (isTiming == 0)
 			{
 				$("#timer").css('color', 'black');
+				//$("body").css("background-color", "rgba(0, 0 , 0, 0.8)");
 				isTiming = 1;
 				updateTimer = 1;
 				allowedToUpdate = 1;
@@ -336,10 +346,16 @@ function updateTime()
 	}
     if (updateTimer == 1)
     {
-    	var split = splitTime(timeElapsed);
-    	$("#timer").html(split[0] + "<small>" + split[1] + "</small>");
+    	var split = splitTime(seconds + "." + milliseconds);
+    	if (minutes == 0)
+    		$("#timer").html(split[0] + "<small>" + split[1] + "</small>");
+    	else if (seconds < 10)
+    		$("#timer").html(minutes + ":0" + split[0] + "<small>" + split[1] + "</small>");
+    	else
+    		$("#timer").html(minutes + ":" + split[0] + "<small>" + split[1] + "</small>");
+    	
     }
-    setTimeout(updateTime, 10);
+    setTimeout(updateTime, 50);
 }
 
 function printScramble()
@@ -436,17 +452,18 @@ function printTimes()
 	$("#" + this.id).attr("data-content", dataContent);
 	for (var i = 0; i < sessionObj.numSolves; i++)
 	{
+		var penalizedTime = convertToTime(+convertToNumber(sessionObj.list[i].time) + 2);
 		var tableHtml = "<tr>\n<td>" + (i + 1);
 		tableHtml = tableHtml.concat("</td>\n<td class=\"timesCell\" id=\"timesCell" + (i + 1) + "\" title=\"<b>");
 		if (sessionObj.list[i].penalty == 1)
-			tableHtml = tableHtml.concat((+sessionObj.list[i].time + 2).toFixed(3) + "+");
+			tableHtml = tableHtml.concat(penalizedTime + "+");
 		else if (sessionObj.list[i].penalty == 2)
 			tableHtml = tableHtml.concat("DNF(" + sessionObj.list[i].time + 2 + ")");
 		else
 			tableHtml = tableHtml.concat(sessionObj.list[i].time);
 		tableHtml = tableHtml.concat("</b>\" data-container=\"#timesCell" + (i + 1) + "\" data-toggle=\"popover\" data-placement=\"right\" data-content=\"\">");
 		if (sessionObj.list[i].penalty == 1)
-			tableHtml = tableHtml.concat((+sessionObj.list[i].time + 2).toFixed(3) + "+");
+			tableHtml = tableHtml.concat(penalizedTime + "+");
 		else if (sessionObj.list[i].penalty == 2)
 			tableHtml = tableHtml.concat("DNF");
 		else
@@ -586,18 +603,20 @@ function printTimes()
 		$("#myModalBody").text("");
 		if (solveNumber >= 5)
 		{
-			var minIndex = solveNumber - 1, maxIndex = solveNumber - 1, minValue = sessionObj.list[solveNumber - 1].time, maxValue = sessionObj.list[solveNumber - 1].time;
+			var minIndex = solveNumber - 1, maxIndex = solveNumber - 1;
+			var minValue = convertToNumber(sessionObj.list[solveNumber - 1].time), maxValue = convertToNumber(sessionObj.list[solveNumber - 1].time);
 			for (i = solveNumber - 1; i >= solveNumber - 5; i--)
 			{
-				if (sessionObj.list[i].time > maxValue)
+				var currentTimeConverted = convertToNumber(sessionObj.list[i].time);
+				if (currentTimeConverted > maxValue)
 				{
 					maxIndex = i;
-					maxValue = sessionObj.list[i].time;
+					maxValue = currentTimeConverted;
 				}
-				if (sessionObj.list[i].time < minValue)
+				if (currentTimeConverted < minValue)
 				{
 					minIndex = i;
-					minValue = sessionObj.list[i].time;
+					minValue = currentTimeConverted;
 				}
 			}
 			if ((minIndex == solveNumber) && (maxIndex == solveNumber))
@@ -633,18 +652,20 @@ function printTimes()
 		$("#myModalBody").text("");
 		if (solveNumber >= 12)
 		{
-			var minIndex = solveNumber - 1, maxIndex = solveNumber - 1, minValue = sessionObj.list[solveNumber - 1].time, maxValue = sessionObj.list[solveNumber - 1].time;
+			var minIndex = solveNumber - 1, maxIndex = solveNumber - 1;
+			var minValue = convertToNumber(sessionObj.list[solveNumber - 1].time), maxValue = convertToNumber(sessionObj.list[solveNumber - 1].time);
 			for (i = solveNumber - 1; i >= solveNumber - 12; i--)
 			{
-				if (sessionObj.list[i].time > maxValue)
+				var currentTimeConverted = convertToNumber(sessionObj.list[i].time);
+				if (currentTimeConverted > maxValue)
 				{
 					maxIndex = i;
-					maxValue = sessionObj.list[i].time;
+					maxValue = currentTimeConverted;
 				}
-				if (sessionObj.list[i].time < minValue)
+				if (currentTimeConverted < minValue)
 				{
 					minIndex = i;
-					minValue = sessionObj.list[i].time;
+					minValue = currentTimeConverted;
 				}
 			}
 			if ((minIndex == solveNumber) && (maxIndex == solveNumber))
@@ -677,43 +698,46 @@ function updateSessionInfo()
 {
 	var sessionObj = JSON.parse(localStorage.getItem("session" + sessionNumber));
 	var sum = 0;
-	sessionBest = 9999999999, sessionWorst = -1;
+	var sessionBestConverted = 9999999999, sessionWorstConverted = -1;
 	solvesAttempted = sessionObj.list.length;
 	solvesCompleted = sessionObj.list.length;
 	for (i = 0; i < solvesAttempted; i++)
 	{
+		var currentTimeConverted = convertToNumber(sessionObj.list[i].time);
 		if (sessionObj.list[i].penalty == 2)
 			solvesCompleted--;
 		else if (sessionObj.list[i].penalty == 1)
 		{
-			sum += (+sessionObj.list[i].time + 2);
-			if (+sessionObj.list[i].time < +sessionBest)
-				sessionBest = (+sessionObj.list[i].time + 2).toFixed(3);
-			if (+sessionObj.list[i].time > +sessionWorst)
-				sessionWorst = (+sessionObj.list[i].time + 2).toFixed(3);
+			sum += (+currentTimeConverted + 2);
+			if (+currentTimeConverted < +sessionBestConverted)
+				sessionBestConverted = (+currentTimeConverted + 2).toFixed(3);
+			if (+currentTimeConverted > +sessionWorstConverted)
+				sessionWorstConverted = (+currentTimeConverted + 2).toFixed(3);
 		}
 		else
 		{
-			sum += +sessionObj.list[i].time;
-			if (+sessionObj.list[i].time < +sessionBest)
-				sessionBest = sessionObj.list[i].time;
-			if (+sessionObj.list[i].time > +sessionWorst)
-				sessionWorst = sessionObj.list[i].time;
+			sum += +currentTimeConverted;
+			if (+currentTimeConverted < +sessionBestConverted)
+				sessionBestConverted = currentTimeConverted;
+			if (+currentTimeConverted > +sessionWorstConverted)
+				sessionWorstConverted = currentTimeConverted;
 		}
 	}
 	if (sum == 0)
 		mean = "N/A";
 	else
 		mean = (sum / solvesAttempted).toFixed(3);
-	sessionMean = mean;
-	if (sessionBest == 9999999999)
-		sessionBest = "N/A";
-	if (sessionWorst == -1)
-		sessionWorst = "N/A";
+	sessionMean = convertToTime(mean);
+	if (sessionBestConverted == 9999999999)
+		sessionBestConverted = "N/A";
+	if (sessionWorstConverted == -1)
+		sessionWorstConverted = "N/A";
+	sessionBest = convertToTime(sessionBestConverted);
+	sessionWorst = convertToTime(sessionWorstConverted);
 	$("#sessionSolves").text("");
 	$("#sessionMean").text("");
 	$("#sessionSolves").append("<b>Solves: " + solvesCompleted + "/" + solvesAttempted + "</b>");
-	$("#sessionMean").append("<b>Mean: " + mean + "</b>");
+	$("#sessionMean").append("<b>Mean: " + sessionMean + "</b>");
 }
 
 function updateAverages()
@@ -727,15 +751,16 @@ function updateAverages()
 			var DNFCount = 0;
 			for (j = 0; j < 5; j++)
 			{
+				var currentTimeConverted = convertToNumber(sessionObj.list[i - j].time);
 				if (sessionObj.list[i - j].penalty == 1)
-					tempList[j] = (+sessionObj.list[i - j].time + 2).toFixed(3);
+					tempList[j] = (+currentTimeConverted + 2).toFixed(3);
 				else if (sessionObj.list[i - j].penalty == 2)
 				{
 					tempList[j] = -1;
 					DNFCount += 1;
 				}
 				else
-					tempList[j] = sessionObj.list[i - j].time;
+					tempList[j] = currentTimeConverted;
 			}
 			var minIndex = 0, maxIndex = 0, minValue = tempList[0], maxValue = tempList[0], maxFound = 0;
 			if (tempList[0] == -1)
@@ -768,7 +793,7 @@ function updateAverages()
 			for (j = 0; j < 5; j++)
 				if (!((j == minIndex) || (j == maxIndex)))
 					sum += +tempList[j];
-			sessionObj.list[i].avg5 = (sum / 3).toFixed(3);
+			sessionObj.list[i].avg5 = convertToTime((sum / 3).toFixed(3));
 			if (DNFCount > 1)
 				sessionObj.list[i].avg5 = "DNF";
 		}
@@ -778,15 +803,16 @@ function updateAverages()
 			var DNFCount = 0;
 			for (j = 0; j < 12; j++)
 			{
+				var currentTimeConverted = convertToNumber(sessionObj.list[i - j].time);
 				if (sessionObj.list[i - j].penalty == 1)
-					tempList[j] = (+sessionObj.list[i - j].time + 2).toFixed(3);
+					tempList[j] = (+currentTimeConverted + 2).toFixed(3);
 				else if (sessionObj.list[i - j].penalty == 2)
 				{
 					tempList[j] = -1;
 					DNFCount += 1;
 				}
 				else
-					tempList[j] = sessionObj.list[i - j].time;
+					tempList[j] = currentTimeConverted;
 			}
 			var minIndex = 0, maxIndex = 0, minValue = tempList[0], maxValue = tempList[0], maxFound = 0;
 			if (tempList[0] == -1)
@@ -819,7 +845,7 @@ function updateAverages()
 			for (j = 0; j < 12; j++)
 				if (!((j == minIndex) || (j == maxIndex)))
 					sum += +tempList[j];
-			sessionObj.list[i].avg12 = (sum / 10).toFixed(3);
+			sessionObj.list[i].avg12 = convertToTime((sum / 10).toFixed(3));
 			if (DNFCount > 1)
 				sessionObj.list[i].avg12 = "DNF";
 		}
@@ -1252,6 +1278,39 @@ function splitTime(timeEllapsed)
 	var time = (+timeEllapsed).toFixed(2);
 	var lastDigit = ((+timeEllapsed * 1000) % 10).toFixed(0);
 	return [time, lastDigit];
+}
+
+function convertToNumber(elapsedTime)
+{
+	if (elapsedTime.length < 7)
+		return elapsedTime;
+	else
+	{
+		var minutes, seconds;
+		if (elapsedTime.length == 8)
+		{
+			minutes = elapsedTime.substr(0, 1);
+			seconds = elapsedTime.substr(2, 8);
+		}
+		else if (elapsedTime.length == 9)
+		{
+			minutes = elapsedTime.substr(0, 2);
+			seconds = elapsedTime.substr(3, 9);
+		}
+		return ((+minutes * 60) + (+seconds)).toFixed(3);
+	}
+}
+
+function convertToTime(n)
+{
+	var minutes = Math.floor(n / 60);
+	var seconds = (n % 60).toFixed(3);
+	if (minutes == 0)
+		return seconds;
+	else if (seconds < 10)
+		return (minutes + ":0" + seconds);
+	else
+		return (minutes + ":" + seconds);
 }
 
 function pad2(n)
