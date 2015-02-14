@@ -564,20 +564,19 @@ function updateSessionInfo()
 		else if (sessionObj.list[i].penalty == 1)
 		{
 			sum += (+sessionObj.list[i].time + 2);
-			if (sessionObj.list[i].time < sessionBest)
+			if (+sessionObj.list[i].time < +sessionBest)
 				sessionBest = (+sessionObj.list[i].time + 2).toFixed(3);
-			if (sessionObj.list[i].time > sessionWorst)
+			if (+sessionObj.list[i].time > +sessionWorst)
 				sessionWorst = (+sessionObj.list[i].time + 2).toFixed(3);
 		}
 		else
 		{
 			sum += +sessionObj.list[i].time;
-			if (sessionObj.list[i].time < sessionBest)
+			if (+sessionObj.list[i].time < +sessionBest)
 				sessionBest = sessionObj.list[i].time;
-			if (sessionObj.list[i].time > sessionWorst)
+			if (+sessionObj.list[i].time > +sessionWorst)
 				sessionWorst = sessionObj.list[i].time;
 		}
-		console.log("Best: " + sessionBest + " Worst: " + sessionWorst);
 	}
 	if (sum == 0)
 		mean = "N/A";
@@ -623,21 +622,21 @@ function updateAverages()
 			}
 			for (j = 0; j < 5; j++)
 			{
-				if (tempList[j] == -1)
+				if (+tempList[j] == -1)
 				{
 					maxIndex = j;
 					maxValue = tempList[j];
 					maxFound = 1;
 				}
-				if ((tempList[j] > maxValue) && (maxFound == 0))
+				if ((+tempList[j] > +maxValue) && (maxFound == 0))
 				{
 					maxIndex = j;
-					maxValue = tempList[j].time;
+					maxValue = tempList[j];
 				}
-				if ((tempList[j] < minValue) && (tempList[j] > 0))
+				if ((+tempList[j] < +minValue) && (+tempList[j] > 0))
 				{
 					minIndex = j;
-					minValue = tempList[j].time;
+					minValue = tempList[j];
 				}
 			}
 			if ((minIndex == i) && (maxIndex == i))
@@ -674,21 +673,21 @@ function updateAverages()
 			}
 			for (j = 0; j < 12; j++)
 			{
-				if (tempList[j] == -1)
+				if (+tempList[j] == -1)
 				{
 					maxIndex = j;
 					maxValue = tempList[j];
 					maxFound = 1;
 				}
-				if ((tempList[j] > maxValue) && (maxFound == 0))
+				if ((+tempList[j] > +maxValue) && (maxFound == 0))
 				{
 					maxIndex = j;
-					maxValue = tempList[j].time;
+					maxValue = tempList[j];
 				}
-				if ((tempList[j] < minValue) && (tempList[j] > 0))
+				if ((+tempList[j] < +minValue) && (+tempList[j] > 0))
 				{
 					minIndex = j;
-					minValue = tempList[j].time;
+					minValue = tempList[j];
 				}
 			}
 			if ((minIndex == i) && (maxIndex == i))
