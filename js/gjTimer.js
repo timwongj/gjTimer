@@ -577,6 +577,7 @@ function updateSessionInfo()
 			if (sessionObj.list[i].time > sessionWorst)
 				sessionWorst = sessionObj.list[i].time;
 		}
+		console.log("Best: " + sessionBest + " Worst: " + sessionWorst);
 	}
 	if (sum == 0)
 		mean = "N/A";
