@@ -28,7 +28,7 @@ $(document).ready(function()
 			localStorage.setItem("session" + i, JSON.stringify(newSession));
 		}
 	}
-	$("#timer").text("0.000");
+	$("#timer").html("0.00<small>0</small>");
 	printTimes();
 	$("#myModal").on("hidden.bs.modal", function () {
   		modalOpen = 0;
@@ -199,8 +199,7 @@ $(document).ready(function()
 					timeElapsed = minutes + ":" + seconds + "." + milliseconds;
 				}
 				var split = splitTime(timeElapsed);
-    			$("#timer").text("");
-    			$("#timer").append(split[0] + "<small>" + split[1] + "</small>");
+    			$("#timer").html(split[0] + "<small>" + split[1] + "</small>");
 				var solveObj = {
 					time: timeElapsed,
 					avg5: "DNF",
@@ -265,8 +264,7 @@ function updateTime()
     if (updateTimer == 1)
     {
     	var split = splitTime(timeElapsed);
-    	$("#timer").text("");
-    	$("#timer").append(split[0] + "<small>" + split[1] + "</small>");
+    	$("#timer").html(split[0] + "<small>" + split[1] + "</small>");
     }
     setTimeout(updateTime, 10);
 }
