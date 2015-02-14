@@ -1,4 +1,4 @@
-var start, stop, solveIndex, isTiming = 0, updateTimer = 0, allowedToUpdate = 0, typingComment = 0, modalOpen = 0, fired = 0;
+var start, stop, solveIndex, isTiming = 0, updateTimer = 0, allowedToUpdate = 0, typingComment = 0, modalOpen = 0, fired = 0, switchingSession = 0;
 var scrambleType = 3, scrambleLength = 20, sessionNumber = 1;
 var solvesAttempted, solvesCompleted, sessionMean, sessionBest, sessionWorst;
 
@@ -16,12 +16,14 @@ $(document).ready(function()
 		localStorage.setItem("scrambleLength", scrambleLength);
 	else
 		scrambleLength = localStorage.getItem("scrambleLength");
-	for (i = 1; i <= 10; i++)
+	for (i = 1; i <= 20; i++)
 	{
 		if (localStorage.getItem("session" + i) == null)
 		{
 			var newSession = {
 				sessionNumber: i,
+				scrambleType: 3,
+				scrambleLength: 20,
 				numSolves: 0,
 				list: []
 			}
@@ -57,8 +59,29 @@ $(document).ready(function()
 			case "Session 13": sessionNumber = 13; break;
 			case "Session 14": sessionNumber = 14; break;
 			case "Session 15": sessionNumber = 15; break;
+			case "Session 16": sessionNumber = 16; break;
+			case "Session 17": sessionNumber = 17; break;
+			case "Session 18": sessionNumber = 18; break;
+			case "Session 19": sessionNumber = 19; break;
+			case "Session 20": sessionNumber = 20; break;
     	}
+    	if (scrambleType == 2)
+			$("#scramble2x2").focus();
+		else if (scrambleType == 3)
+			$("#scramble3x3").focus();
+		else if (scrambleType == 4)
+			$("#scramble4x4").focus();
+		else if (scrambleType == 5)
+			$("#scramble5x5").focus();
+		else if (scrambleType == 6)
+			$("#scramble6x6").focus();
+		else if (scrambleType == 7)
+			$("#scramble7x7").focus();
+		else
+			$("#scramble3x3").focus();
     	localStorage.setItem("sessionNumber", sessionNumber);
+    	switchingSession = 1;
+    	printScramble();
     	printTimes();
 	});
 	$("#statsButton").click(function () {
@@ -102,6 +125,8 @@ $(document).ready(function()
 		{
 			var newSession = {
 				sessionNumber: i,
+				scrambleType: scrambleType,
+				scrambleLength: scrambleLength,
 				numSolves: 0,
 				list: []
 			}
@@ -112,6 +137,10 @@ $(document).ready(function()
 	$("#scramble2x2").click(function () {
 		scrambleType = 2;
 		scrambleLength = 10;
+		var sessionObj = JSON.parse(localStorage.getItem("session" + sessionNumber));
+		sessionObj.scrambleType = 2;
+		sessionObj.scrambleLength = 10;
+		localStorage.setItem("session" + sessionNumber, JSON.stringify(sessionObj));
 		$("#scrambleLength").val(scrambleLength);
 		$("#scramble").text(generate2x2Scramble(scrambleLength))
 						.css('font-size','18pt');
@@ -121,6 +150,10 @@ $(document).ready(function()
 	$("#scramble3x3").click(function () {
 		scrambleType = 3;
 		scrambleLength = 20;
+		var sessionObj = JSON.parse(localStorage.getItem("session" + sessionNumber));
+		sessionObj.scrambleType = 3;
+		sessionObj.scrambleLength = 20;
+		localStorage.setItem("session" + sessionNumber, JSON.stringify(sessionObj));
 		$("#scrambleLength").val(scrambleLength);
 		$("#scramble").text(generate3x3Scramble(scrambleLength))
 						.css('font-size','18pt');
@@ -130,6 +163,10 @@ $(document).ready(function()
 	$("#scramble4x4").click(function () {
 		scrambleType = 4;
 		scrambleLength = 40;
+		var sessionObj = JSON.parse(localStorage.getItem("session" + sessionNumber));
+		sessionObj.scrambleType = 4;
+		sessionObj.scrambleLength = 40;
+		localStorage.setItem("session" + sessionNumber, JSON.stringify(sessionObj));
 		$("#scrambleLength").val(scrambleLength);
 		$("#scramble").text(generate4x4Scramble(scrambleLength))
 						.css('font-size','18pt');
@@ -139,6 +176,10 @@ $(document).ready(function()
 	$("#scramble5x5").click(function () {
 		scrambleType = 5;
 		scrambleLength = 60;
+		var sessionObj = JSON.parse(localStorage.getItem("session" + sessionNumber));
+		sessionObj.scrambleType = 5;
+		sessionObj.scrambleLength = 60;
+		localStorage.setItem("session" + sessionNumber, JSON.stringify(sessionObj));
 		$("#scrambleLength").val(scrambleLength);
 		$("#scramble").text(generate5x5Scramble(scrambleLength))
 						.css('font-size','18pt');
@@ -148,6 +189,10 @@ $(document).ready(function()
 	$("#scramble6x6").click(function () {
 		scrambleType = 6;
 		scrambleLength = 80;
+		var sessionObj = JSON.parse(localStorage.getItem("session" + sessionNumber));
+		sessionObj.scrambleType = 6;
+		sessionObj.scrambleLength = 80;
+		localStorage.setItem("session" + sessionNumber, JSON.stringify(sessionObj));
 		$("#scrambleLength").val(scrambleLength);
 		$("#scramble").text(generate6x6Scramble(scrambleLength))
 						.css('font-size','16pt');
@@ -157,6 +202,10 @@ $(document).ready(function()
 	$("#scramble7x7").click(function () {
 		scrambleType = 7;
 		scrambleLength = 100;
+		var sessionObj = JSON.parse(localStorage.getItem("session" + sessionNumber));
+		sessionObj.scrambleType = 7;
+		sessionObj.scrambleLength = 100;
+		localStorage.setItem("session" + sessionNumber, JSON.stringify(sessionObj));
 		$("#scrambleLength").val(scrambleLength);
 		$("#scramble").text(generate7x7Scramble(scrambleLength))
 						.css('font-size','14pt');
@@ -224,6 +273,9 @@ $(document).ready(function()
 			scrambleLength = $("#scrambleLength").val();
 			localStorage.setItem("scrambleType", scrambleType);
 			localStorage.setItem("scrambleLength", scrambleLength);
+			var sessionObj = JSON.parse(localStorage.getItem("session" + sessionNumber));
+			sessionObj.scrambleLength = scrambleLength;
+			localStorage.setItem("session" + sessionNumber, JSON.stringify(sessionObj));
 			$("#scrambleLength").blur();
 			printScramble();
 		}
@@ -271,50 +323,75 @@ function updateTime()
 
 function printScramble()
 {
-	scrambleLength = $("#scrambleLength").val(scrambleLength);
-	scrambleType = localStorage.getItem("scrambleType");
-	scrambleLength = localStorage.getItem("scrambleLength");
+	var sessionObj = JSON.parse(localStorage.getItem("session" + sessionNumber));
+	var printNew = 1;
+	$("#scrambleLength").val(sessionObj.scrambleLength);
+	if ((switchingSession == 1) && (scrambleType == sessionObj.scrambleType) && (scrambleLength == sessionObj.scrambleLength))
+		printNew = 0;
+	scrambleType = sessionObj.scrambleType;
+	scrambleLength = sessionObj.scrambleLength;
 	if (scrambleType == 2)
 	{
 		$("#scramble2x2").focus();
-		$("#scramble").text(generate2x2Scramble(scrambleLength))
-						.css('font-size','18pt');
+		if (printNew == 1)
+		{
+			$("#scramble").text(generate2x2Scramble(scrambleLength));
+			$("#scramble").css('font-size','18pt');
+		}
 	}
 	else if (scrambleType == 3)
 	{
 		$("#scramble3x3").focus();
-		$("#scramble").text(generate3x3Scramble(scrambleLength))
-						.css('font-size','18pt');
+		if (printNew == 1)
+		{
+			$("#scramble").text(generate3x3Scramble(scrambleLength));
+			$("#scramble").css('font-size','18pt');
+		}
 	}
 	else if (scrambleType == 4)
 	{
 		$("#scramble4x4").focus();
-		$("#scramble").text(generate4x4Scramble(scrambleLength))
-						.css('font-size','18pt');
+		if (printNew == 1)
+		{
+			$("#scramble").text(generate4x4Scramble(scrambleLength));
+			$("#scramble").css('font-size','18pt');
+		}
 	}
 	else if (scrambleType == 5)
 	{
 		$("#scramble5x5").focus();
-		$("#scramble").text(generate5x5Scramble(scrambleLength))
-						.css('font-size','18pt');
+		if (printNew == 1)
+		{
+			$("#scramble").text(generate5x5Scramble(scrambleLength));
+			$("#scramble").css('font-size','18pt');
+		}
 	}
 	else if (scrambleType == 6)
 	{
 		$("#scramble6x6").focus();
-		$("#scramble").text(generate6x6Scramble(scrambleLength))
-						.css('font-size','16pt');
+		if (printNew == 1)
+		{
+			$("#scramble").text(generate6x6Scramble(scrambleLength));
+			$("#scramble").css('font-size','16pt');
+		}
 	}
 	else if (scrambleType == 7)
 	{
 		$("#scramble7x7").focus();
-		$("#scramble").text(generate7x7Scramble(scrambleLength))
-						.css('font-size','14pt');
+		if (printNew == 1)
+		{
+			$("#scramble").text(generate7x7Scramble(scrambleLength));
+			$("#scramble").css('font-size','14pt');
+		}
 	}
 	else
 	{
 		$("#scramble3x3").focus();
-		$("#scramble").text(generate3x3Scramble(scrambleLength))
-						.css('font-size','18pt');
+		if (printNew == 1)
+		{
+			$("#scramble").text(generate3x3Scramble(scrambleLength));
+			$("#scramble").css('font-size','18pt');
+		}
 	}
 }
 
