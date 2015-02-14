@@ -251,36 +251,43 @@ function printScramble()
 	scrambleLength = localStorage.getItem("scrambleLength");
 	if (scrambleType == 2)
 	{
+		$("#scramble2x2").focus();
 		$("#scramble").text(generate2x2Scramble(scrambleLength))
 						.css('font-size','18pt');
 	}
 	else if (scrambleType == 3)
 	{
+		$("#scramble3x3").focus();
 		$("#scramble").text(generate3x3Scramble(scrambleLength))
 						.css('font-size','18pt');
 	}
 	else if (scrambleType == 4)
 	{
+		$("#scramble4x4").focus();
 		$("#scramble").text(generate4x4Scramble(scrambleLength))
 						.css('font-size','18pt');
 	}
 	else if (scrambleType == 5)
 	{
+		$("#scramble5x5").focus();
 		$("#scramble").text(generate5x5Scramble(scrambleLength))
 						.css('font-size','18pt');
 	}
 	else if (scrambleType == 6)
 	{
+		$("#scramble6x6").focus();
 		$("#scramble").text(generate6x6Scramble(scrambleLength))
 						.css('font-size','16pt');
 	}
 	else if (scrambleType == 7)
 	{
+		$("#scramble7x7").focus();
 		$("#scramble").text(generate7x7Scramble(scrambleLength))
 						.css('font-size','14pt');
 	}
 	else
 	{
+		$("#scramble3x3").focus();
 		$("#scramble").text(generate3x3Scramble(scrambleLength))
 						.css('font-size','18pt');
 	}
