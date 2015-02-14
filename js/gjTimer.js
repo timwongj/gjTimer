@@ -244,7 +244,7 @@ $(document).ready(function()
  	});
 	var dt, timeElapsed, minutes, seconds, milliseconds, dtElapsed;
 	printScramble();
-	$(document).on('keydown', function (e)
+	$(document).on("keydown", function (e)
 	{
 		if ((e.keyCode == 32) && (modalOpen == 0))
 		{
@@ -252,9 +252,9 @@ $(document).ready(function()
 			e.preventDefault();
 			if ((isTiming == 0) && (typingComment == 0))
 			{
-				$("#timer").css('color', 'green');
+				$("#timer").css("color", "#2EB82E");
 				setTimeout(function () {
-					$("body").css("background-color", "rgba(0, 0 , 0, 0.8)");
+					$("body").css("background-color", "rgba(0, 0 , 0, 0.8)")
 				}, 50);
 			}
 			else if (allowedToUpdate == 1)
@@ -311,14 +311,13 @@ $(document).ready(function()
 			printScramble();
 		}
 	});
-	$(document).on('keyup', function (e)
+	$(document).on("keyup", function (e)
 	{
 		if ((e.keyCode === 32) && (typingComment == 0) && (modalOpen == 0))
 		{
 			if (isTiming == 0)
 			{
-				$("#timer").css('color', 'black');
-				//$("body").css("background-color", "rgba(0, 0 , 0, 0.8)");
+				$("#timer").css("color", "black");
 				isTiming = 1;
 				updateTimer = 1;
 				allowedToUpdate = 1;
