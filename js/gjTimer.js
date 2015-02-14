@@ -1,4 +1,4 @@
-var start, stop, solveIndex, isTiming = 0, updateTimer = 0, allowedToUpdate = 0, typingComment = 0, fired = 0;
+var start, stop, solveIndex, isTiming = 0, updateTimer = 0, allowedToUpdate = 0, typingComment = 0, modalOpen = 0, fired = 0;
 var scrambleType = 3, scrambleLength = 20, sessionNumber = 1;
 var solvesAttempted, solvesCompleted, sessionMean, sessionBest, sessionWorst;
 
@@ -30,6 +30,12 @@ $(document).ready(function()
 	}
 	$("#timer").text("0.000");
 	printTimes();
+	$("#myModal").on("hidden.bs.modal", function () {
+  		modalOpen = 0;
+	});
+	$("#myModal").on("shown.bs.modal", function () {
+  		modalOpen = 1;
+	});
 	$("#sessionDropdownButton").html("Session " + sessionNumber + " <span class=\"caret\"></span>");
 	$("#sessionDropdownMenu li a").click(function(){
     	$("#sessionDropdownButton").html($(this).text() + " <span class=\"caret\"></span>")
@@ -77,6 +83,21 @@ $(document).ready(function()
 		$("#myModalBody").append(modalBody);
 	});
 	$("#resetButton").click(function () {
+		$("#resetButton").blur();
+		if (scrambleType == 2)
+			$("#scramble2x2").focus();
+		else if (scrambleType == 3)
+			$("#scramble3x3").focus();
+		else if (scrambleType == 4)
+			$("#scramble4x4").focus();
+		else if (scrambleType == 5)
+			$("#scramble5x5").focus();
+		else if (scrambleType == 6)
+			$("#scramble6x6").focus();
+		else if (scrambleType == 7)
+			$("#scramble7x7").focus();
+		else
+			$("#scramble3x3").focus();
 		if(confirm("Reset Session " + sessionNumber + "?"))
 		{
 			var newSession = {
@@ -154,7 +175,7 @@ $(document).ready(function()
 	printScramble();
 	$(document).on('keydown', function (e)
 	{
-		if (e.keyCode == 32)
+		if ((e.keyCode == 32) && (modalOpen == 0))
 		{
 			$("#scrambleLength").blur();
 			e.preventDefault();
@@ -196,7 +217,7 @@ $(document).ready(function()
 				printScramble();
 			}
 		}
-		else if ((e.keyCode === 13) && (typingComment == 0))
+		else if (((e.keyCode === 13) && (typingComment == 0)) && (modalOpen == 0))
 		{
 			e.preventDefault();
 			scrambleLength = $("#scrambleLength").val();
@@ -208,7 +229,7 @@ $(document).ready(function()
 	});
 	$(document).on('keyup', function (e)
 	{
-		if ((e.keyCode === 32) && (typingComment == 0))
+		if ((e.keyCode === 32) && (typingComment == 0) && (modalOpen == 0))
 		{
 			if (isTiming == 0)
 			{
