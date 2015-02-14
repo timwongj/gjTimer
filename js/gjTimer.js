@@ -220,10 +220,13 @@ $(document).ready(function()
 		localStorage.setItem("scrambleType", scrambleType);
 		printScramble();
 	});
-	$("#optionsButton").click(function () {
-		localStorage.clear();
-		location.reload();
-	});
+ 	$("#optionsButton").click(function () {
+ 		if (confirm("How many times did you delete to get that average?"))
+		{
+			localStorage.clear();
+			location.reload();
+		}
+ 	});
 	var dt, timeElapsed, minutes, seconds, milliseconds, dtElapsed;
 	printScramble();
 	$(document).on('keydown', function (e)
