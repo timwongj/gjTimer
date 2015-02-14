@@ -32,11 +32,33 @@ $(document).ready(function()
 	}
 	$("#timer").html("0.00<small>0</small>");
 	printTimes();
-	$("#myModal").on("hidden.bs.modal", function () {
-  		modalOpen = 0;
-	});
 	$("#myModal").on("shown.bs.modal", function () {
   		modalOpen = 1;
+		$("#resetAllButton").click(function () {
+ 			if (confirm("Reset All?"))
+			{
+				localStorage.clear();
+				location.reload();
+			}
+ 		});
+ 		$("#cancelButton").click(function () {
+			$("#myModal").modal("hide");
+		});
+		$("#confirmResetButton").click(function () {
+			$("#myModal").modal("toggle");
+			var newSession = {
+				sessionNumber: i,
+				scrambleType: scrambleType,
+				scrambleLength: scrambleLength,
+				numSolves: 0,
+				list: []
+			}
+			localStorage.setItem("session" + sessionNumber, JSON.stringify(newSession));
+			printTimes();
+		});
+	});
+	$("#myModal").on("hidden.bs.modal", function () {
+  		modalOpen = 0;
 	});
 	$("#sessionDropdownButton").html("Session " + sessionNumber + " <span class=\"caret\"></span>");
 	$("#sessionDropdownMenu li a").click(function(){
@@ -106,6 +128,10 @@ $(document).ready(function()
 		$("#myModalBody").append(modalBody);
 	});
 	$("#resetButton").click(function () {
+		$("#myModal").css("top","30%");
+		$("#myModalTitle").text("Reset");
+		$("#myModalBody").html("Reset Session " + sessionNumber + "?");
+		$("#myModalFooter").html("<button type=\"button\" class=\"btn btn-default\" id=\"cancelButton\">Cancel</button><button type=\"button\" class=\"btn btn-danger\" id=\"confirmResetButton\">Reset</button>");
 		$("#resetButton").blur();
 		if (scrambleType == 2)
 			$("#scramble2x2").focus();
@@ -121,18 +147,6 @@ $(document).ready(function()
 			$("#scramble7x7").focus();
 		else
 			$("#scramble3x3").focus();
-		if(confirm("Reset Session " + sessionNumber + "?"))
-		{
-			var newSession = {
-				sessionNumber: i,
-				scrambleType: scrambleType,
-				scrambleLength: scrambleLength,
-				numSolves: 0,
-				list: []
-			}
-			localStorage.setItem("session" + sessionNumber, JSON.stringify(newSession));
-			printTimes();
-		}
 	});
 	$("#scramble2x2").click(function () {
 		scrambleType = 2;
@@ -221,11 +235,11 @@ $(document).ready(function()
 		printScramble();
 	});
  	$("#optionsButton").click(function () {
- 		if (confirm("Reset All?"))
-		{
-			localStorage.clear();
-			location.reload();
-		}
+ 		$("#myModal").css("top","30%");
+		$("#myModalTitle").text("Options ");
+		$("#myModalTitle").append("<small> (This feature is currently under devlopment)</small>");
+		$("#myModalBody").html("<button type=\"button\" class=\"btn btn-danger\" id=\"resetAllButton\">Reset All</button>");;
+ 		$("#myModalFooter").html("<p>" + new Date() + "</p>");
  	});
 	var dt, timeElapsed, minutes, seconds, milliseconds, dtElapsed;
 	printScramble();
