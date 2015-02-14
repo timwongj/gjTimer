@@ -5,7 +5,7 @@
 #timerJumbotron {
 	height:calc(100vh - 150px);
 	max-height:800px;
-	padding:30px;
+	padding:25px;
 	overflow-y:scroll;
 	border-radius:5px;
 }
@@ -32,14 +32,6 @@
 	margin:5px;
 }
 
-#scrambleTypeButtonGroup {
-	margin:5px;
-}
-
-#scrambleLengthInputGroup {
-	margin:5px;
-}
-
 #scrambleLength {
 	width:50px;
 }
@@ -52,9 +44,19 @@
 	text-align:center;
 }
 
-#newScrambleDiv {
-	text-align:center;
-	margin:5px;
+#scramble2x2, #scramble3x3, #scramble4x4, #scramble5x5, #scramble6x6, #scramble7x7 {
+	margin-top:5px;
+	margin-bottom:5px;
+}
+
+#scrambleLengthInputGroup {
+	margin-top:5px;
+	margin-bottom:5px;
+}
+
+#newScrambleButton, #optionsButton {
+	margin-top:5px;
+	margin-bottom:5px;
 }
 
 #times {
@@ -74,9 +76,9 @@
     text-align:center;
 }
 
-#sessionButtonGroup {
-	padding-top:5px;
-	padding-bottom:10px;
+#sessionDropdownButton, #statsButton, #resetButton {
+	margin-top:5px;
+	margin-bottom:5px;
 }
 
 .popover {

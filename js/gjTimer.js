@@ -219,7 +219,11 @@ $(document).ready(function()
 		localStorage.setItem("scramble", $("#scramble").text());
 		localStorage.setItem("scrambleType", scrambleType);
 		printScramble();
-	})
+	});
+	$("#optionsButton").click(function () {
+		localStorage.clear();
+		location.reload();
+	});
 	var dt, timeElapsed, minutes, seconds, milliseconds, dtElapsed;
 	printScramble();
 	$(document).on('keydown', function (e)
