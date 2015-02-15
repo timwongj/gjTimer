@@ -373,6 +373,7 @@ function printScramble()
 	$("#scrambleLength").val(sessionObj.scrambleLength);
 	if ((switchingSession == 1) && (scrambleType == sessionObj.scrambleType) && (scrambleLength == sessionObj.scrambleLength))
 		printNew = 0;
+	switchingSession = 0;
 	scrambleType = sessionObj.scrambleType;
 	scrambleLength = sessionObj.scrambleLength;
 	if (scrambleType == 2)
