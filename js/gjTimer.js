@@ -461,6 +461,8 @@ function printTimes()
 	for (var i = 0; i < sessionObj.numSolves; i++)
 	{
 		var penalizedTime = convertToTime(+convertToNumber(sessionObj.list[i].time) + 2);
+		var timeFormatted = splitTime(sessionObj.list[i].time)[0];
+		var penalizedTimeFormatted = splitTime(penalizedTime)[0];
 		var tableHtml = "<tr>\n<td>" + (i + 1);
 		tableHtml = tableHtml.concat("</td>\n<td class=\"timesCell\" id=\"timesCell" + (i + 1) + "\" title=\"<b>");
 		if (sessionObj.list[i].penalty == 1)
@@ -471,15 +473,17 @@ function printTimes()
 			tableHtml = tableHtml.concat(sessionObj.list[i].time);
 		tableHtml = tableHtml.concat("</b>\" data-container=\"#timesCell" + (i + 1) + "\" data-toggle=\"popover\" data-placement=\"right\" data-content=\"\">");
 		if (sessionObj.list[i].penalty == 1)
-			tableHtml = tableHtml.concat(penalizedTime + "+");
+			tableHtml = tableHtml.concat(penalizedTimeFormatted + "+");
 		else if (sessionObj.list[i].penalty == 2)
 			tableHtml = tableHtml.concat("DNF");
 		else
-			tableHtml = tableHtml.concat(sessionObj.list[i].time);
+			tableHtml = tableHtml.concat(timeFormatted);
+		var avg5Formatted = splitTime(sessionObj.list[i].avg5)[0];
+		var avg12Formatted = splitTime(sessionObj.list[i].avg12)[0];
 		tableHtml = tableHtml.concat("</td>\n<td class=\"avg5Cell\" id=\"avg5Cell" + (i + 1) + "\" data-toggle=\"modal\" data-target=\"#myModal\">");
-		tableHtml = tableHtml.concat(sessionObj.list[i].avg5);
+		tableHtml = tableHtml.concat(avg5Formatted);
 		tableHtml = tableHtml.concat("</td>\n<td class=\"avg12Cell\" id=\"avg12Cell" + (i + 1) + "\" data-toggle=\"modal\" data-target=\"#myModal\">");
-		tableHtml = tableHtml.concat(sessionObj.list[i].avg12);
+		tableHtml = tableHtml.concat(avg12Formatted);
 		tableHtml = tableHtml.concat("</td></tr>");
 		$("#times").prepend(tableHtml);
 	}
@@ -632,15 +636,17 @@ function printTimes()
 			for (i = 4; i >= 0; i--)
 			{
 				var modalBody = "";
+				var timeFormatted = splitTime(sessionObj.list[solveNumber - 1 - i].time)[0];
+				var penalizedTimeFormatted = splitTime((+sessionObj.list[i].time + 2).toFixed(3))[0];
 				modalBody = modalBody.concat("<p>" + (5 - i) + ". ");
 				if (((solveNumber - 1 - i) == minIndex) || ((solveNumber - 1 - i) == maxIndex))
 					modalBody = modalBody.concat("(");
 				if (sessionObj.list[solveNumber - 1 - i].penalty == 1)
-					modalBody = modalBody.concat((+sessionObj.list[i].time + 2).toFixed(3) + "+");
+					modalBody = modalBody.concat(penalizedTimeFormatted + "+");
 				else if (sessionObj.list[solveNumber - 1 - i].penalty == 2)
-					modalBody = modalBody.concat("DNF(" + sessionObj.list[solveNumber - 1 - i].time + ")");
+					modalBody = modalBody.concat("DNF(" + timeFormatted + ")");
 				else
-					modalBody = modalBody.concat(sessionObj.list[solveNumber - 1 - i].time);
+					modalBody = modalBody.concat(timeFormatted);
 				if (((solveNumber - 1 - i) == minIndex) || ((solveNumber - 1 - i) == maxIndex))
 					modalBody = modalBody.concat(")");
 				modalBody = modalBody.concat(" " + sessionObj.list[solveNumber - 1 - i].scramble);
@@ -681,15 +687,17 @@ function printTimes()
 			for (i = 11; i >= 0; i--)
 			{
 				var modalBody = "";
+				var timeFormatted = splitTime(sessionObj.list[solveNumber - 1 - i].time)[0];
+				var penalizedTimeFormatted = splitTime((+sessionObj.list[i].time + 2).toFixed(3))[0];
 				modalBody = modalBody.concat("<p>" + (12 - i) + ". ");
 				if (((solveNumber - 1 - i) == minIndex) || ((solveNumber - 1 - i) == maxIndex))
 					modalBody = modalBody.concat("(");
 				if (sessionObj.list[solveNumber - 1 - i].penalty == 1)
-					modalBody = modalBody.concat((+sessionObj.list[i].time + 2).toFixed(3) + "+");
+					modalBody = modalBody.concat(penalizedTimeFormatted + "+");
 				else if (sessionObj.list[solveNumber - 1 - i].penalty == 2)
-					modalBody = modalBody.concat("DNF(" + sessionObj.list[solveNumber - 1 - i].time + ")");
+					modalBody = modalBody.concat("DNF(" + timeFormatted + ")");
 				else
-					modalBody = modalBody.concat(sessionObj.list[solveNumber - 1 - i].time);
+					modalBody = modalBody.concat(timeFormatted);
 				if (((solveNumber - 1 - i) == minIndex) || ((solveNumber - 1 - i) == maxIndex))
 					modalBody = modalBody.concat(")");
 				modalBody = modalBody.concat(" " + sessionObj.list[solveNumber - 1 - i].scramble);
@@ -1287,8 +1295,10 @@ function generate7x7Scramble(length)
 
 function splitTime(timeEllapsed)
 {
-	var time = (+timeEllapsed).toFixed(2);
-	var lastDigit = ((+timeEllapsed * 1000) % 10).toFixed(0);
+	if (timeEllapsed == "DNF")
+		return ["DNF", ""];
+	var time = timeEllapsed.substr(0, timeEllapsed.length - 1);
+	var lastDigit = timeEllapsed.substr(timeEllapsed.length - 1, timeEllapsed.lenth);
 	return [time, lastDigit];
 }
 
