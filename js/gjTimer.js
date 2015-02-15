@@ -284,6 +284,8 @@ $(document).ready(function()
     			var split = splitTime(seconds + "." + milliseconds);
     			if (minutes == 0)
     				$("#timer").html(split[0] + "<small>" + split[1] + "</small>");
+    			else if (seconds < 10)
+    				$("#timer").html(minutes + ":0" + split[0] + "<small>" + split[1] + "</small>");
     			else
     				$("#timer").html(minutes + ":" + split[0] + "<small>" + split[1] + "</small>");
 				var solveObj = {
