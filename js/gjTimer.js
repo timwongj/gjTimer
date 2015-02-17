@@ -253,58 +253,8 @@ $(document).ready(function()
 					$("#optionsButton").attr("disabled", "true");
 				}, 50);
 			}
-			else if (allowedToUpdate == 1)
-			{
-				$("body").css("background-color", "white");
-				$("#tableDiv").show();
-				$("#scramble2x2").removeAttr("disabled");
-				$("#scramble3x3").removeAttr("disabled");
-				$("#scramble4x4").removeAttr("disabled");
-				$("#scramble5x5").removeAttr("disabled");
-				$("#scramble6x6").removeAttr("disabled");
-				$("#scramble7x7").removeAttr("disabled");
-				$("#scrambleLength").removeAttr("disabled");
-				$("#newScrambleButton").removeAttr("disabled");
-				$("#optionsButton").removeAttr("disabled");
-				updateTimer = 0;
-				allowedToUpdate = 0;
-				stop = new Date();
-				dtElapsed = stop - start;
-				milliseconds = (dtElapsed % 1000);
-				seconds = Math.floor(dtElapsed / 1000) % 60;
-				minutes = Math.floor(((dtElapsed / 1000) / 60) % 60);
-				milliseconds = pad3(milliseconds);
-				if (minutes == 0)
-					timeElapsed = seconds + "." + milliseconds;
-				else
-				{
-					seconds = pad2(seconds);
-					timeElapsed = minutes + ":" + seconds + "." + milliseconds;
-				}
-    			var split = splitTime(seconds + "." + milliseconds);
-    			if (minutes == 0)
-    				$("#timer").html(split[0] + "<small>" + split[1] + "</small>");
-    			else
-    				$("#timer").html(minutes + ":" + split[0] + "<small>" + split[1] + "</small>");
-				var solveObj = {
-					time: timeElapsed,
-					avg5: "DNF",
-					avg12: "DNF",
-					scramble: $("#scramble").text(),
-					date: stop,
-					penalty: 0,
-					comment: ""
-				}
-				var sessionObj = JSON.parse(localStorage.getItem("session" + sessionNumber));
-				sessionObj.numSolves += 1;
-				sessionObj.list.push(solveObj);
-				localStorage.setItem("session" + sessionNumber, JSON.stringify(sessionObj));
-				localStorage.setItem(pad2(localStorage.length + 1), timeElapsed);
-				printTimes();
-				printScramble();
-			}
 		}
-		else if (((e.keyCode === 13) && (typingComment == 0)) && (modalOpen == 0))
+		if (((e.keyCode === 13) && (typingComment == 0)) && (modalOpen == 0))
 		{
 			e.preventDefault();
 			scrambleLength = $("#scrambleLength").val();
@@ -314,6 +264,56 @@ $(document).ready(function()
 			sessionObj.scrambleLength = scrambleLength;
 			localStorage.setItem("session" + sessionNumber, JSON.stringify(sessionObj));
 			$("#scrambleLength").blur();
+			printScramble();
+		}
+		if ((allowedToUpdate == 1) && (modalOpen == 0))
+		{
+			$("body").css("background-color", "white");
+			$("#tableDiv").show();
+			$("#scramble2x2").removeAttr("disabled");
+			$("#scramble3x3").removeAttr("disabled");
+			$("#scramble4x4").removeAttr("disabled");
+			$("#scramble5x5").removeAttr("disabled");
+			$("#scramble6x6").removeAttr("disabled");
+			$("#scramble7x7").removeAttr("disabled");
+			$("#scrambleLength").removeAttr("disabled");
+			$("#newScrambleButton").removeAttr("disabled");
+			$("#optionsButton").removeAttr("disabled");
+			updateTimer = 0;
+			allowedToUpdate = 0;
+			stop = new Date();
+			dtElapsed = stop - start;
+			milliseconds = (dtElapsed % 1000);
+			seconds = Math.floor(dtElapsed / 1000) % 60;
+			minutes = Math.floor(((dtElapsed / 1000) / 60) % 60);
+			milliseconds = pad3(milliseconds);
+			if (minutes == 0)
+				timeElapsed = seconds + "." + milliseconds;
+			else
+			{
+				seconds = pad2(seconds);
+				timeElapsed = minutes + ":" + seconds + "." + milliseconds;
+			}
+    		var split = splitTime(seconds + "." + milliseconds);
+    		if (minutes == 0)
+    			$("#timer").html(split[0] + "<small>" + split[1] + "</small>");
+    		else
+    			$("#timer").html(minutes + ":" + split[0] + "<small>" + split[1] + "</small>");
+			var solveObj = {
+				time: timeElapsed,
+				avg5: "DNF",
+				avg12: "DNF",
+				scramble: $("#scramble").text(),
+				date: stop,
+				penalty: 0,
+				comment: ""
+			}
+			var sessionObj = JSON.parse(localStorage.getItem("session" + sessionNumber));
+			sessionObj.numSolves += 1;
+			sessionObj.list.push(solveObj);
+			localStorage.setItem("session" + sessionNumber, JSON.stringify(sessionObj));
+			localStorage.setItem(pad2(localStorage.length + 1), timeElapsed);
+			printTimes();
 			printScramble();
 		}
 	});
