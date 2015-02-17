@@ -72,6 +72,10 @@
     text-align:center;
 }
 
+#numHeader, #timeHeader, #avg5Header, #avg12Header {
+	text-align:center;
+}
+
 #sessionDropdownButton, #statsButton, #resetButton {
 	margin-top:5px;
 	margin-bottom:5px;
