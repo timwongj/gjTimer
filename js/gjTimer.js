@@ -109,22 +109,49 @@ $(document).ready(function()
 	});
 	$("#statsButton").click(function () {
 		updateSessionInfo();
+		var sessionObj = JSON.parse(localStorage.getItem("session" + sessionNumber));
+		var bestAvg5 = "DNF", bestAvg12 = "DNF";
+		var currentMo3 = "DNF", bestMo3 = "DNF";
+		if (sessionObj.numSolves >= 3)
+			currentMo3 = convertToTime(calculateMeanOf3(sessionObj.list[sessionObj.numSolves - 1], sessionObj.list[sessionObj.numSolves - 2], sessionObj.list[sessionObj.numSolves - 3]));
+		var currentAvg50 = "DNF", currentAvg100 = "DNF", bestAvg50 = calculateBestAverageOfN(sessionObj.list, 50), bestAvg100 = calculateBestAverageOfN(sessionObj.list, 100);
+		if (sessionObj.numSolves >= 50)
+			currentAvg50 = calculateAverageOfN(sessionObj.list.slice(sessionObj.numSolves - 50, sessionObj.numSolves));
+		if (sessionObj.numSolves >= 100)
+			currentAvg100 = calculateAverageOfN(sessionObj.list.slice(sessionObj.numSolves - 100, sessionObj.numSolves));
+		for (i = 0; i < sessionObj.numSolves; i++)
+		{
+			if (i >= 2)
+			{
+				var tempMo3 = calculateMeanOf3(sessionObj.list[i], sessionObj.list[i - 1], sessionObj.list[i - 2]);
+				if (((bestMo3 == "DNF") && (tempMo3 != "DNF")) || (+tempMo3 < +bestMo3))
+					bestMo3 = tempMo3;
+			}
+			var currentAvg5 = convertToNumber(sessionObj.list[i].avg5);
+			var currentAvg12 = convertToNumber(sessionObj.list[i].avg12);
+			if (((bestAvg5 == "DNF") && (currentAvg5 != "DNF")) || (+currentAvg5 < +bestAvg5))
+				bestAvg5 = currentAvg5;
+			if (((bestAvg12 == "DNF") && (currentAvg12 != "DNF")) || (+currentAvg12 < +bestAvg12))
+				bestAvg12 = currentAvg12;
+		}
+		var bestMo3Converted = convertToTime(bestMo3);
+		var bestAvg5Converted = convertToTime(bestAvg5);
+		var bestAvg12Converted = convertToTime(bestAvg12);
 		$("#myModal").css("top","15%");
 		$("#myModalTitle").text("Statistics ");
-		$("#myModalTitle").append("<small> (This feature is currently under devlopment)</small>");
 		$("#myModalBody").text("");
 		$("#myModalFooter").html("<p>" + new Date() + "</p>");
 		modalBody = "";
-		modalBody = modalBody.concat("<p>Solves: " + solvesCompleted + "/" + solvesAttempted + "</p>");
-		modalBody = modalBody.concat("<p>Mean: " + sessionMean + "</p>");
-		modalBody = modalBody.concat("<p>Best: " + sessionBest + "</p>");
-		modalBody = modalBody.concat("<p>Worst: " + sessionWorst + "</p>");
+		modalBody = modalBody.concat("<div class=\"container\"><div class=\"row\" id=\"statsRow\"><div class=\"col-xs-2\"><b>Solves: " + solvesCompleted + "/" + solvesAttempted + "</div></b>");
+		modalBody = modalBody.concat("<div class=\"col-xs-2\"><b>Mean: " + sessionMean + "</b></div></div>");
+		modalBody = modalBody.concat("<div class=\"row\" id=\"statsRow\"><div class=\"col-xs-2\"><b>Best: " + sessionBest + "</div></b>");
+		modalBody = modalBody.concat("<div class=\"col-xs-2\"><b>Worst: " + sessionWorst + "</b></div></div></div>");
 		modalBody = modalBody.concat("<div class=\"table-responsive\"><table class=\"table table-bordered table-hover\" id=\"statsTable\"><thead><th></th><th>Current</th><th>Best</th></thead><tbody>");
-		modalBody = modalBody.concat("<tr><td>Mean of 3</td><td></td><td></td></tr>");
-		modalBody = modalBody.concat("<tr><td>Average of 5</td><td></td><td></td></tr>");
-		modalBody = modalBody.concat("<tr><td>Average of 12</td><td></td><td></td></tr>");
-		modalBody = modalBody.concat("<tr><td>Average of 50</td><td></td><td></td></tr>");
-		modalBody = modalBody.concat("<tr><td>Average of 100</td><td></td><td></td></tr>");
+		modalBody = modalBody.concat("<tr><td>Mean of 3</td><td>" + currentMo3 + "</td><td>" + bestMo3Converted + "</td></tr>");
+		modalBody = modalBody.concat("<tr><td>Average of 5</td><td>" + sessionObj.list[sessionObj.numSolves - 1].avg5 + "</td><td>" + bestAvg5Converted + "</td></tr>");
+		modalBody = modalBody.concat("<tr><td>Average of 12</td><td>" + sessionObj.list[sessionObj.numSolves - 1].avg12 + "</td><td>" + bestAvg12Converted + "</td></tr>");
+		modalBody = modalBody.concat("<tr><td>Average of 50</td><td>" + currentAvg50 + "</td><td>" + bestAvg50 + "</td></tr>");
+		modalBody = modalBody.concat("<tr><td>Average of 100</td><td>" + currentAvg100 + "</td><td>" + bestAvg100 + "</td></tr>");
 		modalBody = modalBody.concat("</tbody></table></div>");
 		$("#myModalBody").append(modalBody);
 	});
@@ -1301,7 +1328,9 @@ function splitTime(timeEllapsed)
 
 function convertToNumber(elapsedTime)
 {
-	if (elapsedTime.length < 7)
+	if (elapsedTime == "DNF")
+		return "DNF";
+	else if (elapsedTime.length < 7)
 		return elapsedTime;
 	else
 	{
@@ -1322,6 +1351,8 @@ function convertToNumber(elapsedTime)
 
 function convertToTime(n)
 {
+	if (n == "DNF")
+		return "DNF";
 	var minutes = Math.floor(n / 60);
 	var seconds = (n % 60).toFixed(3);
 	if (minutes == 0)
@@ -1330,6 +1361,193 @@ function convertToTime(n)
 		return (minutes + ":0" + seconds);
 	else
 		return (minutes + ":" + seconds);
+}
+
+function calculateMeanOf3(a, b, c)
+{
+	if ((a.penalty == 2) || (b.penalty == 2) || (c.penalty == 2))
+		return "DNF";
+	var aTime = convertToNumber(a.time);
+	var bTime = convertToNumber(b.time);
+	var cTime = convertToNumber(c.time);
+	if (a.penalty == 1)
+		aTime = +aTime + 2;
+	if (b.penalty == 1)
+		bTime = +bTime + 2;
+	if (c.penalty == 1)
+		cTime = +cTime + 2;
+	var sum = +aTime + +bTime + +cTime;
+	return (sum / 3).toFixed(3);
+}
+
+function calculateAverageOfN(list)
+{
+	var avgN = "DNF";
+	var tempList = [];
+	var DNFCount = 0;
+	for (i = 0; i < list.length; i++)
+	{
+		var currentTimeConverted = convertToNumber(list[i].time);
+		if (list[i].penalty == 1)
+			tempList[i] = (+currentTimeConverted + 2).toFixed(3);
+		else if (list[i].penalty == 2)
+		{
+			tempList[i] = -1;
+			DNFCount += 1;
+		}
+		else
+			tempList[i] = currentTimeConverted;
+	}
+	var minIndex = 0, maxIndex = 0, minValue = tempList[0], maxValue = tempList[0], maxFound = 0;
+	if (tempList[0] == -1)
+	{
+		minIndex = 1;
+		minValue = tempList[1];
+	}
+	for (j = 0; j < list.length; j++)
+	{
+		if (+tempList[j] == -1)
+		{
+			maxIndex = j;
+			maxValue = tempList[j];
+			maxFound = 1;
+		}
+		if ((+tempList[j] > +maxValue) && (maxFound == 0))
+		{
+			maxIndex = j;
+			maxValue = tempList[j];
+		}
+		if ((+tempList[j] < +minValue) && (+tempList[j] > 0))
+		{
+			minIndex = j;
+			minValue = tempList[j];
+		}
+	}
+	if ((minIndex == i) && (maxIndex == i))
+		minIndex -= 1;
+	var sum = 0;
+	for (j = 0; j < list.length; j++)
+		if (!((j == minIndex) || (j == maxIndex)))
+			sum += +tempList[j];
+	avgN = convertToTime((sum / list.length).toFixed(3));
+		if (DNFCount > 1)
+			avgN = "DNF";
+	return avgN;
+}
+
+function calculateBestAverageOfN(list, N)
+{
+	if (list.length < N)
+		return "DNF";
+	var avgN = "DNF";
+	var tempList = [];
+	for (i = 0; i < list.length; i++)
+	{
+		var currentTimeConverted = convertToNumber(list[i].time);
+		if (list[i].penalty == 1)
+			tempList[i] = (+currentTimeConverted + 2).toFixed(3);
+		else if (list[i].penalty == 2)
+			tempList[i] = 9999999999;
+		else
+			tempList[i] = currentTimeConverted;
+	}
+	var minIndex = 0, maxIndex = 0, minValue = tempList[0], maxValue = tempList[0], maxFound = 0;
+	if (tempList[0] == 9999999999)
+	{
+		minIndex = 1;
+		minValue = tempList[1];
+	}
+	for (j = 0; j < N; j++)
+	{
+		if (+tempList[j] == 9999999999)
+		{
+			maxIndex = j;
+			maxValue = tempList[j];
+			maxFound = 1;
+		}
+		if ((+tempList[j] > +maxValue) && (maxFound == 0))
+		{
+			maxIndex = j;
+			maxValue = tempList[j];
+		}
+		if ((+tempList[j] < +minValue) && (+tempList[j] > 0))
+		{
+			minIndex = j;
+			minValue = tempList[j];
+		}
+	}
+	if ((minIndex == i) && (maxIndex == i))
+		minIndex -= 1;
+	var bestSum = "DNF";
+	var currentSum = 0;
+	var DNFCount = 0;
+	for (i = 0; i < N; i++)
+	{
+		if (tempList[i] == 9999999999)
+			DNFCount += 1;
+		if (!((i == minIndex) || (i == maxIndex)))
+			currentSum += +tempList[i];
+	}
+	if (DNFCount < 2)
+		bestSum = currentSum;
+	for (i = N; i < list.length; i++)
+	{		
+		if (tempList[i] == 9999999999)
+			DNFCount += 1;
+		if (tempList[i - N] == 9999999999)
+			DNFCount -= 1;
+		if ((maxIndex == (i - N)) || (minIndex == (i - N)))
+		{
+			var isMax = 0;
+			if (maxIndex == (i - N))
+				isMax = 1;
+			maxIndex = i - N + 1;
+			minIndex = i - N + 1;
+			maxValue = tempList[i - N + 1];
+			minValue = tempList[i - N + 1];
+			for (j = i - N + 1; j < i; j++)
+			{
+				if (+tempList[j] > +maxValue)
+				{
+					maxIndex = j;
+					maxValue = tempList[j];
+				}
+				if (+tempList[j] < +minValue)
+				{
+					minIndex = j;
+					minValue = tempList[j];
+				}
+			}
+			currentSum += +tempList[i];
+			if (isMax == 1)
+				currentSum -= +tempList[maxIndex];
+			else
+				currentSum -= +tempList[minIndex];
+		}
+		else
+		{
+			currentSum += +tempList[i];
+			currentSum -= +tempList[i - N];
+		}
+		if (+tempList[i] > +maxValue)
+		{
+			currentSum += +tempList[maxIndex];
+			currentSum -= +tempList[i];
+			maxIndex = i;
+			maxValue = tempList[i];
+		}
+		if (+tempList[i] < +minValue)
+		{
+			currentSum += +tempList[minIndex];
+			currentSum -= +tempList[i];
+			minIndex = i;
+			minValue = tempList[i];
+		}
+		if (((currentSum < bestSum) || (bestSum == "DNF")) && (DNFCount < 2))
+			bestSum = currentSum;
+	}
+	avgN = convertToTime((bestSum / N).toFixed(3));
+	return avgN;
 }
 
 function pad2(n)
