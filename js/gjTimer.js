@@ -1,6 +1,4 @@
-var start, stop, solveIndex, isTiming = 0, updateTimer = 0, allowedToUpdate = 0, typingComment = 0, modalOpen = 0, fired = 0, switchingSession = 0;
-var scrambleType = 3, scrambleLength = 20, sessionNumber = 1;
-var solvesAttempted, solvesCompleted, sessionMean, sessionBest, sessionWorst;
+var start, stop, solveIndex, isTiming = 0, updateTimer = 0, allowedToUpdate = 0, typingComment = 0, modalOpen = 0, fired = 0, switchingSession = 0, scrambleType = 3, scrambleLength = 20, sessionNumber = 1, solvesAttempted, solvesCompleted, sessionMean, sessionBest, sessionWorst;
 
 $(document).ready(function()
 {
@@ -17,19 +15,8 @@ $(document).ready(function()
 	else
 		scrambleLength = localStorage.getItem("scrambleLength");
 	for (i = 1; i <= 20; i++)
-	{
 		if (localStorage.getItem("session" + i) == null)
-		{
-			var newSession = {
-				sessionNumber: i,
-				scrambleType: 3,
-				scrambleLength: 20,
-				numSolves: 0,
-				list: []
-			}
-			localStorage.setItem("session" + i, JSON.stringify(newSession));
-		}
-	}
+			localStorage.setItem("session" + i, JSON.stringify({sessionNumber: i, scrambleType: 3, scrambleLength: 20, numSolves: 0, list: []}));
 	$("#timer").html("0.00<small>0</small>");
 	printTimes();
 	$("#myModal").on("shown.bs.modal", function () {
@@ -46,13 +33,7 @@ $(document).ready(function()
 		});
 		$("#confirmResetButton").click(function () {
 			$("#myModal").modal("toggle");
-			var newSession = {
-				sessionNumber: i,
-				scrambleType: scrambleType,
-				scrambleLength: scrambleLength,
-				numSolves: 0,
-				list: []
-			}
+			var newSession = {sessionNumber: i, scrambleType: scrambleType, scrambleLength: scrambleLength, numSolves: 0, list: []};
 			localStorage.setItem("session" + sessionNumber, JSON.stringify(newSession));
 			printTimes();
 			$("#timer").html("0.00<small>0</small>");
@@ -63,8 +44,7 @@ $(document).ready(function()
 	});
 	$("#sessionDropdownButton").html("Session " + sessionNumber + " <span class=\"caret\"></span>");
 	$("#sessionDropdownMenu li a").click(function(){
-    	$("#sessionDropdownButton").html($(this).text() + " <span class=\"caret\"></span>")
-    								.val($(this).text());
+    	$("#sessionDropdownButton").html($(this).text() + " <span class=\"caret\"></span>").val($(this).text());
     	switch ($(this).text())
     	{
 			case "Session 1": sessionNumber = 1; break;
@@ -109,12 +89,9 @@ $(document).ready(function()
 	});
 	$("#statsButton").click(function () {
 		updateSessionInfo();
-		var sessionObj = JSON.parse(localStorage.getItem("session" + sessionNumber));
-		var bestAvg5 = "DNF", bestAvg12 = "DNF";
-		var currentMo3 = "DNF", bestMo3 = "DNF";
+		var sessionObj = JSON.parse(localStorage.getItem("session" + sessionNumber)), bestAvg5 = "DNF", bestAvg12 = "DNF", currentMo3 = "DNF", bestMo3 = "DNF", currentAvg50 = "DNF", currentAvg100 = "DNF", bestAvg50 = calculateBestAverageOfN(sessionObj.list, 50), bestAvg100 = calculateBestAverageOfN(sessionObj.list, 100);
 		if (sessionObj.numSolves >= 3)
 			currentMo3 = convertToTime(calculateMeanOf3(sessionObj.list[sessionObj.numSolves - 1], sessionObj.list[sessionObj.numSolves - 2], sessionObj.list[sessionObj.numSolves - 3]));
-		var currentAvg50 = "DNF", currentAvg100 = "DNF", bestAvg50 = calculateBestAverageOfN(sessionObj.list, 50), bestAvg100 = calculateBestAverageOfN(sessionObj.list, 100);
 		if (sessionObj.numSolves >= 50)
 			currentAvg50 = calculateAverageOfN(sessionObj.list.slice(sessionObj.numSolves - 50, sessionObj.numSolves));
 		if (sessionObj.numSolves >= 100)
@@ -127,33 +104,18 @@ $(document).ready(function()
 				if (((bestMo3 == "DNF") && (tempMo3 != "DNF")) || (+tempMo3 < +bestMo3))
 					bestMo3 = tempMo3;
 			}
-			var currentAvg5 = convertToNumber(sessionObj.list[i].avg5);
-			var currentAvg12 = convertToNumber(sessionObj.list[i].avg12);
+			var currentAvg5 = convertToNumber(sessionObj.list[i].avg5), currentAvg12 = convertToNumber(sessionObj.list[i].avg12);
 			if (((bestAvg5 == "DNF") && (currentAvg5 != "DNF")) || (+currentAvg5 < +bestAvg5))
 				bestAvg5 = currentAvg5;
 			if (((bestAvg12 == "DNF") && (currentAvg12 != "DNF")) || (+currentAvg12 < +bestAvg12))
 				bestAvg12 = currentAvg12;
 		}
-		var bestMo3Converted = convertToTime(bestMo3);
-		var bestAvg5Converted = convertToTime(bestAvg5);
-		var bestAvg12Converted = convertToTime(bestAvg12);
+		var bestMo3Converted = convertToTime(bestMo3), bestAvg5Converted = convertToTime(bestAvg5), bestAvg12Converted = convertToTime(bestAvg12);
 		$("#myModal").css("top","15%");
 		$("#myModalTitle").text("Statistics ");
 		$("#myModalBody").text("");
 		$("#myModalFooter").html("<p>" + new Date() + "</p>");
-		modalBody = "";
-		modalBody = modalBody.concat("<div class=\"container\"><div class=\"row\" id=\"statsRow\"><div class=\"col-xs-2\"><b>Solves: " + solvesCompleted + "/" + solvesAttempted + "</div></b>");
-		modalBody = modalBody.concat("<div class=\"col-xs-2\"><b>Mean: " + sessionMean + "</b></div></div>");
-		modalBody = modalBody.concat("<div class=\"row\" id=\"statsRow\"><div class=\"col-xs-2\"><b>Best: " + sessionBest + "</div></b>");
-		modalBody = modalBody.concat("<div class=\"col-xs-2\"><b>Worst: " + sessionWorst + "</b></div></div></div>");
-		modalBody = modalBody.concat("<div class=\"table-responsive\"><table class=\"table table-bordered table-hover\" id=\"statsTable\"><thead><th></th><th>Current</th><th>Best</th></thead><tbody>");
-		modalBody = modalBody.concat("<tr><td>Mean of 3</td><td>" + currentMo3 + "</td><td>" + bestMo3Converted + "</td></tr>");
-		modalBody = modalBody.concat("<tr><td>Average of 5</td><td>" + sessionObj.list[sessionObj.numSolves - 1].avg5 + "</td><td>" + bestAvg5Converted + "</td></tr>");
-		modalBody = modalBody.concat("<tr><td>Average of 12</td><td>" + sessionObj.list[sessionObj.numSolves - 1].avg12 + "</td><td>" + bestAvg12Converted + "</td></tr>");
-		modalBody = modalBody.concat("<tr><td>Average of 50</td><td>" + currentAvg50 + "</td><td>" + bestAvg50 + "</td></tr>");
-		modalBody = modalBody.concat("<tr><td>Average of 100</td><td>" + currentAvg100 + "</td><td>" + bestAvg100 + "</td></tr>");
-		modalBody = modalBody.concat("</tbody></table></div>");
-		$("#myModalBody").append(modalBody);
+		$("#myModalBody").append("<div class=\"container\"><div class=\"row\" id=\"statsRow\"><div class=\"col-xs-2\"><b>Solves: " + solvesCompleted + "/" + solvesAttempted + "</div></b><div class=\"col-xs-2\"><b>Mean: " + sessionMean + "</b></div></div><div class=\"row\" id=\"statsRow\"><div class=\"col-xs-2\"><b>Best: " + sessionBest + "</div></b><div class=\"col-xs-2\"><b>Worst: " + sessionWorst + "</b></div></div></div><div class=\"table-responsive\"><table class=\"table table-bordered table-hover\" id=\"statsTable\"><thead><th></th><th>Current</th><th>Best</th></thead><tbody><tr><td>Mean of 3</td><td>" + currentMo3 + "</td><td>" + bestMo3Converted + "</td></tr><tr><td>Average of 5</td><td>" + sessionObj.list[sessionObj.numSolves - 1].avg5 + "</td><td>" + bestAvg5Converted + "</td></tr><tr><td>Average of 12</td><td>" + sessionObj.list[sessionObj.numSolves - 1].avg12 + "</td><td>" + bestAvg12Converted + "</td></tr><tr><td>Average of 50</td><td>" + currentAvg50 + "</td><td>" + bestAvg50 + "</td></tr><tr><td>Average of 100</td><td>" + currentAvg100 + "</td><td>" + bestAvg100 + "</td></tr></tbody></table></div>");
 	});
 	$("#resetButton").click(function () {
 		$("#myModal").css("top","30%");
@@ -170,8 +132,7 @@ $(document).ready(function()
 		sessionObj.scrambleLength = 10;
 		localStorage.setItem("session" + sessionNumber, JSON.stringify(sessionObj));
 		$("#scrambleLength").val(scrambleLength);
-		$("#scramble").text(generate2x2Scramble(scrambleLength))
-						.css('font-size','18pt');
+		$("#scramble").text(generate2x2Scramble(scrambleLength)).css('font-size','18pt');
 		localStorage.setItem("scrambleType", scrambleType);
 		localStorage.setItem("scrambleLength", scrambleLength);
 	});
@@ -183,8 +144,7 @@ $(document).ready(function()
 		sessionObj.scrambleLength = 20;
 		localStorage.setItem("session" + sessionNumber, JSON.stringify(sessionObj));
 		$("#scrambleLength").val(scrambleLength);
-		$("#scramble").text(generate3x3Scramble(scrambleLength))
-						.css('font-size','18pt');
+		$("#scramble").text(generate3x3Scramble(scrambleLength)).css('font-size','18pt');
 		localStorage.setItem("scrambleType", scrambleType);
 		localStorage.setItem("scrambleLength", scrambleLength);
 	});
@@ -196,8 +156,7 @@ $(document).ready(function()
 		sessionObj.scrambleLength = 40;
 		localStorage.setItem("session" + sessionNumber, JSON.stringify(sessionObj));
 		$("#scrambleLength").val(scrambleLength);
-		$("#scramble").text(generate4x4Scramble(scrambleLength))
-						.css('font-size','18pt');
+		$("#scramble").text(generate4x4Scramble(scrambleLength)).css('font-size','18pt');
 		localStorage.setItem("scrambleType", scrambleType);
 		localStorage.setItem("scrambleLength", scrambleLength);
 	});
@@ -209,8 +168,7 @@ $(document).ready(function()
 		sessionObj.scrambleLength = 60;
 		localStorage.setItem("session" + sessionNumber, JSON.stringify(sessionObj));
 		$("#scrambleLength").val(scrambleLength);
-		$("#scramble").text(generate5x5Scramble(scrambleLength))
-						.css('font-size','18pt');
+		$("#scramble").text(generate5x5Scramble(scrambleLength)).css('font-size','18pt');
 		localStorage.setItem("scrambleType", scrambleType);
 		localStorage.setItem("scrambleLength", scrambleLength);
 	});
@@ -222,8 +180,7 @@ $(document).ready(function()
 		sessionObj.scrambleLength = 80;
 		localStorage.setItem("session" + sessionNumber, JSON.stringify(sessionObj));
 		$("#scrambleLength").val(scrambleLength);
-		$("#scramble").text(generate6x6Scramble(scrambleLength))
-						.css('font-size','16pt');
+		$("#scramble").text(generate6x6Scramble(scrambleLength)).css('font-size','16pt');
 		localStorage.setItem("scrambleType", scrambleType);
 		localStorage.setItem("scrambleLength", scrambleLength);
 	});
@@ -235,8 +192,7 @@ $(document).ready(function()
 		sessionObj.scrambleLength = 100;
 		localStorage.setItem("session" + sessionNumber, JSON.stringify(sessionObj));
 		$("#scrambleLength").val(scrambleLength);
-		$("#scramble").text(generate7x7Scramble(scrambleLength))
-						.css('font-size','14pt');
+		$("#scramble").text(generate7x7Scramble(scrambleLength)).css('font-size','14pt');
 		localStorage.setItem("scrambleType", scrambleType);
 		localStorage.setItem("scrambleLength", scrambleLength);
 	});
@@ -250,8 +206,7 @@ $(document).ready(function()
 	});
  	$("#optionsButton").click(function () {
  		$("#myModal").css("top","30%");
-		$("#myModalTitle").text("Options ");
-		$("#myModalTitle").append("<small> (This feature is currently under devlopment)</small>");
+		$("#myModalTitle").html("Options <small> (This feature is currently under devlopment)</small>");
 		$("#myModalBody").html("<button type=\"button\" class=\"btn btn-danger\" id=\"resetAllButton\">Reset All</button>");;
  		$("#myModalFooter").html("<p>" + new Date() + "</p>");
  	});
@@ -326,15 +281,7 @@ $(document).ready(function()
     			$("#timer").html(split[0] + "<small>" + split[1] + "</small>");
     		else
     			$("#timer").html(minutes + ":" + split[0] + "<small>" + split[1] + "</small>");
-			var solveObj = {
-				time: timeElapsed,
-				avg5: "DNF",
-				avg12: "DNF",
-				scramble: $("#scramble").text(),
-				date: stop,
-				penalty: 0,
-				comment: ""
-			}
+			var solveObj = {time: timeElapsed, avg5: "DNF", avg12: "DNF", scramble: $("#scramble").text(), date: stop, penalty: 0, comment: ""};
 			var sessionObj = JSON.parse(localStorage.getItem("session" + sessionNumber));
 			sessionObj.numSolves += 1;
 			sessionObj.list.push(solveObj);
@@ -365,11 +312,7 @@ $(document).ready(function()
 
 function updateTime()
 {
-	var elapsed = new Date() - start;
-	milliseconds = (elapsed % 1000);
-	seconds = Math.floor(elapsed / 1000) % 60;
-	minutes = Math.floor(((elapsed / 1000) / 60) % 60);
-	milliseconds = pad3(milliseconds);			
+	var elapsed = new Date() - start, milliseconds = (elapsed % 1000), seconds = Math.floor(elapsed / 1000) % 60, minutes = Math.floor(((elapsed / 1000) / 60) % 60), milliseconds = pad3(milliseconds);			
 	if (minutes == 0)
 		timeElapsed = seconds + "." + milliseconds;
 	else
@@ -384,15 +327,13 @@ function updateTime()
     		$("#timer").html(split[0] + "<small>" + split[1] + "</small>");
     	else
     		$("#timer").html(minutes + ":" + split[0] + "<small>" + split[1] + "</small>");
-    	
     }
     setTimeout(updateTime, 50);
 }
 
 function printScramble()
 {
-	var sessionObj = JSON.parse(localStorage.getItem("session" + sessionNumber));
-	var printNew = 1;
+	var sessionObj = JSON.parse(localStorage.getItem("session" + sessionNumber)), printNew = 1;
 	$("#scrambleLength").val(sessionObj.scrambleLength);
 	if ((switchingSession == 1) && (scrambleType == sessionObj.scrambleType) && (scrambleLength == sessionObj.scrambleLength))
 		printNew = 0;
@@ -403,64 +344,37 @@ function printScramble()
 	{
 		$("#scramble2x2").focus();
 		if (printNew == 1)
-		{
-			$("#scramble").text(generate2x2Scramble(scrambleLength));
-			$("#scramble").css('font-size','18pt');
-		}
-	}
-	else if (scrambleType == 3)
-	{
-		$("#scramble3x3").focus();
-		if (printNew == 1)
-		{
-			$("#scramble").text(generate3x3Scramble(scrambleLength));
-			$("#scramble").css('font-size','18pt');
-		}
+			$("#scramble").text(generate2x2Scramble(scrambleLength)).css('font-size','18pt');
 	}
 	else if (scrambleType == 4)
 	{
 		$("#scramble4x4").focus();
 		if (printNew == 1)
-		{
-			$("#scramble").text(generate4x4Scramble(scrambleLength));
-			$("#scramble").css('font-size','18pt');
-		}
+			$("#scramble").text(generate4x4Scramble(scrambleLength)).css('font-size','18pt');
 	}
 	else if (scrambleType == 5)
 	{
 		$("#scramble5x5").focus();
 		if (printNew == 1)
-		{
-			$("#scramble").text(generate5x5Scramble(scrambleLength));
-			$("#scramble").css('font-size','18pt');
-		}
+			$("#scramble").text(generate5x5Scramble(scrambleLength)).css('font-size','18pt');
 	}
 	else if (scrambleType == 6)
 	{
 		$("#scramble6x6").focus();
 		if (printNew == 1)
-		{
-			$("#scramble").text(generate6x6Scramble(scrambleLength));
-			$("#scramble").css('font-size','16pt');
-		}
+			$("#scramble").text(generate6x6Scramble(scrambleLength)).css('font-size','16pt');
 	}
 	else if (scrambleType == 7)
 	{
 		$("#scramble7x7").focus();
 		if (printNew == 1)
-		{
-			$("#scramble").text(generate7x7Scramble(scrambleLength));
-			$("#scramble").css('font-size','14pt');
-		}
+			$("#scramble").text(generate7x7Scramble(scrambleLength)).css('font-size','14pt');
 	}
 	else
 	{
 		$("#scramble3x3").focus();
 		if (printNew == 1)
-		{
-			$("#scramble").text(generate3x3Scramble(scrambleLength));
-			$("#scramble").css('font-size','18pt');
-		}
+			$("#scramble").text(generate3x3Scramble(scrambleLength)).css('font-size','18pt');
 	}
 }
 
@@ -469,26 +383,14 @@ function printTimes()
 	updateAverages();
 	updateSessionInfo();
 	$("#times").text("");
-	var sessionObj = JSON.parse(localStorage.getItem("session" + sessionNumber));
-	var dataContent = "";
-	dataContent = dataContent.concat("<div class=\"btn-toolbar\" role=\"toolbar\" aria-label=\"...\">");
-	dataContent = dataContent.concat("<div class=\"btn-group btn-group-xs\" role=\"group\" aria-label=\"...\">");
-	dataContent = dataContent.concat("<button type=\"button\" class=\"btn btn-success\" id=\"okButton\">OK</button>");
-	dataContent = dataContent.concat("<button type=\"button\" class=\"btn btn-warning\" id=\"plus2Button\">+2</button>");
-	dataContent = dataContent.concat("<button type=\"button\" class=\"btn btn-danger\" id=\"DNFButton\">DNF</button>");
-	dataContent = dataContent.concat("</div>");
-	dataContent = dataContent.concat("<div class=\"btn-group btn-group-xs\" role=\"group\" aria-label=\"...\">");
-	dataContent = dataContent.concat("<button type=\"button\" class=\"btn btn-default\" id=\"deleteButton\">X</button>");
-	dataContent = dataContent.concat("</div>");
-	dataContent = dataContent.concat("</div>");
+	var sessionObj = JSON.parse(localStorage.getItem("session" + sessionNumber)), dataContent = "<div class=\"btn-toolbar\" role=\"toolbar\" aria-label=\"...\"><div class=\"btn-group btn-group-xs\" role=\"group\" aria-label=\"...\"><button type=\"button\" class=\"btn btn-success\" id=\"okButton\">OK</button><button type=\"button\" class=\"btn btn-warning\" id=\"plus2Button\">+2</button><button type=\"button\" class=\"btn btn-danger\" id=\"DNFButton\">DNF</button></div><div class=\"btn-group btn-group-xs\" role=\"group\" aria-label=\"...\"><button type=\"button\" class=\"btn btn-default\" id=\"deleteButton\">X</button></div></div>";
 	$("#" + this.id).attr("data-content", dataContent);
 	for (var i = 0; i < sessionObj.numSolves; i++)
 	{
 		var penalizedTime = convertToTime(+convertToNumber(sessionObj.list[i].time) + 2);
 		var timeFormatted = splitTime(sessionObj.list[i].time)[0];
 		var penalizedTimeFormatted = splitTime(penalizedTime)[0];
-		var tableHtml = "<tr>\n<td>" + (i + 1);
-		tableHtml = tableHtml.concat("</td>\n<td class=\"timesCell\" id=\"timesCell" + (i + 1) + "\" title=\"<b>");
+		var tableHtml = "<tr>\n<td>" + (i + 1) + "</td>\n<td class=\"timesCell\" id=\"timesCell" + (i + 1) + "\" title=\"<b>";
 		if (sessionObj.list[i].penalty == 1)
 			tableHtml = tableHtml.concat(penalizedTime + "+");
 		else if (sessionObj.list[i].penalty == 2)
@@ -504,11 +406,7 @@ function printTimes()
 			tableHtml = tableHtml.concat(timeFormatted);
 		var avg5Formatted = splitTime(sessionObj.list[i].avg5)[0];
 		var avg12Formatted = splitTime(sessionObj.list[i].avg12)[0];
-		tableHtml = tableHtml.concat("</td>\n<td class=\"avg5Cell\" id=\"avg5Cell" + (i + 1) + "\" data-toggle=\"modal\" data-target=\"#myModal\">");
-		tableHtml = tableHtml.concat(avg5Formatted);
-		tableHtml = tableHtml.concat("</td>\n<td class=\"avg12Cell\" id=\"avg12Cell" + (i + 1) + "\" data-toggle=\"modal\" data-target=\"#myModal\">");
-		tableHtml = tableHtml.concat(avg12Formatted);
-		tableHtml = tableHtml.concat("</td></tr>");
+		tableHtml = tableHtml.concat("</td>\n<td class=\"avg5Cell\" id=\"avg5Cell" + (i + 1) + "\" data-toggle=\"modal\" data-target=\"#myModal\">" + avg5Formatted + "</td>\n<td class=\"avg12Cell\" id=\"avg12Cell" + (i + 1) + "\" data-toggle=\"modal\" data-target=\"#myModal\">" + avg12Formatted + "</td></tr>");
 		$("#times").prepend(tableHtml);
 	}
 	if (sessionObj.numSolves >= 5)
@@ -524,18 +422,7 @@ function printTimes()
 		var solveNumber = this.id.substring(9);
 		solveIndex = this.id.substring(9);
 		$("#" + this.id).attr("title", solveNumber);
-		var dataContent = "";
-		dataContent = dataContent.concat("<div class=\"btn-toolbar\" role=\"toolbar\" aria-label=\"...\">");
-		dataContent = dataContent.concat("<div class=\"btn-group btn-group-xs\" role=\"group\" aria-label=\"...\">");
-		dataContent = dataContent.concat("<button type=\"button\" class=\"btn btn-success okButton\" id=\"okButton" + solveIndex + "\"><span class=\"glyphicon glyphicon-ok\" aria-hidden=\"true\"></span></button>");
-		dataContent = dataContent.concat("<button type=\"button\" class=\"btn btn-warning plus2Button\" id=\"plus2Button" + solveIndex + "\">+2</button>");
-		dataContent = dataContent.concat("<button type=\"button\" class=\"btn btn-danger DNFButton\" id=\"DNFButton" + solveIndex + "\">DNF</button>");
-		dataContent = dataContent.concat("</div>");
-		dataContent = dataContent.concat("<div class=\"btn-group btn-group-xs\" role=\"group\" aria-label=\"...\">");
-		dataContent = dataContent.concat("<button type=\"button\" class=\"btn btn-default deleteButton\" id=\"deleteButton" + solveIndex + "\"><span class=\"glyphicon glyphicon-remove\" aria-hidden=\"true\"></span></button>");
-		dataContent = dataContent.concat("</div>");
-		dataContent = dataContent.concat("</div>");
-		dataContent = dataContent.concat("<input type=\"text\" maxlength=\"50\" class=\"form-control input-sm commentInput\" id=\"commentInput" + solveIndex + "\" placeholder=\"comment\">");
+		var dataContent = "<div class=\"btn-toolbar\" role=\"toolbar\" aria-label=\"...\"><div class=\"btn-group btn-group-xs\" role=\"group\" aria-label=\"...\"><button type=\"button\" class=\"btn btn-success okButton\" id=\"okButton" + solveIndex + "\"><span class=\"glyphicon glyphicon-ok\" aria-hidden=\"true\"></span></button><button type=\"button\" class=\"btn btn-warning plus2Button\" id=\"plus2Button" + solveIndex + "\">+2</button><button type=\"button\" class=\"btn btn-danger DNFButton\" id=\"DNFButton" + solveIndex + "\">DNF</button></div><div class=\"btn-group btn-group-xs\" role=\"group\" aria-label=\"...\"><button type=\"button\" class=\"btn btn-default deleteButton\" id=\"deleteButton" + solveIndex + "\"><span class=\"glyphicon glyphicon-remove\" aria-hidden=\"true\"></span></button></div></div><input type=\"text\" maxlength=\"50\" class=\"form-control input-sm commentInput\" id=\"commentInput" + solveIndex + "\" placeholder=\"comment\">";
 		$("#" + this.id).attr("data-content", dataContent);
 		$(document).on('keydown', function (e)
 		{
@@ -578,7 +465,8 @@ function printTimes()
         		$this.data("hoveringPopover", false);
         		$this.data("waitingForPopoverTO", true);
         		$this.data("popoverTO", setTimeout(function () {
-            		if (!$this.data("hoveringPopover")) {
+            		if (!$this.data("hoveringPopover"))
+            		{
                 		$this.data("forceHidePopover", true);
                 		$this.data("waitingForPopoverTO", false);
                 		$this.popover("hide");
@@ -631,16 +519,14 @@ function printTimes()
 		}
 	});
 	$(document).off("click", ".avg5Cell").on("click", ".avg5Cell", function () {
-		var solveNumber = this.id.substring(8);
-		var date = new Date(sessionObj.list[solveNumber - 1].date);
+		var solveNumber = this.id.substring(8), date = new Date(sessionObj.list[solveNumber - 1].date);
 		$("#myModal").css("top", "25%");
 		$("#myModalTitle").text("Average of 5: " + sessionObj.list[solveNumber - 1].avg5);
 		$("#myModalFooter").html("<p>" + date.toLocaleString() + "</p>");
 		$("#myModalBody").text("");
 		if (solveNumber >= 5)
 		{
-			var tempList = [];
-			var DNFCount = 0;
+			var tempList = [], DNFCount = 0;
 			for (i = 0; i < 5; i++)
 			{
 				var currentTimeConverted = convertToNumber(sessionObj.list[solveNumber - 1 - i].time);
@@ -684,9 +570,7 @@ function printTimes()
 			for (i = 4; i >= 0; i--)
 			{
 				console.log(solveNumber - 1 - i);
-				var modalBody = "";
-				var timeFormatted = splitTime(sessionObj.list[solveNumber - 1 - i].time)[0];
-				var penalizedTimeFormatted = splitTime((+sessionObj.list[solveNumber - 1 - i].time + 2).toFixed(3))[0];
+				var modalBody = "", timeFormatted = splitTime(sessionObj.list[solveNumber - 1 - i].time)[0], penalizedTimeFormatted = splitTime((+sessionObj.list[solveNumber - 1 - i].time + 2).toFixed(3))[0];
 				modalBody = modalBody.concat("<p>" + (5 - i) + ". ");
 				if ((i == minIndex) || (i == maxIndex))
 					modalBody = modalBody.concat("(");
@@ -707,16 +591,14 @@ function printTimes()
 		}
 	});
 	$(document).off("click", ".avg12Cell").on("click", ".avg12Cell", function () {
-		var solveNumber = this.id.substring(9);
-		var date = new Date(sessionObj.list[solveNumber - 1].date);
+		var solveNumber = this.id.substring(9), date = new Date(sessionObj.list[solveNumber - 1].date);
 		$("#myModal").css("top", "15%");
 		$("#myModalTitle").text("Average of 12: " + sessionObj.list[solveNumber - 1].avg12);
 		$("#myModalFooter").html("<p>" + date.toLocaleString() + "</p>");
 		$("#myModalBody").text("");
 		if (solveNumber >= 12)
 		{
-			var tempList = [];
-			var DNFCount = 0;
+			var tempList = [], DNFCount = 0;
 			for (i = 0; i < 12; i++)
 			{
 				var currentTimeConverted = convertToNumber(sessionObj.list[solveNumber - 1 - i].time);
@@ -760,9 +642,7 @@ function printTimes()
 			for (i = 11; i >= 0; i--)
 			{
 				console.log(solveNumber - 1 - i);
-				var modalBody = "";
-				var timeFormatted = splitTime(sessionObj.list[solveNumber - 1 - i].time)[0];
-				var penalizedTimeFormatted = splitTime((+sessionObj.list[solveNumber - 1 - i].time + 2).toFixed(3))[0];
+				var modalBody = "", timeFormatted = splitTime(sessionObj.list[solveNumber - 1 - i].time)[0], penalizedTimeFormatted = splitTime((+sessionObj.list[solveNumber - 1 - i].time + 2).toFixed(3))[0];
 				modalBody = modalBody.concat("<p>" + (12 - i) + ". ");
 				if ((i == minIndex) || (i == maxIndex))
 					modalBody = modalBody.concat("(");
@@ -786,9 +666,7 @@ function printTimes()
 
 function updateSessionInfo()
 {
-	var sessionObj = JSON.parse(localStorage.getItem("session" + sessionNumber));
-	var sum = 0;
-	var sessionBestConverted = 9999999999, sessionWorstConverted = -1;
+	var sessionObj = JSON.parse(localStorage.getItem("session" + sessionNumber)), sum = 0, sessionBestConverted = 9999999999, sessionWorstConverted = -1;
 	solvesAttempted = sessionObj.list.length;
 	solvesCompleted = sessionObj.list.length;
 	for (i = 0; i < solvesAttempted; i++)
@@ -826,9 +704,9 @@ function updateSessionInfo()
 	sessionWorst = convertToTime(sessionWorstConverted);
 	if (sessionObj.list.length == 0)
 	{
-		sessionMean = "N/A"
-		sessionBest = "N/A"
-		sessionWorst = "N/A"
+		sessionMean = "N/A";
+		sessionBest = "N/A";
+		sessionWorst = "N/A";
 	}
 	$("#sessionSolves").html("<b>Solves: " + solvesCompleted + "/" + solvesAttempted + "</b>");
 	$("#sessionMean").html("<b>Mean: " + sessionMean + "</b>");
@@ -841,8 +719,7 @@ function updateAverages()
 	{
 		if (i >= 4)
 		{
-			var tempList = [];
-			var DNFCount = 0;
+			var tempList = [], DNFCount = 0;
 			for (j = 0; j < 5; j++)
 			{
 				var currentTimeConverted = convertToNumber(sessionObj.list[i - j].time);
@@ -893,8 +770,7 @@ function updateAverages()
 		}
 		if (i >= 11)
 		{
-			var tempList = [];
-			var DNFCount = 0;
+			var tempList = [], DNFCount = 0;
 			for (j = 0; j < 12; j++)
 			{
 				var currentTimeConverted = convertToNumber(sessionObj.list[i - j].time);
@@ -947,14 +823,251 @@ function updateAverages()
 	localStorage.setItem("session" + sessionNumber, JSON.stringify(sessionObj));
 }
 
+function splitTime(timeEllapsed)
+{
+	if (timeEllapsed == "DNF")
+		return ["DNF", ""];
+	return [timeEllapsed.substr(0, timeEllapsed.length - 1), lastDigit = timeEllapsed.substr(timeEllapsed.length - 1, timeEllapsed.lenth), lastDigit];
+}
+
+function convertToNumber(elapsedTime)
+{
+	if (elapsedTime == "DNF")
+		return "DNF";
+	else if (elapsedTime.length < 7)
+		return elapsedTime;
+	else
+	{
+		var minutes, seconds;
+		if (elapsedTime.length == 8)
+		{
+			minutes = elapsedTime.substr(0, 1);
+			seconds = elapsedTime.substr(2, 8);
+		}
+		else if (elapsedTime.length == 9)
+		{
+			minutes = elapsedTime.substr(0, 2);
+			seconds = elapsedTime.substr(3, 9);
+		}
+		return ((+minutes * 60) + (+seconds)).toFixed(3);
+	}
+}
+
+function convertToTime(n)
+{
+	if (n == "DNF")
+		return "DNF";
+	var minutes = Math.floor(n / 60), seconds = (n % 60).toFixed(3);
+	if (minutes == 0)
+		return seconds;
+	else if (seconds < 10)
+		return (minutes + ":0" + seconds);
+	else
+		return (minutes + ":" + seconds);
+}
+
+function calculateMeanOf3(a, b, c)
+{
+	if ((a.penalty == 2) || (b.penalty == 2) || (c.penalty == 2))
+		return "DNF";
+	var aTime = convertToNumber(a.time), bTime = convertToNumber(b.time), cTime = convertToNumber(c.time);
+	if (a.penalty == 1)
+		aTime = +aTime + 2;
+	if (b.penalty == 1)
+		bTime = +bTime + 2;
+	if (c.penalty == 1)
+		cTime = +cTime + 2;
+	return ((+aTime + +bTime + +cTime) / 3).toFixed(3);
+}
+
+function calculateAverageOfN(list)
+{
+	var avgN = "DNF", tempList = [], DNFCount = 0;
+	for (i = 0; i < list.length; i++)
+	{
+		var currentTimeConverted = convertToNumber(list[i].time);
+		if (list[i].penalty == 1)
+			tempList[i] = (+currentTimeConverted + 2).toFixed(3);
+		else if (list[i].penalty == 2)
+		{
+			tempList[i] = -1;
+			DNFCount += 1;
+		}
+		else
+			tempList[i] = currentTimeConverted;
+	}
+	var minIndex = 0, maxIndex = 0, minValue = tempList[0], maxValue = tempList[0], maxFound = 0;
+	if (tempList[0] == -1)
+	{
+		minIndex = 1;
+		minValue = tempList[1];
+	}
+	for (j = 0; j < list.length; j++)
+	{
+		if (+tempList[j] == -1)
+		{
+			maxIndex = j;
+			maxValue = tempList[j];
+			maxFound = 1;
+		}
+		if ((+tempList[j] > +maxValue) && (maxFound == 0))
+		{
+			maxIndex = j;
+			maxValue = tempList[j];
+		}
+		if ((+tempList[j] < +minValue) && (+tempList[j] > 0))
+		{
+			minIndex = j;
+			minValue = tempList[j];
+		}
+	}
+	if ((minIndex == i) && (maxIndex == i))
+		minIndex -= 1;
+	var sum = 0;
+	for (j = 0; j < list.length; j++)
+		if (!((j == minIndex) || (j == maxIndex)))
+			sum += +tempList[j];
+	avgN = convertToTime((sum / list.length).toFixed(3));
+		if (DNFCount > 1)
+			avgN = "DNF";
+	return avgN;
+}
+
+function calculateBestAverageOfN(list, N)
+{
+	if (list.length < N)
+		return "DNF";
+	var avgN = "DNF", tempList = [];
+	for (i = 0; i < list.length; i++)
+	{
+		var currentTimeConverted = convertToNumber(list[i].time);
+		if (list[i].penalty == 1)
+			tempList[i] = (+currentTimeConverted + 2).toFixed(3);
+		else if (list[i].penalty == 2)
+			tempList[i] = 9999999999;
+		else
+			tempList[i] = currentTimeConverted;
+	}
+	var minIndex = 0, maxIndex = 0, minValue = tempList[0], maxValue = tempList[0], maxFound = 0;
+	if (tempList[0] == 9999999999)
+	{
+		minIndex = 1;
+		minValue = tempList[1];
+	}
+	for (j = 0; j < N; j++)
+	{
+		if (+tempList[j] == 9999999999)
+		{
+			maxIndex = j;
+			maxValue = tempList[j];
+			maxFound = 1;
+		}
+		if ((+tempList[j] > +maxValue) && (maxFound == 0))
+		{
+			maxIndex = j;
+			maxValue = tempList[j];
+		}
+		if ((+tempList[j] < +minValue) && (+tempList[j] > 0))
+		{
+			minIndex = j;
+			minValue = tempList[j];
+		}
+	}
+	if ((minIndex == i) && (maxIndex == i))
+		minIndex -= 1;
+	var bestSum = "DNF", currentSum = 0, DNFCount = 0;
+	for (i = 0; i < N; i++)
+	{
+		if (tempList[i] == 9999999999)
+			DNFCount += 1;
+		if (!((i == minIndex) || (i == maxIndex)))
+			currentSum += +tempList[i];
+	}
+	if (DNFCount < 2)
+		bestSum = currentSum;
+	for (i = N; i < list.length; i++)
+	{		
+		if (tempList[i] == 9999999999)
+			DNFCount += 1;
+		if (tempList[i - N] == 9999999999)
+			DNFCount -= 1;
+		if ((maxIndex == (i - N)) || (minIndex == (i - N)))
+		{
+			var isMax = 0;
+			if (maxIndex == (i - N))
+				isMax = 1;
+			maxIndex = i - N + 1;
+			minIndex = i - N + 1;
+			maxValue = tempList[i - N + 1];
+			minValue = tempList[i - N + 1];
+			for (j = i - N + 1; j < i; j++)
+			{
+				if (+tempList[j] > +maxValue)
+				{
+					maxIndex = j;
+					maxValue = tempList[j];
+				}
+				if (+tempList[j] < +minValue)
+				{
+					minIndex = j;
+					minValue = tempList[j];
+				}
+			}
+			currentSum += +tempList[i];
+			if (isMax == 1)
+				currentSum -= +tempList[maxIndex];
+			else
+				currentSum -= +tempList[minIndex];
+		}
+		else
+		{
+			currentSum += +tempList[i];
+			currentSum -= +tempList[i - N];
+		}
+		if (+tempList[i] > +maxValue)
+		{
+			currentSum += +tempList[maxIndex];
+			currentSum -= +tempList[i];
+			maxIndex = i;
+			maxValue = tempList[i];
+		}
+		if (+tempList[i] < +minValue)
+		{
+			currentSum += +tempList[minIndex];
+			currentSum -= +tempList[i];
+			minIndex = i;
+			minValue = tempList[i];
+		}
+		if (((currentSum < bestSum) || (bestSum == "DNF")) && (DNFCount < 2))
+			bestSum = currentSum;
+	}
+	avgN = convertToTime((bestSum / N).toFixed(3));
+	return avgN;
+}
+
+function pad2(n)
+{
+    if (n > 9)
+    	return n;
+    else
+    	return "0" + n;
+}
+
+function pad3(n){
+    if (n > 99)
+    	return n;
+    else if (n > 9)
+    	return "0" + n;
+    else 
+    	return "00" + n;
+}
+
 function generate2x2Scramble(length)
 {
-    var scramble = "";
-    var previousOrientation = -1;
+    var scramble = "", previousOrientation = -1;
     for (i = 0; i < length; i++)
     {
-        var turningOrientation = Math.floor((Math.random() * 3));
-        var turningDirection = Math.floor((Math.random() * 3));
+        var turningOrientation = Math.floor((Math.random() * 3)), turningDirection = Math.floor((Math.random() * 3));
         while (turningOrientation == previousOrientation)
         {
             turningOrientation = Math.floor((Math.random() * 3));
@@ -981,13 +1094,10 @@ function generate2x2Scramble(length)
 
 function generate3x3Scramble(length)
 {
-	var previousMove = -1;
-    var secondPreviousMove = -1;
-    var scramble = "";
+	var previousMove = -1, secondPreviousMove = -1, scramble = "";
     for (i = 0; i < length; i++)
     {
-        var move = Math.floor((Math.random() * 6));
-        var direction = Math.floor((Math.random() * 3));
+        var move = Math.floor((Math.random() * 6)), direction = Math.floor((Math.random() * 3));
         if (((previousMove == 0) && (secondPreviousMove != 1)) || ((previousMove == 1) && (secondPreviousMove != 0)) || ((previousMove == 2) && (secondPreviousMove != 3)) || ((previousMove == 3) && (secondPreviousMove != 2)) || ((previousMove == 4) && (secondPreviousMove != 5)) || ((previousMove == 5) && (secondPreviousMove != 4)))
             secondPreviousMove = -1;
         while ((move == previousMove) || (move == secondPreviousMove))
@@ -1016,16 +1126,10 @@ function generate3x3Scramble(length)
 
 function generate4x4Scramble(length)
 {
-    var scramble = "";
-    var layersTurned = 0;
-    var previousOrientation = -1;
-    var temp = -1;
+    var scramble = "", layersTurned = 0, previousOrientation = -1, temp = -1;
     for (i = 0; i < length; i++)
     {
-        var turningOrientation = Math.floor((Math.random() * 3));
-        var turningLayer = Math.floor((Math.random() * 3));
-        var innerTurningLayer = Math.floor((Math.random() * 2));
-        var turningDirection = Math.floor((Math.random() * 3));
+        var turningOrientation = Math.floor((Math.random() * 3)), turningLayer = Math.floor((Math.random() * 3)), innerTurningLayer = Math.floor((Math.random() * 2)), turningDirection = Math.floor((Math.random() * 3));
         if (turningOrientation != previousOrientation)
             layersTurned = 0;
         switch (turningLayer)
@@ -1096,15 +1200,10 @@ function generate4x4Scramble(length)
 
 function generate5x5Scramble(length)
 {
-    var scramble = "";
-	var layersTurned = 0;
-    var previousOrientation = -1;
-    var temp = -1;
+    var scramble = "", layersTurned = 0, previousOrientation = -1, temp = -1;
     for (i = 0; i < length; i++)
     {
-        var turningOrientation = Math.floor((Math.random() * 3));
-        var turningLayer = Math.floor((Math.random() * 4));
-        var turningDirection = Math.floor((Math.random() * 3));
+        var turningOrientation = Math.floor((Math.random() * 3)), turningLayer = Math.floor((Math.random() * 4)), turningDirection = Math.floor((Math.random() * 3));
         if (turningOrientation != previousOrientation)
             layersTurned = 0;
         switch (turningLayer)
@@ -1176,16 +1275,10 @@ function generate5x5Scramble(length)
 
 function generate6x6Scramble(length)
 {
-    var scramble = "";
-    var layersTurned = 0;
-    var previousOrientation = -1;
-    var temp = -1;
+    var scramble = "", layersTurned = 0, previousOrientation = -1, temp = -1;
     for (i = 0; i < length; i++)
     {
-        var turningOrientation = Math.floor((Math.random() * 3));
-        var turningLayer = Math.floor((Math.random() * 5));
-        var innerTurningLayer = Math.floor((Math.random() * 2));
-        var turningDirection = Math.floor((Math.random() * 3));
+        var turningOrientation = Math.floor((Math.random() * 3)), turningLayer = Math.floor((Math.random() * 5)), innerTurningLayer = Math.floor((Math.random() * 2)), turningDirection = Math.floor((Math.random() * 3));
         if (turningOrientation != previousOrientation)
             layersTurned = 0;
         switch (turningLayer)
@@ -1272,15 +1365,10 @@ function generate6x6Scramble(length)
 
 function generate7x7Scramble(length)
 {
-    var scramble = "";
-    var layersTurned = 0;
-    var previousOrientation = -1;
-    var temp = -1;
+    var scramble = "", layersTurned = 0, previousOrientation = -1, temp = -1;
     for (i = 0; i < length; i++)
     {
-        var turningOrientation = Math.floor((Math.random() * 3));
-        var turningLayer = Math.floor((Math.random() * 6));
-        var turningDirection = Math.floor((Math.random() * 3));
+        var turningOrientation = Math.floor((Math.random() * 3)), turningLayer = Math.floor((Math.random() * 6)), turningDirection = Math.floor((Math.random() * 3));
         if (turningOrientation != previousOrientation)
             layersTurned = 0;
         switch (turningLayer)
@@ -1365,254 +1453,4 @@ function generate7x7Scramble(length)
             scramble = scramble.concat(" ");
     }
     return scramble;
-}
-
-function splitTime(timeEllapsed)
-{
-	if (timeEllapsed == "DNF")
-		return ["DNF", ""];
-	var time = timeEllapsed.substr(0, timeEllapsed.length - 1);
-	var lastDigit = timeEllapsed.substr(timeEllapsed.length - 1, timeEllapsed.lenth);
-	return [time, lastDigit];
-}
-
-function convertToNumber(elapsedTime)
-{
-	if (elapsedTime == "DNF")
-		return "DNF";
-	else if (elapsedTime.length < 7)
-		return elapsedTime;
-	else
-	{
-		var minutes, seconds;
-		if (elapsedTime.length == 8)
-		{
-			minutes = elapsedTime.substr(0, 1);
-			seconds = elapsedTime.substr(2, 8);
-		}
-		else if (elapsedTime.length == 9)
-		{
-			minutes = elapsedTime.substr(0, 2);
-			seconds = elapsedTime.substr(3, 9);
-		}
-		return ((+minutes * 60) + (+seconds)).toFixed(3);
-	}
-}
-
-function convertToTime(n)
-{
-	if (n == "DNF")
-		return "DNF";
-	var minutes = Math.floor(n / 60);
-	var seconds = (n % 60).toFixed(3);
-	if (minutes == 0)
-		return seconds;
-	else if (seconds < 10)
-		return (minutes + ":0" + seconds);
-	else
-		return (minutes + ":" + seconds);
-}
-
-function calculateMeanOf3(a, b, c)
-{
-	if ((a.penalty == 2) || (b.penalty == 2) || (c.penalty == 2))
-		return "DNF";
-	var aTime = convertToNumber(a.time);
-	var bTime = convertToNumber(b.time);
-	var cTime = convertToNumber(c.time);
-	if (a.penalty == 1)
-		aTime = +aTime + 2;
-	if (b.penalty == 1)
-		bTime = +bTime + 2;
-	if (c.penalty == 1)
-		cTime = +cTime + 2;
-	var sum = +aTime + +bTime + +cTime;
-	return (sum / 3).toFixed(3);
-}
-
-function calculateAverageOfN(list)
-{
-	var avgN = "DNF";
-	var tempList = [];
-	var DNFCount = 0;
-	for (i = 0; i < list.length; i++)
-	{
-		var currentTimeConverted = convertToNumber(list[i].time);
-		if (list[i].penalty == 1)
-			tempList[i] = (+currentTimeConverted + 2).toFixed(3);
-		else if (list[i].penalty == 2)
-		{
-			tempList[i] = -1;
-			DNFCount += 1;
-		}
-		else
-			tempList[i] = currentTimeConverted;
-	}
-	var minIndex = 0, maxIndex = 0, minValue = tempList[0], maxValue = tempList[0], maxFound = 0;
-	if (tempList[0] == -1)
-	{
-		minIndex = 1;
-		minValue = tempList[1];
-	}
-	for (j = 0; j < list.length; j++)
-	{
-		if (+tempList[j] == -1)
-		{
-			maxIndex = j;
-			maxValue = tempList[j];
-			maxFound = 1;
-		}
-		if ((+tempList[j] > +maxValue) && (maxFound == 0))
-		{
-			maxIndex = j;
-			maxValue = tempList[j];
-		}
-		if ((+tempList[j] < +minValue) && (+tempList[j] > 0))
-		{
-			minIndex = j;
-			minValue = tempList[j];
-		}
-	}
-	if ((minIndex == i) && (maxIndex == i))
-		minIndex -= 1;
-	var sum = 0;
-	for (j = 0; j < list.length; j++)
-		if (!((j == minIndex) || (j == maxIndex)))
-			sum += +tempList[j];
-	avgN = convertToTime((sum / list.length).toFixed(3));
-		if (DNFCount > 1)
-			avgN = "DNF";
-	return avgN;
-}
-
-function calculateBestAverageOfN(list, N)
-{
-	if (list.length < N)
-		return "DNF";
-	var avgN = "DNF";
-	var tempList = [];
-	for (i = 0; i < list.length; i++)
-	{
-		var currentTimeConverted = convertToNumber(list[i].time);
-		if (list[i].penalty == 1)
-			tempList[i] = (+currentTimeConverted + 2).toFixed(3);
-		else if (list[i].penalty == 2)
-			tempList[i] = 9999999999;
-		else
-			tempList[i] = currentTimeConverted;
-	}
-	var minIndex = 0, maxIndex = 0, minValue = tempList[0], maxValue = tempList[0], maxFound = 0;
-	if (tempList[0] == 9999999999)
-	{
-		minIndex = 1;
-		minValue = tempList[1];
-	}
-	for (j = 0; j < N; j++)
-	{
-		if (+tempList[j] == 9999999999)
-		{
-			maxIndex = j;
-			maxValue = tempList[j];
-			maxFound = 1;
-		}
-		if ((+tempList[j] > +maxValue) && (maxFound == 0))
-		{
-			maxIndex = j;
-			maxValue = tempList[j];
-		}
-		if ((+tempList[j] < +minValue) && (+tempList[j] > 0))
-		{
-			minIndex = j;
-			minValue = tempList[j];
-		}
-	}
-	if ((minIndex == i) && (maxIndex == i))
-		minIndex -= 1;
-	var bestSum = "DNF";
-	var currentSum = 0;
-	var DNFCount = 0;
-	for (i = 0; i < N; i++)
-	{
-		if (tempList[i] == 9999999999)
-			DNFCount += 1;
-		if (!((i == minIndex) || (i == maxIndex)))
-			currentSum += +tempList[i];
-	}
-	if (DNFCount < 2)
-		bestSum = currentSum;
-	for (i = N; i < list.length; i++)
-	{		
-		if (tempList[i] == 9999999999)
-			DNFCount += 1;
-		if (tempList[i - N] == 9999999999)
-			DNFCount -= 1;
-		if ((maxIndex == (i - N)) || (minIndex == (i - N)))
-		{
-			var isMax = 0;
-			if (maxIndex == (i - N))
-				isMax = 1;
-			maxIndex = i - N + 1;
-			minIndex = i - N + 1;
-			maxValue = tempList[i - N + 1];
-			minValue = tempList[i - N + 1];
-			for (j = i - N + 1; j < i; j++)
-			{
-				if (+tempList[j] > +maxValue)
-				{
-					maxIndex = j;
-					maxValue = tempList[j];
-				}
-				if (+tempList[j] < +minValue)
-				{
-					minIndex = j;
-					minValue = tempList[j];
-				}
-			}
-			currentSum += +tempList[i];
-			if (isMax == 1)
-				currentSum -= +tempList[maxIndex];
-			else
-				currentSum -= +tempList[minIndex];
-		}
-		else
-		{
-			currentSum += +tempList[i];
-			currentSum -= +tempList[i - N];
-		}
-		if (+tempList[i] > +maxValue)
-		{
-			currentSum += +tempList[maxIndex];
-			currentSum -= +tempList[i];
-			maxIndex = i;
-			maxValue = tempList[i];
-		}
-		if (+tempList[i] < +minValue)
-		{
-			currentSum += +tempList[minIndex];
-			currentSum -= +tempList[i];
-			minIndex = i;
-			minValue = tempList[i];
-		}
-		if (((currentSum < bestSum) || (bestSum == "DNF")) && (DNFCount < 2))
-			bestSum = currentSum;
-	}
-	avgN = convertToTime((bestSum / N).toFixed(3));
-	return avgN;
-}
-
-function pad2(n)
-{
-    if (n > 9)
-    	return n;
-    else
-    	return "0" + n;
-}
-
-function pad3(n){
-    if (n > 99)
-    	return n;
-    else if (n > 9)
-    	return "0" + n;
-    else 
-    	return "00" + n;
 }
