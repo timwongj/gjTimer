@@ -937,7 +937,7 @@ function calculateBestAverageOfN(list, N)
 {
 	if (list.length < N)
 		return "DNF";
-	var avgN = "DNF", tempList = [];
+	var avgN = "DNF", tempList = [], minIndex = 0, maxIndex = 0, minValue = tempList[0], maxValue = tempList[0], maxFound = 0, bestSum = "DNF", currentSum = 0, DNFCount = 0;
 	for (i = 0; i < list.length; i++)
 	{
 		var currentTimeConverted = convertToNumber(list[i].time);
@@ -948,7 +948,6 @@ function calculateBestAverageOfN(list, N)
 		else
 			tempList[i] = currentTimeConverted;
 	}
-	var minIndex = 0, maxIndex = 0, minValue = tempList[0], maxValue = tempList[0], maxFound = 0;
 	if (tempList[0] == 9999999999)
 	{
 		minIndex = 1;
@@ -975,7 +974,6 @@ function calculateBestAverageOfN(list, N)
 	}
 	if ((minIndex == i) && (maxIndex == i))
 		minIndex -= 1;
-	var bestSum = "DNF", currentSum = 0, DNFCount = 0;
 	for (i = 0; i < N; i++)
 	{
 		if (tempList[i] == 9999999999)
@@ -1041,6 +1039,8 @@ function calculateBestAverageOfN(list, N)
 		if (((currentSum < bestSum) || (bestSum == "DNF")) && (DNFCount < 2))
 			bestSum = currentSum;
 	}
+	if (bestSum == "DNF")
+		return "DNF";
 	avgN = convertToTime((bestSum / N).toFixed(3));
 	return avgN;
 }
