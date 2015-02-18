@@ -639,31 +639,56 @@ function printTimes()
 		$("#myModalBody").text("");
 		if (solveNumber >= 5)
 		{
-			var minIndex = solveNumber - 1, maxIndex = solveNumber - 1;
-			var minValue = convertToNumber(sessionObj.list[solveNumber - 1].time), maxValue = convertToNumber(sessionObj.list[solveNumber - 1].time);
-			for (i = solveNumber - 1; i >= solveNumber - 5; i--)
+			var tempList = [];
+			var DNFCount = 0;
+			for (i = 0; i < 5; i++)
 			{
-				var currentTimeConverted = convertToNumber(sessionObj.list[i].time);
-				if (currentTimeConverted > maxValue)
+				var currentTimeConverted = convertToNumber(sessionObj.list[solveNumber - 1 - i].time);
+				if (sessionObj.list[solveNumber - 1 - i].penalty == 1)
+					tempList[i] = (+currentTimeConverted + 2).toFixed(3);
+				else if (sessionObj.list[solveNumber - 1 - i].penalty == 2)
 				{
-					maxIndex = i;
-					maxValue = currentTimeConverted;
+					tempList[i] = -1;
+					DNFCount += 1;
 				}
-				if (currentTimeConverted < minValue)
+				else
+					tempList[i] = currentTimeConverted;
+			}
+			var minIndex = 0, maxIndex = 0, minValue = tempList[0], maxValue = tempList[0], maxFound = 0;
+			if (tempList[0] == -1)
+			{
+				minIndex = 1;
+				minValue = tempList[1];
+			}
+			for (j = 0; j < 5; j++)
+			{
+				if (+tempList[j] == -1)
 				{
-					minIndex = i;
-					minValue = currentTimeConverted;
+					maxIndex = j;
+					maxValue = tempList[j];
+					maxFound = 1;
+				}
+				if ((+tempList[j] > +maxValue) && (maxFound == 0))
+				{
+					maxIndex = j;
+					maxValue = tempList[j];
+				}
+				if ((+tempList[j] < +minValue) && (+tempList[j] > 0))
+				{
+					minIndex = j;
+					minValue = tempList[j];
 				}
 			}
-			if ((minIndex == solveNumber) && (maxIndex == solveNumber))
-				minIndex -= 1;
+			if ((minIndex == solveNumber - 1) && (maxIndex == solveNumber - 1))
+				minIndex = solveNumber - 2;			
 			for (i = 4; i >= 0; i--)
 			{
+				console.log(solveNumber - 1 - i);
 				var modalBody = "";
 				var timeFormatted = splitTime(sessionObj.list[solveNumber - 1 - i].time)[0];
-				var penalizedTimeFormatted = splitTime((+sessionObj.list[i].time + 2).toFixed(3))[0];
+				var penalizedTimeFormatted = splitTime((+sessionObj.list[solveNumber - 1 - i].time + 2).toFixed(3))[0];
 				modalBody = modalBody.concat("<p>" + (5 - i) + ". ");
-				if (((solveNumber - 1 - i) == minIndex) || ((solveNumber - 1 - i) == maxIndex))
+				if ((i == minIndex) || (i == maxIndex))
 					modalBody = modalBody.concat("(");
 				if (sessionObj.list[solveNumber - 1 - i].penalty == 1)
 					modalBody = modalBody.concat(penalizedTimeFormatted + "+");
@@ -671,7 +696,7 @@ function printTimes()
 					modalBody = modalBody.concat("DNF(" + timeFormatted + ")");
 				else
 					modalBody = modalBody.concat(timeFormatted);
-				if (((solveNumber - 1 - i) == minIndex) || ((solveNumber - 1 - i) == maxIndex))
+				if ((i == minIndex) || (i == maxIndex))
 					modalBody = modalBody.concat(")");
 				modalBody = modalBody.concat(" " + sessionObj.list[solveNumber - 1 - i].scramble);
 				if ((sessionObj.list[solveNumber - 1 - i].comment != null) && (sessionObj.list[solveNumber - 1 - i].comment != ""))
@@ -690,31 +715,56 @@ function printTimes()
 		$("#myModalBody").text("");
 		if (solveNumber >= 12)
 		{
-			var minIndex = solveNumber - 1, maxIndex = solveNumber - 1;
-			var minValue = convertToNumber(sessionObj.list[solveNumber - 1].time), maxValue = convertToNumber(sessionObj.list[solveNumber - 1].time);
-			for (i = solveNumber - 1; i >= solveNumber - 12; i--)
+			var tempList = [];
+			var DNFCount = 0;
+			for (i = 0; i < 12; i++)
 			{
-				var currentTimeConverted = convertToNumber(sessionObj.list[i].time);
-				if (currentTimeConverted > maxValue)
+				var currentTimeConverted = convertToNumber(sessionObj.list[solveNumber - 1 - i].time);
+				if (sessionObj.list[solveNumber - 1 - i].penalty == 1)
+					tempList[i] = (+currentTimeConverted + 2).toFixed(3);
+				else if (sessionObj.list[solveNumber - 1 - i].penalty == 2)
 				{
-					maxIndex = i;
-					maxValue = currentTimeConverted;
+					tempList[i] = -1;
+					DNFCount += 1;
 				}
-				if (currentTimeConverted < minValue)
+				else
+					tempList[i] = currentTimeConverted;
+			}
+			var minIndex = 0, maxIndex = 0, minValue = tempList[0], maxValue = tempList[0], maxFound = 0;
+			if (tempList[0] == -1)
+			{
+				minIndex = 1;
+				minValue = tempList[1];
+			}
+			for (j = 0; j < 12; j++)
+			{
+				if (+tempList[j] == -1)
 				{
-					minIndex = i;
-					minValue = currentTimeConverted;
+					maxIndex = j;
+					maxValue = tempList[j];
+					maxFound = 1;
+				}
+				if ((+tempList[j] > +maxValue) && (maxFound == 0))
+				{
+					maxIndex = j;
+					maxValue = tempList[j];
+				}
+				if ((+tempList[j] < +minValue) && (+tempList[j] > 0))
+				{
+					minIndex = j;
+					minValue = tempList[j];
 				}
 			}
-			if ((minIndex == solveNumber) && (maxIndex == solveNumber))
-				minIndex -= 1;
+			if ((minIndex == solveNumber - 1) && (maxIndex == solveNumber - 1))
+				minIndex = solveNumber - 2;			
 			for (i = 11; i >= 0; i--)
 			{
+				console.log(solveNumber - 1 - i);
 				var modalBody = "";
 				var timeFormatted = splitTime(sessionObj.list[solveNumber - 1 - i].time)[0];
-				var penalizedTimeFormatted = splitTime((+sessionObj.list[i].time + 2).toFixed(3))[0];
+				var penalizedTimeFormatted = splitTime((+sessionObj.list[solveNumber - 1 - i].time + 2).toFixed(3))[0];
 				modalBody = modalBody.concat("<p>" + (12 - i) + ". ");
-				if (((solveNumber - 1 - i) == minIndex) || ((solveNumber - 1 - i) == maxIndex))
+				if ((i == minIndex) || (i == maxIndex))
 					modalBody = modalBody.concat("(");
 				if (sessionObj.list[solveNumber - 1 - i].penalty == 1)
 					modalBody = modalBody.concat(penalizedTimeFormatted + "+");
@@ -722,7 +772,7 @@ function printTimes()
 					modalBody = modalBody.concat("DNF(" + timeFormatted + ")");
 				else
 					modalBody = modalBody.concat(timeFormatted);
-				if (((solveNumber - 1 - i) == minIndex) || ((solveNumber - 1 - i) == maxIndex))
+				if ((i == minIndex) || (i == maxIndex))
 					modalBody = modalBody.concat(")");
 				modalBody = modalBody.concat(" " + sessionObj.list[solveNumber - 1 - i].scramble);
 				if ((sessionObj.list[solveNumber - 1 - i].comment != null) && (sessionObj.list[solveNumber - 1 - i].comment != ""))
