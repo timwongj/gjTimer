@@ -1,16 +1,29 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+	<!-- Bootstrap CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+	<!-- Bootstrap CSS Theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+	<!-- jQuery -->
 	<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.3/jquery-ui.min.js">
-	<link rel="stylesheet" type="text/css" href="css/style.css">
-	<link rel="shortcut icon" type="image/x-icon" href="images/cubeLogo.png"/>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-    <script src="js/gjTimer.js"></script>
-    <title>gjTimer</title>
+	<!-- BootstrapJS -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+	<!-- Angular JS -->
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.13/angular.min.js"></script>
+	<!-- Angular Route -->
+	<script src="https://code.angularjs.org/1.3.13/angular-route.min.js"></script>
+	<!-- Local CSS-->
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<!-- Local JS-->
+	<script src="js/gjTimer.js"></script>
+	<!-- Icon -->
+	<link rel="shortcut icon" type="image/x-icon" href="images/cubeLogo.png"/>
+	<!-- Title -->
+	<title>gjTimer</title>
 </head>
-<body>
+<body ng-app="gjTimer" ng-controller="gjController">
 	<nav class="navbar">
 		<div class="container">
 			<div class="container-fluid" id="navbarContainerFluid">
@@ -60,26 +73,26 @@
 					<div class="btn-group" role="group">
 						<button class="btn btn-default dropdown-toggle" type="button" id="sessionDropdownButton" data-toggle="dropdown" aria-expanded="true"></button>
   						<ul class="dropdown-menu" id="sessionDropdownMenu" role="menu" aria-labelledby="dropdownMenu1">
-    						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 1</a></li>
-    						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 2</a></li>
-    						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 3</a></li>
-    						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 4</a></li>
-    						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 5</a></li>
-    						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 6</a></li>
-    						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 7</a></li>
-    						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 8</a></li>
-    						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 9</a></li>
-    						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 10</a></li>
-    						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 11</a></li>
-    						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 12</a></li>
-    						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 13</a></li>
-    						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 14</a></li>
-    						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 15</a></li>
-    						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 16</a></li>
-    						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 17</a></li>
-    						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 18</a></li>
-    						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 19</a></li>
-    						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 20</a></li>
+							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 1</a></li>
+							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 2</a></li>
+							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 3</a></li>
+							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 4</a></li>
+							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 5</a></li>
+							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 6</a></li>
+							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 7</a></li>
+							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 8</a></li>
+							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 9</a></li>
+							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 10</a></li>
+							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 11</a></li>
+							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 12</a></li>
+							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 13</a></li>
+							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 14</a></li>
+							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 15</a></li>
+							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 16</a></li>
+							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 17</a></li>
+							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 18</a></li>
+							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 19</a></li>
+							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 20</a></li>
   						</ul>
   					</div>
   					<button type="button" class="btn btn-info" id="statsButton" data-toggle="modal" data-target="#myModal">Stats</button>
@@ -94,10 +107,12 @@
 				<div class="table-responsive">
 					<table class="table table-condensed table-bordered table-hover" id="timesTable">
 						<thead>
-							<th id="numHeader">#</th>
-							<th id="timeHeader">time</th>
-							<th id="avg5Header">avg5</th>
-							<th id="avg12Header">avg12</th>
+							<tr>
+								<th id="numHeader">#</th>
+								<th id="timeHeader">Time</th>
+								<th id="avg5Header">Avg 5</th>
+								<th id="avg12Header">Avg 12</th>
+							</tr>
 						</thead>
 						<tbody id="times"></tbody>
 					</table>

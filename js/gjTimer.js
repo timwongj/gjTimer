@@ -1,5 +1,9 @@
 var start, stop, solveIndex, isTiming = 0, updateTimer = 0, allowedToUpdate = 0, typingComment = 0, modalOpen = 0, fired = 0, switchingSession = 0, scrambleType = 3, scrambleLength = 20, sessionNumber = 1, solvesAttempted, solvesCompleted, sessionMean, sessionBest, sessionWorst;
 
+angular.module('gjTimer', []).controller('gjController', function($scope) {
+
+});
+
 $(document).ready(function()
 {
 	if (localStorage.getItem("sessionNumber") == null)
@@ -22,7 +26,7 @@ $(document).ready(function()
 	$("#myModal").on("shown.bs.modal", function () {
   		modalOpen = 1;
 		$("#resetAllButton").click(function () {
- 			if (confirm("Reset All?"))
+ 			if (confirm("Reset All Sessions?"))
 			{
 				localStorage.clear();
 				location.reload();
@@ -84,6 +88,7 @@ $(document).ready(function()
 			$("#scramble3x3").focus();
     	localStorage.setItem("sessionNumber", sessionNumber);
     	switchingSession = 1;
+		$("#timer").html("0.00<small>0</small>");
     	printScramble();
     	printTimes();
 	});
@@ -206,7 +211,7 @@ $(document).ready(function()
  	$("#optionsButton").click(function () {
  		$("#myModal").css("top","30%");
 		$("#myModalTitle").html("Options <small> (This feature is currently under devlopment)</small>");
-		$("#myModalBody").html("<button type=\"button\" class=\"btn btn-danger\" id=\"resetAllButton\">Reset All</button>");;
+		$("#myModalBody").html("<button type=\"button\" class=\"btn btn-danger\" id=\"resetAllButton\">Reset All Sessions</button>");;
  		$("#myModalFooter").html("<p>" + new Date() + "</p>");
  	});
 	var dt, timeElapsed, minutes, seconds, milliseconds, dtElapsed;
@@ -409,13 +414,13 @@ function printTimes()
 		$("#times").prepend(tableHtml);
 	}
 	if (sessionObj.numSolves >= 5)
-		$("#avg5").text("avg5: " + sessionObj.list[sessionObj.numSolves - 1].avg5);
+		$("#avg5").text("Avg5: " + sessionObj.list[sessionObj.numSolves - 1].avg5);
 	else
-		$("#avg5").text("avg5: DNF");
+		$("#avg5").text("Avg5: DNF");
 	if (sessionObj.numSolves >= 12)
-		$("#avg12").text("avg12: " + sessionObj.list[sessionObj.numSolves - 1].avg12);	
+		$("#avg12").text("Avg12: " + sessionObj.list[sessionObj.numSolves - 1].avg12);
 	else
-		$("#avg12").text("avg12: DNF");
+		$("#avg12").text("Avg12: DNF");
 	$(".timesCell").hover(function() {
 		typingComment = 1;
 		var solveNumber = this.id.substring(9);
