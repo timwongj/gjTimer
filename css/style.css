@@ -1,32 +1,13 @@
-.navbar {
-	border-radius:0px;
-}
-
-.navbar-inverse {
-	border-radius:0px;
-}
-
-.navbar-button {
-	margin:10px;
-}
-
-.logo {
-	width:25px;
-	height:25px;
-	text-align:center;
-	vertical-align:middle
-}
-
-.col-md-3 {
-	text-align:center;
-	vertical-align:middle;
+.container {
+	width:1200px;
 }
 
 #timerJumbotron {
 	height:calc(100vh - 150px);
 	max-height:800px;
-	padding:30px;
+	padding:25px;
 	overflow-y:scroll;
+	border-radius:5px;
 }
 
 #scramble {
@@ -51,14 +32,6 @@
 	margin:5px;
 }
 
-#scrambleTypeButtonGroup {
-	margin:5px;
-}
-
-#scrambleLengthInputGroup {
-	margin:5px;
-}
-
 #scrambleLength {
 	width:50px;
 }
@@ -69,6 +42,21 @@
 
 #scrambleLengthDiv {
 	text-align:center;
+}
+
+#scramble2x2, #scramble3x3, #scramble4x4, #scramble5x5, #scramble6x6, #scramble7x7 {
+	margin-top:5px;
+	margin-bottom:5px;
+}
+
+#scrambleLengthInputGroup {
+	margin-top:5px;
+	margin-bottom:5px;
+}
+
+#newScrambleButton, #optionsButton {
+	margin-top:5px;
+	margin-bottom:5px;
 }
 
 #times {
@@ -88,17 +76,13 @@
     text-align:center;
 }
 
-#sessionButtonToolbar {
+#numHeader, #timeHeader, #avg5Header, #avg12Header {
 	text-align:center;
-	padding-bottom:5px;
 }
 
-#sessionDropdownButton {
-	margin:5px;
-}
-
-#resetButton {
-	margin:5px;
+#sessionDropdownButton, #statsButton, #resetButton {
+	margin-top:5px;
+	margin-bottom:5px;
 }
 
 .popover {
@@ -119,4 +103,9 @@
 
 #myModal {
 	position: absolute;
+}
+
+#statsRow {
+	margin-top:5px;
+	margin-bottom:5px;
 }
