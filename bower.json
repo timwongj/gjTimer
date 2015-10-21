@@ -1,0 +1,16 @@
+{
+  "name": "gjTimer",
+  "version": "0.0.0",
+  "homepage": "http://gjtimer.com",
+  "authors": [
+    "timwongj <wong.t@husky.neu.edu>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
