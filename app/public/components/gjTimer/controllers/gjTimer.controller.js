@@ -10,13 +10,21 @@
     var cub = new Cub();
 
     $scope.settings = {
-      puzzles: ['2x2', '3x3', '4x4', '5x5', '6x6', '7x7'],
+      puzzles: [
+        { name: '2x2', defaultScrambleLength: 10 },
+        { name: '3x3', defaultScrambleLength: 20 },
+        { name: '4x4', defaultScrambleLength: 40 },
+        { name: '5x5', defaultScrambleLength: 60 },
+        { name: '6x6', defaultScrambleLength: 80 },
+        { name: '7x7', defaultScrambleLength: 100 }
+      ],
       selectedPuzzle: '3x3',
       scrambleLength: 20
     };
 
     $scope.timer = {
-      scramble: scrambler.getScramble(),
+      scramble: scrambler.generateScramble($scope.settings.selectedPuzzle, $scope.settings.scrambleLength),
+      scrambleStyle: {'font-size': '150%'},
       display: timer.getTime(),
       avg5: '8.995',
       avg12: '10.235'
@@ -36,8 +44,22 @@
       session.name = 'Session ' + ($index + 1);
     });
 
-    $scope.newScramble = function() {
+    $scope.applySettings = function(puzzle, length) {
+      $scope.settings.scrambleLength = length;
+      $scope.newScramble(puzzle, length);
+      if (length <= 60) {
+        $scope.timer.scrambleStyle = {'font-size': '150%'};
+      } else if (length <= 80) {
+        $scope.timer.scrambleStyle = {'font-size': '140%'};
+      } else if (length <= 100) {
+        $scope.timer.scrambleStyle = {'font-size': '130%'};
+      } else {
+        $scope.timer.scrambleStyle = {'font-size': '100%'};
+      }
+    };
 
+    $scope.newScramble = function(puzzle, length) {
+      $scope.timer.scramble = scrambler.generateScramble(puzzle, length);
     };
 
     $scope.options = function() {

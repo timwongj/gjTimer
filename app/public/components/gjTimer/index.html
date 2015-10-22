@@ -16,11 +16,11 @@
       <span class="title">gjTimer</span>
       <div class="form-group">
         <div class="btn-group btn-group-puzzles" role="group">
-          <button type="button" class="btn btn-default" ng-repeat="puzzle in settings.puzzles" ng-bind="puzzle" ng-click="settings.selectedPuzzle=puzzle"></button>
+          <button type="button" class="btn btn-default" ng-repeat="puzzle in settings.puzzles" ng-bind="puzzle.name" ng-click="applySettings(puzzle.name, puzzle.defaultScrambleLength)"></button>
         </div>
         <div class="input-group input-scramble-length">
           <span class="input-group-addon">Length</span>
-          <input type="number" class="form-control" ng-model="settings.scrambleLength">
+          <input type="number" class="form-control" ng-model="settings.scrambleLength" ng-change="applySettings(settings.selectedPuzzle, settings.scrambleLength)">
         </div>
         <div class="btn-group btn-group-menu-bar">
           <button type="button" class="btn btn-primary" ng-click="options()">Options</button>
@@ -33,7 +33,7 @@
     <div class="col-md-7">
       <div class="jumbotron">
         <div class="timer">
-          <p class="scramble" ng-bind="timer.scramble"></p>
+          <p class="scramble" ng-bind="timer.scramble" ng-style="timer.scrambleStyle"></p>
           <p class="display" ng-bind="timer.display"></p>
           <p class="stat" ng-bind="'Avg 5: ' + timer.avg5"></p>
           <p class="stat" ng-bind="'Avg 12: ' + timer.avg12"></p>
