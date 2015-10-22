@@ -1,5 +1,5 @@
 .menu-bar {
-  padding: 1.5em 0;
+  padding: 1.5em 0 1em;
 }
 .title {
   margin: 0 .5em 0 0;
@@ -9,7 +9,19 @@
 .input-scramble-length {
   width: 9.5em;
 }
+.timer {
+  text-align: center;
+}
+.timer .scramble {
+  font-size: 150%;
+}
+.timer .display {
+  font-size: 700%;
+}
+.timer .stat {
+  font-size: 100%;
+  margin: 0 0 .25em 0;
+}
 .jumbotron {
-  padding: 2em !important;
-  border-radius: 0;
+  padding: 1em !important;
 }

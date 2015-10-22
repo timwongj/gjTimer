@@ -2,7 +2,12 @@
 
   'use strict';
 
-  function GjTimerController($scope) {
+  function GjTimerController($scope, Scrambler, Timer, Calculator, Cub) {
+
+    var timer = new Timer();
+    var scrambler = new Scrambler();
+    var calculator = new Calculator();
+    var cub = new Cub();
 
     $scope.settings = {
       puzzles: ['2x2', '3x3', '4x4', '5x5', '6x6', '7x7'],
@@ -11,10 +16,10 @@
     };
 
     $scope.timer = {
-      scramble: '',
-      display: '',
-      avg5: '',
-      avg12: ''
+      scramble: scrambler.getScramble(),
+      display: timer.getTime(),
+      avg5: '8.995',
+      avg12: '10.235'
     };
 
     $scope.session = {
@@ -49,6 +54,6 @@
 
   }
 
-  angular.module('GjTimerApp').controller('GjTimerController', ['$scope', GjTimerController]);
+  angular.module('gjTimer').controller('gjTimerController', ['$scope', 'Scrambler', 'Timer', 'Calculator', 'Cub', GjTimerController]);
 
 })();

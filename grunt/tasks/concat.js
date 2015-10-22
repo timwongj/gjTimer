@@ -8,8 +8,11 @@
       gjTimerJs: {
         src: [
           'app/public/components/gjTimer/app.js',
-          'app/public/components/gjTimer/gjTimer.controller.js',
-          'app/public/components/gjTimer/gjTimer.service.js'
+          'app/public/components/gjTimer/controllers/gjTimer.controller.js',
+          'app/public/components/gjTimer/services/calculator.service.js',
+          'app/public/components/gjTimer/services/cub.service.js',
+          'app/public/components/gjTimer/services/scrambler.service.js',
+          'app/public/components/gjTimer/services/timer.service.js'
         ],
         dest: 'dist/js/gjTimer.js'
       },

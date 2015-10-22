@@ -2,6 +2,6 @@
 
   'use strict';
 
-  angular.module('GjTimerApp', ['ui.bootstrap']);
+  angular.module('gjTimer', ['ui.bootstrap']);
 
 })();

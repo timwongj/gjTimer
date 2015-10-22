@@ -9,7 +9,7 @@
   <link rel="shortcut icon" type="image/x-icon" href="dist/img/cubeLogo.png"/>
   <title>gjTimer</title>
 </head>
-<body ng-app="GjTimerApp" ng-controller="GjTimerController">
+<body ng-app="gjTimer" ng-controller="gjTimerController">
 <div class="container">
   <div class="menu-bar">
     <div class="form-inline">
@@ -30,17 +30,17 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-xs-9">
+    <div class="col-md-7">
       <div class="jumbotron">
         <div class="timer">
-          <p ng-bind="timer.scramble"></p>
-          <p ng-bind="timer.display"></p>
-          <p ng-bind="timer.avg5"></p>
-          <p ng-bind="timer.avg12"></p>
+          <p class="scramble" ng-bind="timer.scramble"></p>
+          <p class="display" ng-bind="timer.display"></p>
+          <p class="stat" ng-bind="'Avg 5: ' + timer.avg5"></p>
+          <p class="stat" ng-bind="'Avg 12: ' + timer.avg12"></p>
         </div>
       </div>
     </div>
-    <div class="col-xs-3">
+    <div class="col-md-5">
       <div class="jumbotron">
         <div class="btn-group" role="group" aria-label="...">
           <div class="btn-group" role="group">
@@ -53,12 +53,6 @@
           </div>
           <button type="button" class="btn btn-info" ng-click="stats()">Stats</button>
           <button type="button" class="btn btn-warning" ng-click="reset()">Reset</button>
-        </div>
-        <div class="col-xs-6">
-          <p ng-bind="session.solved + '/' + session.attempted"></p>
-        </div>
-        <div class="col-xs-6">
-          <p ng-bind="session.mean"></p>
         </div>
         <div class="table-responsive">
           <table class="table table-condensed table-bordered table-hover">
