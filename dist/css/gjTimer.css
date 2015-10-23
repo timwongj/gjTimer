@@ -1,36 +1,33 @@
-.menu-bar {
-  padding: 1.5em 0 1em;
+.section {
+  padding: .375em;
 }
-.title {
+#scramble {
+  margin: .5em 0;
+  padding: .5em 0;
+}
+#scramble .scramble {
+  font-size: 150%;
+}
+#menuBar {
+  margin: .5em 0;
+  padding: .5em 0;
+}
+#menuBar .title {
   margin-right: .5em;
   font-size: 150%;
   font-weight: 400;
 }
-.input-scramble-length {
-  width: 9.5em;
-}
-.section {
-  padding: .375em;
-}
-.timer {
-  text-align: center;
-}
-.timer .scramble {
-  font-size: 150%;
-}
-.timer .display {
-  font-size: 800%;
-}
-.timer .stat {
-  font-size: 120%;
-  margin-bottom: .25em;
-}
-.session-bar {
-  text-align: center;
-  margin-bottom: 1em;
-}
-.jumbotron-timer,
-.jumbotron-data {
+#statistics .jumbotron-statistics {
   padding: 1em;
-  margin-bottom: 0;
+  margin-bottom: .5em;
+}
+#timer {
+  text-align: center;
+}
+#timer .jumbotron-timer {
+  padding: 1em;
+  margin-bottom: .5em;
+}
+#timer .time {
+  font-size: 800%;
 }

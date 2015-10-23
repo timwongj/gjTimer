@@ -2,7 +2,24 @@
 
   'use strict';
 
-  angular.module('gjTimer', ['ui.bootstrap']);
+  function Config() {
+
+  }
+
+  function Run() {
+
+  }
+
+  angular.module('gjTimerApp', [
+    // main angular modules
+
+    // third-party (non-Angular modules)
+    'ui.bootstrap',
+    // gjTimer
+    'gjTimer'
+  ]);
+
+  angular.module('gjTimerApp').config(Config).run(Run);
 
 })();
 
@@ -10,81 +27,11 @@
 
   'use strict';
 
-  function GjTimerController($scope, Scrambler, Timer, Calculator, Cub) {
-
-    var timer = new Timer();
-    var scrambler = new Scrambler();
-    var calculator = new Calculator();
-    var cub = new Cub();
-
-    $scope.settings = {
-      puzzles: [
-        { name: '2x2', defaultScrambleLength: 10 },
-        { name: '3x3', defaultScrambleLength: 20 },
-        { name: '4x4', defaultScrambleLength: 40 },
-        { name: '5x5', defaultScrambleLength: 60 },
-        { name: '6x6', defaultScrambleLength: 80 },
-        { name: '7x7', defaultScrambleLength: 100 }
-      ],
-      selectedPuzzle: '3x3',
-      scrambleLength: 20
-    };
-
-    $scope.timer = {
-      scramble: scrambler.generateScramble($scope.settings.selectedPuzzle, $scope.settings.scrambleLength),
-      scrambleStyle: {'font-size': '150%'},
-      display: timer.getTime(),
-      avg5: '8.995',
-      avg12: '10.235'
-    };
-
-    $scope.session = {
-      name: 'Session 1',
-      solved: 0,
-      attempted: 0,
-      mean: 0,
-      solves: []
-    };
-
-    $scope.sessions = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
-
-    angular.forEach($scope.sessions, function(session, $index) {
-      session.name = 'Session ' + ($index + 1);
-    });
-
-    $scope.applySettings = function(puzzle, length) {
-      $scope.settings.scrambleLength = length;
-      $scope.newScramble(puzzle, length);
-      if (length <= 60) {
-        $scope.timer.scrambleStyle = {'font-size': '150%'};
-      } else if (length <= 80) {
-        $scope.timer.scrambleStyle = {'font-size': '140%'};
-      } else if (length <= 100) {
-        $scope.timer.scrambleStyle = {'font-size': '130%'};
-      } else {
-        $scope.timer.scrambleStyle = {'font-size': '100%'};
-      }
-    };
-
-    $scope.newScramble = function(puzzle, length) {
-      $scope.timer.scramble = scrambler.generateScramble(puzzle, length);
-    };
-
-    $scope.options = function() {
-
-    };
-
-    $scope.stats = function() {
-
-    };
-
-    $scope.reset = function() {
-
-    };
-
-  }
-
-  angular.module('gjTimer').controller('gjTimerController', ['$scope', 'Scrambler', 'Timer', 'Calculator', 'Cub', GjTimerController]);
+  /**
+   * This is the main gjTimer module. All gjTimer components should be pulled in here as dependencies.
+   * This module is pulled into the main app.js 'gjTimerApp' module.
+   */
+  angular.module('gjTimer', ['cub', 'menuBar', 'scramble', 'statistics', 'timer']);
 
 })();
 
@@ -92,39 +39,82 @@
 
   'use strict';
 
-  function CalculatorService() {
+  function GjTimerController($scope) {
 
-    var Calculator = function() {
-
-      var self = this;
-
-    };
-
-    return Calculator;
+    //$scope.timer = {
+    //  scramble: scramble.generateScramble($scope.settings.selectedPuzzle, $scope.settings.scrambleLength),
+    //  scrambleStyle: {'font-size': '150%'},
+    //  display: timer.getTime(),
+    //  avg5: '8.995',
+    //  avg12: '10.235'
+    //};
+    //
+    //
+    //$scope.applySettings = function(puzzle, length) {
+    //  $scope.settings.scrambleLength = length;
+    //  $scope.newScramble(puzzle, length);
+    //  if (length <= 60) {
+    //    $scope.timer.scrambleStyle = {'font-size': '150%'};
+    //  } else if (length <= 80) {
+    //    $scope.timer.scrambleStyle = {'font-size': '140%'};
+    //  } else if (length <= 100) {
+    //    $scope.timer.scrambleStyle = {'font-size': '130%'};
+    //  } else {
+    //    $scope.timer.scrambleStyle = {'font-size': '100%'};
+    //  }
+    //};
+    //
+    //$scope.newScramble = function(puzzle, length) {
+    //  $scope.timer.scramble = scramble.generateScramble(puzzle, length);
+    //};
 
   }
 
-  angular.module('gjTimer').factory('Calculator', CalculatorService);
+  angular.module('gjTimer').controller('gjTimerController', ['$scope', GjTimerController]);
 
 })();
 
+(function() {
+
+  'use strict';
+
+  function cubDirective() {
+    return {
+      restrict: 'E',
+      templateUrl: '/dist/components/gjTimer/cub/cub.html',
+      controller: 'CubController',
+      controllerAs: 'ctrl',
+      scope: true
+    };
+  }
+
+  angular.module('cub', []).directive('cub', cubDirective);
+
+})();
+(function() {
+
+  'use strict';
+
+  function CubController($rootScope, CubService) {
+
+    var self = this;
+
+  }
+
+  angular.module('cub').controller('CubController', ['$rootScope', 'CubService', CubController]);
+
+})();
 (function() {
 
   'use strict';
 
   function CubService() {
 
-    var Cub = function() {
-
-      var self = this;
-
-    };
-
-    return Cub;
+    var self = this;
 
   }
 
-  angular.module('gjTimer').factory('Cub', CubService);
+  angular.module('cub').service('CubService', CubService);
 
 })();
 
@@ -132,11 +122,43 @@
 
   'use strict';
 
-  function ScramblerService() {
+  function scrambleDirective() {
+    return {
+      restrict: 'E',
+      templateUrl: '/dist/components/gjTimer/scramble/scramble.html',
+      controller: 'ScrambleController',
+      controllerAs: 'ctrl',
+      scope: true
+    };
+  }
 
-    var Scrambler = function() {  };
+  angular.module('scramble', []).directive('scramble', scrambleDirective);
 
-    Scrambler.prototype.generateScramble = function(puzzle, length) {
+})();
+(function() {
+
+  'use strict';
+
+  function ScrambleController($rootScope, ScrambleService) {
+
+    var self = this;
+
+    self.scramble = "R B' R' U' B2 F2 D2 L2 B' F L' D2 B R2 L' F' B D2 R' B'";
+
+  }
+
+  angular.module('scramble').controller('ScrambleController', ['$rootScope', 'ScrambleService', ScrambleController]);
+
+})();
+(function() {
+
+  'use strict';
+
+  function ScrambleService() {
+
+    var self = this;
+
+    self.generateScramble = function(puzzle, length) {
       switch(puzzle) {
         case '2x2': return this.generate2x2Scramble(length);
         case '3x3': return this.generate3x3Scramble(length);
@@ -147,7 +169,7 @@
       }
     };
 
-    Scrambler.prototype.generate2x2Scramble = function(length)
+    self.generate2x2Scramble = function(length)
     {
       var scramble = '', previousOrientation = -1;
       for (var i = 0; i < length; i++)
@@ -177,7 +199,7 @@
       return scramble;
     };
 
-    Scrambler.prototype.generate3x3Scramble = function(length)
+    self.generate3x3Scramble = function(length)
     {
       var previousMove = -1, secondPreviousMove = -1, scramble = '';
       for (var i = 0; i < length; i++)
@@ -209,7 +231,7 @@
       return scramble;
     };
 
-    Scrambler.prototype.generate4x4Scramble = function(length)
+    self.generate4x4Scramble = function(length)
     {
       var scramble = '', layersTurned = 0, previousOrientation = -1, temp = -1;
       for (var i = 0; i < length; i++)
@@ -283,7 +305,7 @@
       return scramble;
     };
 
-    Scrambler.prototype.generate5x5Scramble = function(length)
+    self.generate5x5Scramble = function(length)
     {
       var scramble = '', layersTurned = 0, previousOrientation = -1, temp = -1;
       for (var i = 0; i < length; i++)
@@ -358,7 +380,7 @@
       return scramble;
     };
 
-    Scrambler.prototype.generate6x6Scramble = function(length)
+    self.generate6x6Scramble = function(length)
     {
       var scramble = '', layersTurned = 0, previousOrientation = -1, temp = -1;
       for (var i = 0; i < length; i++)
@@ -448,7 +470,7 @@
       return scramble;
     };
 
-    Scrambler.prototype.generate7x7Scramble = function(length)
+    self.generate7x7Scramble = function(length)
     {
       var scramble = '', layersTurned = 0, previousOrientation = -1, temp = -1;
       for (var i = 0; i < length; i++)
@@ -540,11 +562,9 @@
       return scramble;
     };
 
-    return Scrambler;
-
   }
 
-  angular.module('gjTimer').factory('Scrambler', ScramblerService);
+  angular.module('scramble').service('ScrambleService', ScrambleService);
 
 })();
 
@@ -552,24 +572,183 @@
 
   'use strict';
 
-  function TimerService() {
+  function menuBarDirective() {
+    return {
+      restrict: 'E',
+      templateUrl: '/dist/components/gjTimer/menuBar/menuBar.html',
+      controller: 'MenuBarController',
+      controllerAs: 'ctrl',
+      scope: true
+    };
+  }
 
-    var Timer = function() {
+  angular.module('menuBar', []).directive('menuBar', menuBarDirective);
 
-      var self = this;
+})();
+(function() {
 
-      self.time = '15:38.843';
+  'use strict';
 
+  function MenuBarController($rootScope, MenuBarService) {
+
+    var self = this;
+
+    self.puzzles = ['2x2', '3x3', '4x4', '5x5', '6x6', '7x7'];
+
+    self.puzzle = '3x3';
+
+    self.sessions = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
+
+    angular.forEach(self.sessions, function(session, $index) {
+      session.name = 'Session ' + ($index + 1);
+    });
+
+    self.session = self.sessions[0];
+
+    self.selectPuzzle = function(puzzle) {
+      self.puzzle = puzzle;
+      $rootScope.puzzle = puzzle;
+      console.log(self.puzzle);
     };
 
-    Timer.prototype.getTime = function() {
-      return this.time;
+    self.options = function() {
+      console.log('options');
     };
 
-    return Timer;
+    self.scramble = function() {
+      console.log('scramble');
+    };
+
+    self.resetSession = function() {
+      console.log('reset session');
+    };
 
   }
 
-  angular.module('gjTimer').factory('Timer', TimerService);
+  angular.module('menuBar').controller('MenuBarController', ['$rootScope', 'MenuBarService', MenuBarController]);
+
+})();
+(function() {
+
+  'use strict';
+
+  function MenuBarService() {
+
+    var self = this;
+
+  }
+
+  angular.module('menuBar').service('MenuBarService', MenuBarService);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function statisticsDirective() {
+    return {
+      restrict: 'E',
+      templateUrl: '/dist/components/gjTimer/statistics/statistics.html',
+      controller: 'StatisticsController',
+      controllerAs: 'ctrl',
+      scope: true
+    };
+  }
+
+  angular.module('statistics', []).directive('statistics', statisticsDirective);
+
+})();
+(function() {
+
+  'use strict';
+
+  function StatisticsController($rootScope, StatisticsService) {
+
+    var self = this;
+
+    self.session = {};
+
+    self.session.solves = [
+      {
+        time: '6.25',
+        avg5: 'DNF',
+        avg12: 'DNF'
+      },
+      {
+        time: '6.44',
+        avg5: 'DNF',
+        avg12: 'DNF'
+      }
+    ];
+
+  }
+
+  angular.module('statistics').controller('StatisticsController', ['$rootScope', 'StatisticsService', StatisticsController]);
+
+})();
+(function() {
+
+  'use strict';
+
+  function StatisticsService() {
+
+    var self = this;
+
+  }
+
+  angular.module('statistics').service('StatisticsService', StatisticsService);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function timerDirective() {
+    return {
+      restrict: 'E',
+      templateUrl: '/dist/components/gjTimer/timer/timer.html',
+      controller: 'TimerController',
+      controllerAs: 'ctrl',
+      scope: true
+    };
+  }
+
+  angular.module('timer', []).directive('timer', timerDirective);
+
+})();
+(function() {
+
+  'use strict';
+
+  function TimerController($rootScope, TimerService) {
+
+    var self = this;
+
+    self.time = TimerService.getTime();
+
+  }
+
+  angular.module('timer').controller('TimerController', ['$rootScope', 'TimerService', TimerController]);
+
+})();
+(function() {
+
+  'use strict';
+
+  function TimerService() {
+
+    var self = this;
+
+    self.time = '17:38.625';
+
+    self.getTime = function() {
+      return self.time;
+    };
+
+  }
+
+  angular.module('timer').service('TimerService', TimerService);
 
 })();

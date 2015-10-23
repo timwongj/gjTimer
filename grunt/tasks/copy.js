@@ -9,9 +9,9 @@
         files: [
           {
             expand: true,
-            cwd: 'app/public/components/gjTimer',
-            src: ['index.html'],
-            dest: ''
+            cwd: 'app/public',
+            src: ['**/*.html'],
+            dest: 'dist/'
           }
         ]
       },

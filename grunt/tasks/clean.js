@@ -5,7 +5,7 @@
   module.exports = function(grunt) {
 
     grunt.config('clean', {
-      files: ['dist', 'index.html']
+      files: ['dist']
     });
 
     grunt.registerTask('clean', function() {

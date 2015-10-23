@@ -7,12 +7,37 @@
     grunt.config('concat', {
       gjTimerJs: {
         src: [
-          'app/public/components/gjTimer/app.js',
-          'app/public/components/gjTimer/controllers/gjTimer.controller.js',
-          'app/public/components/gjTimer/services/calculator.service.js',
-          'app/public/components/gjTimer/services/cub.service.js',
-          'app/public/components/gjTimer/services/scrambler.service.js',
-          'app/public/components/gjTimer/services/timer.service.js'
+          // gjTimerApp
+          'app/public/components/app.js',
+
+          // gjTimer
+          'app/public/components/gjTimer/gjTimer.directive.js',
+          'app/public/components/gjTimer/gjTimer.controller.js',
+
+          // Cub
+          'app/public/components/gjTimer/cub/cub.directive.js',
+          'app/public/components/gjTimer/cub/cub.controller.js',
+          'app/public/components/gjTimer/cub/cub.service.js',
+
+          // Scramble
+          'app/public/components/gjTimer/scramble/scramble.directive.js',
+          'app/public/components/gjTimer/scramble/scramble.controller.js',
+          'app/public/components/gjTimer/scramble/scramble.service.js',
+
+          // Menu
+          'app/public/components/gjTimer/menuBar/menuBar.directive.js',
+          'app/public/components/gjTimer/menuBar/menuBar.controller.js',
+          'app/public/components/gjTimer/menuBar/menuBar.service.js',
+
+          // Statistics
+          'app/public/components/gjTimer/statistics/statistics.directive.js',
+          'app/public/components/gjTimer/statistics/statistics.controller.js',
+          'app/public/components/gjTimer/statistics/statistics.service.js',
+
+          // Timer
+          'app/public/components/gjTimer/timer/timer.directive.js',
+          'app/public/components/gjTimer/timer/timer.controller.js',
+          'app/public/components/gjTimer/timer/timer.service.js'
         ],
         dest: 'dist/js/gjTimer.js'
       },
@@ -28,7 +53,12 @@
       },
       gjTimerLess: {
         src: [
-          'app/public/less/gjTimer.less'
+          'app/public/less/gjTimer.less',
+          'app/public/less/cub.less',
+          'app/public/less/scramble.less',
+          'app/public/less/menuBar.less',
+          'app/public/less/statistics.less',
+          'app/public/less/timer.less'
         ],
         dest: 'dist/css/gjTimer.less'
       },

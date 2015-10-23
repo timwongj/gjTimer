@@ -2,11 +2,11 @@
 
   'use strict';
 
-  function ScramblerService() {
+  function ScrambleService() {
 
-    var Scrambler = function() {  };
+    var self = this;
 
-    Scrambler.prototype.generateScramble = function(puzzle, length) {
+    self.generateScramble = function(puzzle, length) {
       switch(puzzle) {
         case '2x2': return this.generate2x2Scramble(length);
         case '3x3': return this.generate3x3Scramble(length);
@@ -17,7 +17,7 @@
       }
     };
 
-    Scrambler.prototype.generate2x2Scramble = function(length)
+    self.generate2x2Scramble = function(length)
     {
       var scramble = '', previousOrientation = -1;
       for (var i = 0; i < length; i++)
@@ -47,7 +47,7 @@
       return scramble;
     };
 
-    Scrambler.prototype.generate3x3Scramble = function(length)
+    self.generate3x3Scramble = function(length)
     {
       var previousMove = -1, secondPreviousMove = -1, scramble = '';
       for (var i = 0; i < length; i++)
@@ -79,7 +79,7 @@
       return scramble;
     };
 
-    Scrambler.prototype.generate4x4Scramble = function(length)
+    self.generate4x4Scramble = function(length)
     {
       var scramble = '', layersTurned = 0, previousOrientation = -1, temp = -1;
       for (var i = 0; i < length; i++)
@@ -153,7 +153,7 @@
       return scramble;
     };
 
-    Scrambler.prototype.generate5x5Scramble = function(length)
+    self.generate5x5Scramble = function(length)
     {
       var scramble = '', layersTurned = 0, previousOrientation = -1, temp = -1;
       for (var i = 0; i < length; i++)
@@ -228,7 +228,7 @@
       return scramble;
     };
 
-    Scrambler.prototype.generate6x6Scramble = function(length)
+    self.generate6x6Scramble = function(length)
     {
       var scramble = '', layersTurned = 0, previousOrientation = -1, temp = -1;
       for (var i = 0; i < length; i++)
@@ -318,7 +318,7 @@
       return scramble;
     };
 
-    Scrambler.prototype.generate7x7Scramble = function(length)
+    self.generate7x7Scramble = function(length)
     {
       var scramble = '', layersTurned = 0, previousOrientation = -1, temp = -1;
       for (var i = 0; i < length; i++)
@@ -410,10 +410,8 @@
       return scramble;
     };
 
-    return Scrambler;
-
   }
 
-  angular.module('gjTimer').factory('Scrambler', ScramblerService);
+  angular.module('scramble').service('ScrambleService', ScrambleService);
 
 })();
