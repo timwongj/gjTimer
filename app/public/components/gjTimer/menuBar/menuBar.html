@@ -2,25 +2,33 @@
   <div class="form-inline">
     <span class="title">gjTimer</span>
     <div class="form-group">
-      <div class="btn-group btn-group-puzzles" role="group">
-        <button type="button" class="btn btn-default" ng-repeat="puzzle in ctrl.puzzles" ng-bind="puzzle" ng-click="ctrl.selectPuzzle(puzzle)"></button>
-      </div>
-      <button type="button" class="btn btn-success" ng-click="ctrl.scramble()">Scramble</button>
-      <button type="button" class="btn btn-primary" ng-click="ctrl.options()">Options</button>
       <div class="btn-group" role="group">
         <div class="btn-group" role="group">
           <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="true">
-            {{ctrl.session.name}} <span class="caret"></span>
+            {{ctrl.puzzle}}&nbsp;<span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu" role="menu">
+            <li role="presentation" ng-repeat="puzzle in ctrl.puzzles">
+              <a role="menuitem" tabindex="-1" href="" ng-bind="puzzle" ng-click="ctrl.selectPuzzle(puzzle)"></a>
+            </li>
+          </ul>
+        </div>
+        <button type="button" class="btn btn-success" ng-click="ctrl.scramble()" onclick="this.blur()">Scramble</button>
+      </div>
+      <div class="btn-group" role="group">
+        <div class="btn-group" role="group">
+          <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="true">
+            {{ctrl.session.name}}&nbsp;<span class="caret"></span>
           </button>
           <ul class="dropdown-menu" role="menu">
             <li role="presentation" ng-repeat="session in ctrl.sessions">
               <a role="menuitem" tabindex="-1" href="" ng-bind="session.name" ng-click="ctrl.changeSession(session.name)"></a>
             </li>
           </ul>
-
         </div>
-        <button type="button" class="btn btn-warning" ng-click="ctrl.resetSession()">Reset</button>
+        <button type="button" class="btn btn-warning" ng-click="ctrl.resetSession()" onclick="this.blur()">Reset</button>
       </div>
+      <button type="button" class="btn btn-primary" ng-click="ctrl.settings()" onclick="this.blur()">Settings</button>
     </div>
   </div>
 </div>

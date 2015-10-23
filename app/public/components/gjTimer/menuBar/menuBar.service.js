@@ -7,7 +7,7 @@
     var self = this;
 
     var NUMBER_OF_SESSIONS = 20;
-    var PUZZLES = ['2x2', '3x3', '4x4', '5x5', '6x6', '7x7'];
+    var PUZZLES = ['Rubik\'s Cube', '4x4 Cube', '5x5 Cube', '2x2 Cube', '6x6 Cube', '7x7 Cube'];
 
     /**
      * Initialize or get session number from local storage.
@@ -26,7 +26,7 @@
       }
 
       var newSession = {
-        puzzle: '3x3',
+        puzzle: 'Rubik\'s Cube',
         list: []
       };
 
@@ -65,6 +65,19 @@
     };
 
     /**
+     * Resets the session in local storage.
+     * @param sessionId
+     */
+    self.resetSession = function(sessionId) {
+
+      var session = JSON.parse(localStorage.getItem(sessionId));
+      session.list = [];
+      localStorage.setItem(sessionId, JSON.stringify(session));
+      return session;
+
+    };
+
+    /**
      * Saves the new puzzle in the session.
      * @param sessionId
      * @param puzzle
@@ -98,11 +111,12 @@
     self.convertScrambleType = function(scrambleType) {
 
       switch(scrambleType) {
-        case 3: return '3x3';
-        case 4: return '4x4';
-        case 5: return '5x5';
-        case 6: return '6x6';
-        case 7: return '7x7';
+        case 2: return '2x2 Cube';
+        case 3: return 'Rubik\'s Cube';
+        case 4: return '4x4 Cube';
+        case 5: return '5x5 Cube';
+        case 6: return '6x6 Cube';
+        case 7: return '7x7 Cube';
       }
 
     };

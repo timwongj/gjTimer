@@ -12,8 +12,6 @@
     self.session = MenuBarService.init();
     self.puzzle = self.session.puzzle || MenuBarService.convertScrambleType(self.session.scrambleType);
 
-    console.log(self.session.name);
-
     self.sessions = [];
     for (var i = 0; i < NUMBER_OF_SESSIONS; i++) {
       self.sessions[i] = {};
@@ -33,8 +31,8 @@
       $rootScope.session = self.session;
     };
 
-    self.options = function() {
-      console.log('options');
+    self.settings = function() {
+      console.log('settings');
     };
 
     self.scramble = function() {
@@ -42,7 +40,9 @@
     };
 
     self.resetSession = function() {
-      console.log('reset session');
+      if (confirm('Are you sure you would like to reset ' + self.session.name + '?')) {
+        self.session = MenuBarService.resetSession('session' + self.session.name.substr(8, self.session.name.length));
+      }
     };
 
   }
