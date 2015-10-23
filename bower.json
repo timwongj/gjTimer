@@ -12,5 +12,10 @@
     "bower_components",
     "test",
     "tests"
-  ]
+  ],
+  "devDependencies": {},
+  "dependencies": {
+    "font-awesome": "~4.4.0",
+    "angular-bootstrap": "~0.14.2"
+  }
 }

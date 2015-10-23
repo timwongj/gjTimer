@@ -1,0 +1,24 @@
+<div id="statistics">
+  <div class="jumbotron jumbotron-statistics">
+    <div class="table-responsive">
+      <table class="table table-condensed table-bordered table-hover">
+        <thead>
+        <tr>
+          <th>#</th>
+          <th>Time</th>
+          <th>Avg 5</th>
+          <th>Avg 12</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="solve in ctrl.session.solves">
+          <td ng-bind="$index+1"></td>
+          <td ng-bind="solve.time"></td>
+          <td ng-bind="solve.avg5"></td>
+          <td ng-bind="solve.avg12"></td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

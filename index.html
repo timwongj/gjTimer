@@ -1,136 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<!-- Bootstrap CSS -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-	<!-- Bootstrap CSS Theme -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
-	<!-- jQuery -->
-	<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.3/jquery-ui.min.js">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-	<!-- BootstrapJS -->
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-	<!-- Angular JS -->
-	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.13/angular.min.js"></script>
-	<!-- Angular Route -->
-	<script src="https://code.angularjs.org/1.3.13/angular-route.min.js"></script>
-	<!-- Local CSS-->
-	<link rel="stylesheet" type="text/css" href="css/style.css">
-	<!-- Local JS-->
-	<script src="js/gjTimer.js"></script>
-	<!-- Icon -->
-	<link rel="shortcut icon" type="image/x-icon" href="images/cubeLogo.png"/>
-	<!-- Title -->
-	<title>gjTimer</title>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" type="text/css" href="dist/css/lib.css">
+  <link rel="stylesheet" type="text/css" href="dist/css/gjTimer.css">
+  <script src="dist/js/lib.min.js"></script>
+  <script src="dist/js/gjTimer.min.js"></script>
+  <link rel="shortcut icon" type="image/x-icon" href="dist/img/cubeLogo.png"/>
+  <title>gjTimer</title>
 </head>
-<body ng-app="gjTimer" ng-controller="gjController">
-	<nav class="navbar">
-		<div class="container">
-			<div class="container-fluid" id="navbarContainerFluid">
-				<div>
-					<ul class="nav navbar-nav" id="navbar">
-						<h1>gjTimer</h1>
-					</ul>
-				</div>
-			</div>
-		</div>
-	</nav>
-	<div class="container">
-		<div class="row">
-			<div class="col-xs-9">
-				<div class="jumbotron" id="timerJumbotron">
-					<div class="row">
-						<div class="col-xs-5 col-xs-offset-1" id="scrambleTypeDiv">
-							<div class="btn-group" id="scrambleTypeButtonGroup" role="group" aria-label="..." id="scrambleType">
-  								<button type="button" class="btn btn-default" id="scramble2x2">2x2</button>
-  								<button type="button" class="btn btn-default" id="scramble3x3">3x3</button>
-  								<button type="button" class="btn btn-default" id="scramble4x4">4x4</button>
-  								<button type="button" class="btn btn-default" id="scramble5x5">5x5</button>
-  								<button type="button" class="btn btn-default" id="scramble6x6">6x6</button>
-  								<button type="button" class="btn btn-default" id="scramble7x7">7x7</button>
-							</div>
-						</div>
-						<div class="col-xs-2" id="scrambleLengthDiv">
-							<div class="input-group" id="scrambleLengthInputGroup">
-  								<span class="input-group-addon" id="lengthLabel">Length</span>
-  								<input type="text" maxlength="3" class="form-control" value="20" aria-describedby="basic-addon1" id="scrambleLength">
-							</div>
-						</div>
-						<div class="col-xs-4" id="newScrambleDiv">
-							<button type="button" class="btn btn-success" id="newScrambleButton">New Scramble</button>
-							<button type="button" class="btn btn-primary" id="optionsButton" data-toggle="modal" data-target="#myModal">Options</button>
-						</div>
-					</div>
-					<hr/>
-					<p id="scramble"></p>
-					<p id="timer"></p>
-					<p id="avg5"></p>
-					<p id="avg12"></p>
-				</div>
-			</div>
-			<div class="col-xs-3" id="tableDiv">
-				<div class="btn-group" role="group" id="sessionButtonGroup" aria-label="...">
-					<div class="btn-group" role="group">
-						<button class="btn btn-default dropdown-toggle" type="button" id="sessionDropdownButton" data-toggle="dropdown" aria-expanded="true"></button>
-  						<ul class="dropdown-menu" id="sessionDropdownMenu" role="menu" aria-labelledby="dropdownMenu1">
-							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 1</a></li>
-							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 2</a></li>
-							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 3</a></li>
-							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 4</a></li>
-							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 5</a></li>
-							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 6</a></li>
-							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 7</a></li>
-							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 8</a></li>
-							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 9</a></li>
-							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 10</a></li>
-							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 11</a></li>
-							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 12</a></li>
-							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 13</a></li>
-							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 14</a></li>
-							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 15</a></li>
-							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 16</a></li>
-							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 17</a></li>
-							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 18</a></li>
-							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 19</a></li>
-							<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Session 20</a></li>
-  						</ul>
-  					</div>
-  					<button type="button" class="btn btn-info" id="statsButton" data-toggle="modal" data-target="#myModal">Stats</button>
-					<button type="button" class="btn btn-warning" id="resetButton" data-toggle="modal" data-target="#myModal">Reset</button>
-				</div>
-				<div class="col-xs-6">
-					<p id="sessionSolves"></p>
-				</div>
-				<div class="col-xs-6">
-					<p id="sessionMean"></p>
-				</div>
-				<div class="table-responsive">
-					<table class="table table-condensed table-bordered table-hover" id="timesTable">
-						<thead>
-							<tr>
-								<th id="numHeader">#</th>
-								<th id="timeHeader">Time</th>
-								<th id="avg5Header">Avg 5</th>
-								<th id="avg12Header">Avg 12</th>
-							</tr>
-						</thead>
-						<tbody id="times"></tbody>
-					</table>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="modal fade bs-example-modal-lg" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-		<div class="modal-dialog modal-lg">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        			<h4 class="modal-title" id="myModalTitle"></h4>
-      			</div>
-      			<div class="modal-body" id="myModalBody"></div>
-      			<div class="modal-footer" id="myModalFooter"></div>
-    		</div>
-  		</div>
-	</div>
+<body ng-app="gjTimerApp" ng-controller="gjTimerController">
+  <div class="container">
+    <menu-bar></menu-bar>
+    <div class="row">
+      <div class="col-md-8 section">
+        <timer></timer>
+      </div>
+      <div class="col-md-4 section">
+        <statistics></statistics>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
