@@ -13,8 +13,11 @@
             {{ctrl.session.name}} <span class="caret"></span>
           </button>
           <ul class="dropdown-menu" role="menu">
-            <li role="presentation" ng-repeat="session in ctrl.sessions"><a role="menuitem" tabindex="-1" href="#" ng-bind="session.name"></a></li>
+            <li role="presentation" ng-repeat="session in ctrl.sessions">
+              <a role="menuitem" tabindex="-1" href="" ng-bind="session.name" ng-click="ctrl.changeSession(session.name)"></a>
+            </li>
           </ul>
+
         </div>
         <button type="button" class="btn btn-warning" ng-click="ctrl.resetSession()">Reset</button>
       </div>

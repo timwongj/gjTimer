@@ -6,22 +6,31 @@
 
     var self = this;
 
-    self.puzzles = ['2x2', '3x3', '4x4', '5x5', '6x6', '7x7'];
+    var NUMBER_OF_SESSIONS = 20;
 
-    self.puzzle = '3x3';
+    self.puzzles = MenuBarService.getPuzzles();
+    self.session = MenuBarService.init();
+    self.puzzle = self.session.puzzle || MenuBarService.convertScrambleType(self.session.scrambleType);
 
-    self.sessions = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
+    console.log(self.session.name);
+
+    self.sessions = [];
+    for (var i = 0; i < NUMBER_OF_SESSIONS; i++) {
+      self.sessions[i] = {};
+    }
 
     angular.forEach(self.sessions, function(session, $index) {
       session.name = 'Session ' + ($index + 1);
     });
 
-    self.session = self.sessions[0];
-
     self.selectPuzzle = function(puzzle) {
-      self.puzzle = puzzle;
-      $rootScope.puzzle = puzzle;
-      console.log(self.puzzle);
+      self.puzzle = MenuBarService.changePuzzle('session' + self.session.name.substr(8, self.session.name.length), puzzle);
+      $rootScope.puzzle = self.puzzle;
+    };
+
+    self.changeSession = function(sessionName) {
+      self.session = MenuBarService.changeSession('session' + sessionName.substr(8, sessionName.length));
+      $rootScope.session = self.session;
     };
 
     self.options = function() {
