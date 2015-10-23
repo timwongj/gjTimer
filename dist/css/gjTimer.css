@@ -2,11 +2,13 @@
   padding: .375em;
 }
 #scramble {
-  margin: .5em 0;
-  padding: .5em 0;
+  margin: .25em;
+  padding: .25em;
 }
 #scramble .scramble {
   font-size: 150%;
+  margin: .125em;
+  padding: .125em;
 }
 #menuBar {
   margin: .5em 0;
@@ -21,6 +23,10 @@
   padding: 1em;
   margin-bottom: .5em;
 }
+#statistics .times {
+  margin: .125em;
+  padding: .125em;
+}
 #timer {
   text-align: center;
 }
@@ -30,4 +36,6 @@
 }
 #timer .time {
   font-size: 800%;
+  margin: .0625em;
+  padding: .0625em;
 }
