@@ -47,7 +47,8 @@
           'bower_components/jquery-ui/jquery-ui.min.js',
           'bower_components/bootstrap/dist/js/bootstrap.min.js',
           'bower_components/angular/angular.min.js',
-          'bower_components/angular-bootstrap/ui-bootstrap.min.js'
+          'bower_components/angular-bootstrap/ui-bootstrap.min.js',
+          'bower_components/moment/min/moment.min.js'
         ],
         dest: 'dist/js/lib.min.js'
       },

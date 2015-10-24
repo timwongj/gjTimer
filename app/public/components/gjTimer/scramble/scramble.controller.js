@@ -2,14 +2,17 @@
 
   'use strict';
 
-  function ScrambleController($rootScope, ScrambleService) {
+  function ScrambleController($scope, $rootScope, ScrambleService) {
 
     var self = this;
 
-    self.scramble = "R B' R' U' B2 F2 D2 L2 B' F L' D2 B R2 L' F' B D2 R' B'";
+    $scope.$on('new scramble', function($event, puzzle) {
+      self.scramble = ScrambleService.newScramble(puzzle);
+      $rootScope.scramble = self.scramble;
+    });
 
   }
 
-  angular.module('scramble').controller('ScrambleController', ['$rootScope', 'ScrambleService', ScrambleController]);
+  angular.module('scramble').controller('ScrambleController', ['$scope', '$rootScope', 'ScrambleService', ScrambleController]);
 
 })();

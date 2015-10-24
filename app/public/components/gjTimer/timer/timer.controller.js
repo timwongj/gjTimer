@@ -2,14 +2,48 @@
 
   'use strict';
 
-  function TimerController($rootScope, TimerService) {
+  function TimerController($scope, $rootScope, $interval, TimerService) {
 
     var self = this;
 
-    self.time = TimerService.getTime();
+    var TIMER_REFRESH_INTERVAL = 50;
+    var timer, isKeydown = false, isTiming = false;
+
+    self.time = moment(0).format('s.SS');
+    self.timerStyle = { 'color': '#000000' };
+
+    $scope.$on('keydown', function(event, args) {
+      if (!isKeydown) {
+        isKeydown = true;
+        if (!isTiming && (args.keyCode === 32)) {
+          self.time = moment(0).format('s.SS');
+          self.timerStyle = { 'color': '#2EB82E' };
+        } else if (isTiming) {
+          $interval.cancel(timer);
+          TimerService.saveResult(self.time, $rootScope.scramble);
+          $rootScope.$broadcast('new scramble', $rootScope.puzzle);
+        }
+      }
+    });
+
+    $scope.$on('keyup', function(event, args) {
+      if (isKeydown && (args.keyCode === 32)) {
+        isKeydown = false;
+        if (!isTiming) {
+          isTiming = 1;
+          self.timerStyle = { 'color': '#000000' };
+          TimerService.startTimer();
+          timer = $interval(function() {
+            self.time = TimerService.getTime();
+          }, TIMER_REFRESH_INTERVAL);
+        } else {
+          isTiming = 0;
+        }
+      }
+    });
 
   }
 
-  angular.module('timer').controller('TimerController', ['$rootScope', 'TimerService', TimerController]);
+  angular.module('timer').controller('TimerController', ['$scope', '$rootScope', '$interval', 'TimerService', TimerController]);
 
 })();

@@ -9,7 +9,7 @@
   <link rel="shortcut icon" type="image/x-icon" href="dist/img/cubeLogo.png"/>
   <title>gjTimer</title>
 </head>
-<body ng-app="gjTimerApp" ng-controller="gjTimerController">
+<body ng-app="gjTimerApp" ng-controller="gjTimerController" ng-keydown="keydown($event)" ng-keyup="keyup($event)">
   <div class="container">
     <menu-bar></menu-bar>
     <div class="row">

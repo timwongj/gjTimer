@@ -39,38 +39,19 @@
 
   'use strict';
 
-  function GjTimerController($scope) {
+  function GjTimerController($scope, $rootScope) {
 
-    //$scope.timer = {
-    //  scramble: scramble.generateScramble($scope.settings.selectedPuzzle, $scope.settings.scrambleLength),
-    //  scrambleStyle: {'font-size': '150%'},
-    //  display: timer.getTime(),
-    //  avg5: '8.995',
-    //  avg12: '10.235'
-    //};
-    //
-    //
-    //$scope.applySettings = function(puzzle, length) {
-    //  $scope.settings.scrambleLength = length;
-    //  $scope.newScramble(puzzle, length);
-    //  if (length <= 60) {
-    //    $scope.timer.scrambleStyle = {'font-size': '150%'};
-    //  } else if (length <= 80) {
-    //    $scope.timer.scrambleStyle = {'font-size': '140%'};
-    //  } else if (length <= 100) {
-    //    $scope.timer.scrambleStyle = {'font-size': '130%'};
-    //  } else {
-    //    $scope.timer.scrambleStyle = {'font-size': '100%'};
-    //  }
-    //};
-    //
-    //$scope.newScramble = function(puzzle, length) {
-    //  $scope.timer.scramble = scramble.generateScramble(puzzle, length);
-    //};
+    $scope.keydown = function(event) {
+      $rootScope.$broadcast('keydown', event);
+    };
+
+    $scope.keyup = function(event) {
+      $rootScope.$broadcast('keyup', event);
+    };
 
   }
 
-  angular.module('gjTimer').controller('gjTimerController', ['$scope', GjTimerController]);
+  angular.module('gjTimer').controller('gjTimerController', ['$scope', '$rootScope', GjTimerController]);
 
 })();
 
@@ -139,15 +120,18 @@
 
   'use strict';
 
-  function ScrambleController($rootScope, ScrambleService) {
+  function ScrambleController($scope, $rootScope, ScrambleService) {
 
     var self = this;
 
-    self.scramble = "R B' R' U' B2 F2 D2 L2 B' F L' D2 B R2 L' F' B D2 R' B'";
+    $scope.$on('new scramble', function($event, puzzle) {
+      self.scramble = ScrambleService.newScramble(puzzle);
+      $rootScope.scramble = self.scramble;
+    });
 
   }
 
-  angular.module('scramble').controller('ScrambleController', ['$rootScope', 'ScrambleService', ScrambleController]);
+  angular.module('scramble').controller('ScrambleController', ['$scope', '$rootScope', 'ScrambleService', ScrambleController]);
 
 })();
 (function() {
@@ -158,413 +142,422 @@
 
     var self = this;
 
-    self.generateScramble = function(puzzle, length) {
-      switch(puzzle) {
-        case '2x2': return this.generate2x2Scramble(length);
-        case '3x3': return this.generate3x3Scramble(length);
-        case '4x4': return this.generate4x4Scramble(length);
-        case '5x5': return this.generate5x5Scramble(length);
-        case '6x6': return this.generate6x6Scramble(length);
-        case '7x7': return this.generate7x7Scramble(length);
-      }
+    self.getScramble = function() {
+      return self.scramble;
     };
 
-    self.generate2x2Scramble = function(length)
-    {
-      var scramble = '', previousOrientation = -1;
-      for (var i = 0; i < length; i++)
-      {
-        var turningOrientation = Math.floor((Math.random() * 3)), innerTurningLayer, turningDirection = Math.floor((Math.random() * 3));
-        while (turningOrientation === previousOrientation)
-        {
-          turningOrientation = Math.floor((Math.random() * 3));
-          innerTurningLayer = Math.floor((Math.random() * 2));
-          turningDirection = Math.floor((Math.random() * 3));
-        }
-        if (turningOrientation === 0)
-          scramble = scramble.concat('U');
-        else if (turningOrientation === 1)
-          scramble = scramble.concat('F');
-        else if (turningOrientation === 2)
-          scramble = scramble.concat('R');
-        switch (turningDirection)
-        {
-          case 1: scramble = scramble.concat('\''); break;
-          case 2: scramble = scramble.concat('2'); break;
-        }
-        previousOrientation = turningOrientation;
-        if (i < length - 1)
-          scramble = scramble.concat(' ');
-      }
-      return scramble;
-    };
-
-    self.generate3x3Scramble = function(length)
-    {
-      var previousMove = -1, secondPreviousMove = -1, scramble = '';
-      for (var i = 0; i < length; i++)
-      {
-        var move = Math.floor((Math.random() * 6)), direction = Math.floor((Math.random() * 3));
-        if (((previousMove === 0) && (secondPreviousMove !== 1)) || ((previousMove === 1) && (secondPreviousMove !== 0)) || ((previousMove === 2) && (secondPreviousMove !== 3)) || ((previousMove === 3) && (secondPreviousMove !== 2)) || ((previousMove === 4) && (secondPreviousMove !== 5)) || ((previousMove === 5) && (secondPreviousMove !== 4)))
-          secondPreviousMove = -1;
-        while ((move === previousMove) || (move === secondPreviousMove))
-          move = Math.floor((Math.random() * 6));
-        switch (move)
-        {
-          case 0: scramble = scramble.concat('U'); break;
-          case 1: scramble = scramble.concat('D'); break;
-          case 2: scramble = scramble.concat('L'); break;
-          case 3: scramble = scramble.concat('R'); break;
-          case 4: scramble = scramble.concat('F'); break;
-          case 5: scramble = scramble.concat('B'); break;
-        }
-        switch (direction)
-        {
-          case 1: scramble = scramble.concat('\''); break;
-          case 2: scramble = scramble.concat('2'); break;
-        }
-        secondPreviousMove = previousMove;
-        previousMove = move;
-        if (i < length - 1)
-          scramble = scramble.concat(' ');
-      }
-      return scramble;
-    };
-
-    self.generate4x4Scramble = function(length)
-    {
-      var scramble = '', layersTurned = 0, previousOrientation = -1, temp = -1;
-      for (var i = 0; i < length; i++)
-      {
-        var turningOrientation = Math.floor((Math.random() * 3)), turningLayer = Math.floor((Math.random() * 3)), innerTurningLayer = Math.floor((Math.random() * 2)), turningDirection = Math.floor((Math.random() * 3));
-        if (turningOrientation !== previousOrientation)
-          layersTurned = 0;
-        switch (turningLayer)
-        {
-          case 0: temp = 1; break;
-          case 1: temp = 2; break;
-          case 2: temp = 4; break;
-        }
-        while ((previousOrientation === turningOrientation) && ((temp & layersTurned) > 0))
-        {
-          turningOrientation = Math.floor((Math.random() * 3));
-          turningLayer = Math.floor((Math.random() * 3));
-          innerTurningLayer = Math.floor((Math.random() * 2));
-          turningDirection = Math.floor((Math.random() * 3));
-          if (turningOrientation !== previousOrientation)
-            layersTurned = 0;
-        }
-        if (turningOrientation === 0)
-        {
-          if (turningLayer === 0)
-            scramble = scramble.concat('U');
-          else if (turningLayer === 2)
-            scramble = scramble.concat('D');
-          else if (innerTurningLayer === 0)
-            scramble = scramble.concat('Uw');
-          else
-            scramble = scramble.concat('Dw');
-        }
-        else if (turningOrientation === 1)
-        {
-          if (turningLayer === 0)
-            scramble = scramble.concat('F');
-          else if (turningLayer === 2)
-            scramble = scramble.concat('B');
-          else if (innerTurningLayer === 0)
-            scramble = scramble.concat('Fw');
-          else
-            scramble = scramble.concat('Bw');
-        }
-        else if (turningOrientation === 2)
-        {
-          if (turningLayer === 0)
-            scramble = scramble.concat('L');
-          else if (turningLayer === 2)
-            scramble = scramble.concat('R');
-          else if (innerTurningLayer === 0)
-            scramble = scramble.concat('Lw');
-          else
-            scramble = scramble.concat('Rw');
-        }
-        switch (turningLayer)
-        {
-          case 0: layersTurned += 1; break;
-          case 1: layersTurned += 2; break;
-          case 2: layersTurned += 4; break;
-        }
-        switch (turningDirection)
-        {
-          case 1: scramble = scramble.concat('\''); break;
-          case 2: scramble = scramble.concat('2'); break;
-        }
-        previousOrientation = turningOrientation;
-        if (i < length - 1)
-          scramble = scramble.concat(' ');
-      }
-      return scramble;
-    };
-
-    self.generate5x5Scramble = function(length)
-    {
-      var scramble = '', layersTurned = 0, previousOrientation = -1, temp = -1;
-      for (var i = 0; i < length; i++)
-      {
-        var turningOrientation = Math.floor((Math.random() * 3)), turningLayer = Math.floor((Math.random() * 4)), turningDirection = Math.floor((Math.random() * 3));
-        if (turningOrientation !== previousOrientation)
-          layersTurned = 0;
-        switch (turningLayer)
-        {
-          case 0: temp = 1; break;
-          case 1: temp = 2; break;
-          case 2: temp = 4; break;
-          case 3: temp = 8; break;
-        }
-        while ((previousOrientation === turningOrientation) && ((temp & layersTurned) > 0))
-        {
-          turningOrientation = Math.floor((Math.random() * 3));
-          turningLayer = Math.floor((Math.random() * 4));
-          turningDirection = Math.floor((Math.random() * 3));
-          if (turningOrientation !== previousOrientation)
-            layersTurned = 0;
-        }
-        if (turningOrientation === 0)
-        {
-          if (turningLayer === 0)
-            scramble = scramble.concat('U');
-          else if (turningLayer === 1)
-            scramble = scramble.concat('Uw');
-          else if (turningLayer === 2)
-            scramble = scramble.concat('Dw');
-          else
-            scramble = scramble.concat('D');
-        }
-        else if (turningOrientation === 1)
-        {
-          if (turningLayer === 0)
-            scramble = scramble.concat('F');
-          else if (turningLayer === 1)
-            scramble = scramble.concat('Fw');
-          else if (turningLayer === 2)
-            scramble = scramble.concat('Bw');
-          else
-            scramble = scramble.concat('B');
-        }
-        else if (turningOrientation === 2)
-        {
-          if (turningLayer === 0)
-            scramble = scramble.concat('L');
-          else if (turningLayer === 1)
-            scramble = scramble.concat('Lw');
-          else if (turningLayer === 2)
-            scramble = scramble.concat('Rw');
-          else
-            scramble = scramble.concat('R');
-        }
-        switch (turningLayer)
-        {
-          case 0: layersTurned += 1; break;
-          case 1: layersTurned += 2; break;
-          case 2: layersTurned += 4; break;
-          case 3: layersTurned += 8; break;
-        }
-        switch (turningDirection)
-        {
-          case 1: scramble = scramble.concat('\''); break;
-          case 2: scramble = scramble.concat('2'); break;
-        }
-        previousOrientation = turningOrientation;
-        if (i < length - 1)
-          scramble = scramble.concat(' ');
-      }
-      return scramble;
-    };
-
-    self.generate6x6Scramble = function(length)
-    {
-      var scramble = '', layersTurned = 0, previousOrientation = -1, temp = -1;
-      for (var i = 0; i < length; i++)
-      {
-        var turningOrientation = Math.floor((Math.random() * 3)), turningLayer = Math.floor((Math.random() * 5)), innerTurningLayer = Math.floor((Math.random() * 2)), turningDirection = Math.floor((Math.random() * 3));
-        if (turningOrientation !== previousOrientation)
-          layersTurned = 0;
-        switch (turningLayer)
-        {
-          case 0: temp = 1; break;
-          case 1: temp = 2; break;
-          case 2: temp = 4; break;
-          case 3: temp = 8; break;
-          case 4: temp = 16; break;
-        }
-        while ((previousOrientation === turningOrientation) && ((temp & layersTurned) > 0))
-        {
-          turningOrientation = Math.floor((Math.random() * 3));
-          turningLayer = Math.floor((Math.random() * 5));
-          innerTurningLayer = Math.floor((Math.random() * 2));
-          turningDirection = Math.floor((Math.random() * 3));
-          if (turningOrientation !== previousOrientation)
-            layersTurned = 0;
-        }
-        if (turningOrientation === 0)
-        {
-          if (turningLayer === 0)
-            scramble = scramble.concat('U');
-          else if (turningLayer === 1)
-            scramble = scramble.concat('D');
-          else if (turningLayer === 2)
-            scramble = scramble.concat('Uw');
-          else if (turningLayer === 3)
-            scramble = scramble.concat('Dw');
-          else if (innerTurningLayer === 0)
-            scramble = scramble.concat('3Uw');
-          else
-            scramble = scramble.concat('3Dw');
-        }
-        else if (turningOrientation === 1)
-        {
-          if (turningLayer === 0)
-            scramble = scramble.concat('F');
-          else if (turningLayer === 1)
-            scramble = scramble.concat('B');
-          else if (turningLayer === 2)
-            scramble = scramble.concat('Fw');
-          else if (turningLayer === 3)
-            scramble = scramble.concat('Bw');
-          else if (innerTurningLayer === 0)
-            scramble = scramble.concat('3Fw');
-          else
-            scramble = scramble.concat('3Bw');
-        }
-        else if (turningOrientation === 2)
-        {
-          if (turningLayer === 0)
-            scramble = scramble.concat('L');
-          else if (turningLayer === 1)
-            scramble = scramble.concat('R');
-          else if (turningLayer === 2)
-            scramble = scramble.concat('Lw');
-          else if (turningLayer === 3)
-            scramble = scramble.concat('Rw');
-          else if (innerTurningLayer === 0)
-            scramble = scramble.concat('3Lw');
-          else
-            scramble = scramble.concat('3Rw');
-        }
-        switch (turningLayer)
-        {
-          case 0: layersTurned += 1; break;
-          case 1: layersTurned += 2; break;
-          case 2: layersTurned += 4; break;
-          case 3: layersTurned += 8; break;
-          case 4: layersTurned += 16; break;
-        }
-        switch (turningDirection)
-        {
-          case 1: scramble = scramble.concat('\''); break;
-          case 2: scramble = scramble.concat('2'); break;
-        }
-        previousOrientation = turningOrientation;
-        if (i < length - 1)
-          scramble = scramble.concat(' ');
-      }
-      return scramble;
-    };
-
-    self.generate7x7Scramble = function(length)
-    {
-      var scramble = '', layersTurned = 0, previousOrientation = -1, temp = -1;
-      for (var i = 0; i < length; i++)
-      {
-        var turningOrientation = Math.floor((Math.random() * 3)), turningLayer = Math.floor((Math.random() * 6)), turningDirection = Math.floor((Math.random() * 3));
-        if (turningOrientation !== previousOrientation)
-          layersTurned = 0;
-        switch (turningLayer)
-        {
-          case 0: temp = 1; break;
-          case 1: temp = 2; break;
-          case 2: temp = 4; break;
-          case 3: temp = 8; break;
-          case 4: temp = 16; break;
-          case 5: temp = 32; break;
-        }
-        while ((previousOrientation === turningOrientation) && ((temp & layersTurned) > 0))
-        {
-          turningOrientation = Math.floor((Math.random() * 3));
-          turningLayer = Math.floor((Math.random() * 6));
-          turningDirection = Math.floor((Math.random() * 3));
-          if (turningOrientation !== previousOrientation)
-            layersTurned = 0;
-        }
-        if (turningOrientation === 0)
-        {
-          if (turningLayer === 0)
-            scramble = scramble.concat('U');
-          else if (turningLayer === 1)
-            scramble = scramble.concat('D');
-          else if (turningLayer === 2)
-            scramble = scramble.concat('Uw');
-          else if (turningLayer === 3)
-            scramble = scramble.concat('Dw');
-          else if (turningLayer === 4)
-            scramble = scramble.concat('3Uw');
-          else
-            scramble = scramble.concat('3Dw');
-
-        }
-        else if (turningOrientation === 1)
-        {
-          if (turningLayer === 0)
-            scramble = scramble.concat('F');
-          else if (turningLayer === 1)
-            scramble = scramble.concat('B');
-          else if (turningLayer === 2)
-            scramble = scramble.concat('Fw');
-          else if (turningLayer === 3)
-            scramble = scramble.concat('Bw');
-          else if (turningLayer === 4)
-            scramble = scramble.concat('3Fw');
-          else
-            scramble = scramble.concat('3Bw');
-        }
-        else if (turningOrientation === 2)
-        {
-          if (turningLayer === 0)
-            scramble = scramble.concat('L');
-          else if (turningLayer === 1)
-            scramble = scramble.concat('R');
-          else if (turningLayer === 2)
-            scramble = scramble.concat('Lw');
-          else if (turningLayer === 3)
-            scramble = scramble.concat('Rw');
-          else if (turningLayer === 4)
-            scramble = scramble.concat('3Lw');
-          else
-            scramble = scramble.concat('3Rw');
-        }
-        switch (turningLayer)
-        {
-          case 0: layersTurned += 1; break;
-          case 1: layersTurned += 2; break;
-          case 2: layersTurned += 4; break;
-          case 3: layersTurned += 8; break;
-          case 4: layersTurned += 16; break;
-          case 5: layersTurned += 32; break;
-        }
-        switch (turningDirection)
-        {
-          case 1: scramble = scramble.concat('\''); break;
-          case 2: scramble = scramble.concat('2'); break;
-        }
-        previousOrientation = turningOrientation;
-        if (i < length - 1)
-          scramble = scramble.concat(' ');
-      }
-      return scramble;
+    self.newScramble = function(puzzle) {
+      self.scramble = generateScramble(puzzle);
+      return self.scramble;
     };
 
   }
 
   angular.module('scramble').service('ScrambleService', ScrambleService);
+
+  function generateScramble(puzzle) {
+    switch(puzzle) {
+      case '2x2 Cube': return generate2x2Scramble(10);
+      case 'Rubik\'s Cube': return generate3x3Scramble(20);
+      case '4x4 Cube': return generate4x4Scramble(40);
+      case '5x5 Cube': return generate5x5Scramble(60);
+      case '6x6 Cube': return generate6x6Scramble(80);
+      case '7x7 Cube': return generate7x7Scramble(100);
+    }
+  }
+
+  function generate2x2Scramble(length)
+  {
+    var scramble = '', previousOrientation = -1;
+    for (var i = 0; i < length; i++)
+    {
+      var turningOrientation = Math.floor((Math.random() * 3)), innerTurningLayer, turningDirection = Math.floor((Math.random() * 3));
+      while (turningOrientation === previousOrientation)
+      {
+        turningOrientation = Math.floor((Math.random() * 3));
+        innerTurningLayer = Math.floor((Math.random() * 2));
+        turningDirection = Math.floor((Math.random() * 3));
+      }
+      if (turningOrientation === 0)
+        scramble = scramble.concat('U');
+      else if (turningOrientation === 1)
+        scramble = scramble.concat('F');
+      else if (turningOrientation === 2)
+        scramble = scramble.concat('R');
+      switch (turningDirection)
+      {
+        case 1: scramble = scramble.concat('\''); break;
+        case 2: scramble = scramble.concat('2'); break;
+      }
+      previousOrientation = turningOrientation;
+      if (i < length - 1)
+        scramble = scramble.concat(' ');
+    }
+    return scramble;
+  }
+
+  function generate3x3Scramble(length)
+  {
+    var previousMove = -1, secondPreviousMove = -1, scramble = '';
+    for (var i = 0; i < length; i++)
+    {
+      var move = Math.floor((Math.random() * 6)), direction = Math.floor((Math.random() * 3));
+      if (((previousMove === 0) && (secondPreviousMove !== 1)) || ((previousMove === 1) && (secondPreviousMove !== 0)) || ((previousMove === 2) && (secondPreviousMove !== 3)) || ((previousMove === 3) && (secondPreviousMove !== 2)) || ((previousMove === 4) && (secondPreviousMove !== 5)) || ((previousMove === 5) && (secondPreviousMove !== 4)))
+        secondPreviousMove = -1;
+      while ((move === previousMove) || (move === secondPreviousMove))
+        move = Math.floor((Math.random() * 6));
+      switch (move)
+      {
+        case 0: scramble = scramble.concat('U'); break;
+        case 1: scramble = scramble.concat('D'); break;
+        case 2: scramble = scramble.concat('L'); break;
+        case 3: scramble = scramble.concat('R'); break;
+        case 4: scramble = scramble.concat('F'); break;
+        case 5: scramble = scramble.concat('B'); break;
+      }
+      switch (direction)
+      {
+        case 1: scramble = scramble.concat('\''); break;
+        case 2: scramble = scramble.concat('2'); break;
+      }
+      secondPreviousMove = previousMove;
+      previousMove = move;
+      if (i < length - 1)
+        scramble = scramble.concat(' ');
+    }
+    return scramble;
+  }
+
+  function generate4x4Scramble(length)
+  {
+    var scramble = '', layersTurned = 0, previousOrientation = -1, temp = -1;
+    for (var i = 0; i < length; i++)
+    {
+      var turningOrientation = Math.floor((Math.random() * 3)), turningLayer = Math.floor((Math.random() * 3)), innerTurningLayer = Math.floor((Math.random() * 2)), turningDirection = Math.floor((Math.random() * 3));
+      if (turningOrientation !== previousOrientation)
+        layersTurned = 0;
+      switch (turningLayer)
+      {
+        case 0: temp = 1; break;
+        case 1: temp = 2; break;
+        case 2: temp = 4; break;
+      }
+      while ((previousOrientation === turningOrientation) && ((temp & layersTurned) > 0))
+      {
+        turningOrientation = Math.floor((Math.random() * 3));
+        turningLayer = Math.floor((Math.random() * 3));
+        innerTurningLayer = Math.floor((Math.random() * 2));
+        turningDirection = Math.floor((Math.random() * 3));
+        if (turningOrientation !== previousOrientation)
+          layersTurned = 0;
+      }
+      if (turningOrientation === 0)
+      {
+        if (turningLayer === 0)
+          scramble = scramble.concat('U');
+        else if (turningLayer === 2)
+          scramble = scramble.concat('D');
+        else if (innerTurningLayer === 0)
+          scramble = scramble.concat('Uw');
+        else
+          scramble = scramble.concat('Dw');
+      }
+      else if (turningOrientation === 1)
+      {
+        if (turningLayer === 0)
+          scramble = scramble.concat('F');
+        else if (turningLayer === 2)
+          scramble = scramble.concat('B');
+        else if (innerTurningLayer === 0)
+          scramble = scramble.concat('Fw');
+        else
+          scramble = scramble.concat('Bw');
+      }
+      else if (turningOrientation === 2)
+      {
+        if (turningLayer === 0)
+          scramble = scramble.concat('L');
+        else if (turningLayer === 2)
+          scramble = scramble.concat('R');
+        else if (innerTurningLayer === 0)
+          scramble = scramble.concat('Lw');
+        else
+          scramble = scramble.concat('Rw');
+      }
+      switch (turningLayer)
+      {
+        case 0: layersTurned += 1; break;
+        case 1: layersTurned += 2; break;
+        case 2: layersTurned += 4; break;
+      }
+      switch (turningDirection)
+      {
+        case 1: scramble = scramble.concat('\''); break;
+        case 2: scramble = scramble.concat('2'); break;
+      }
+      previousOrientation = turningOrientation;
+      if (i < length - 1)
+        scramble = scramble.concat(' ');
+    }
+    return scramble;
+  }
+
+  function generate5x5Scramble(length)
+  {
+    var scramble = '', layersTurned = 0, previousOrientation = -1, temp = -1;
+    for (var i = 0; i < length; i++)
+    {
+      var turningOrientation = Math.floor((Math.random() * 3)), turningLayer = Math.floor((Math.random() * 4)), turningDirection = Math.floor((Math.random() * 3));
+      if (turningOrientation !== previousOrientation)
+        layersTurned = 0;
+      switch (turningLayer)
+      {
+        case 0: temp = 1; break;
+        case 1: temp = 2; break;
+        case 2: temp = 4; break;
+        case 3: temp = 8; break;
+      }
+      while ((previousOrientation === turningOrientation) && ((temp & layersTurned) > 0))
+      {
+        turningOrientation = Math.floor((Math.random() * 3));
+        turningLayer = Math.floor((Math.random() * 4));
+        turningDirection = Math.floor((Math.random() * 3));
+        if (turningOrientation !== previousOrientation)
+          layersTurned = 0;
+      }
+      if (turningOrientation === 0)
+      {
+        if (turningLayer === 0)
+          scramble = scramble.concat('U');
+        else if (turningLayer === 1)
+          scramble = scramble.concat('Uw');
+        else if (turningLayer === 2)
+          scramble = scramble.concat('Dw');
+        else
+          scramble = scramble.concat('D');
+      }
+      else if (turningOrientation === 1)
+      {
+        if (turningLayer === 0)
+          scramble = scramble.concat('F');
+        else if (turningLayer === 1)
+          scramble = scramble.concat('Fw');
+        else if (turningLayer === 2)
+          scramble = scramble.concat('Bw');
+        else
+          scramble = scramble.concat('B');
+      }
+      else if (turningOrientation === 2)
+      {
+        if (turningLayer === 0)
+          scramble = scramble.concat('L');
+        else if (turningLayer === 1)
+          scramble = scramble.concat('Lw');
+        else if (turningLayer === 2)
+          scramble = scramble.concat('Rw');
+        else
+          scramble = scramble.concat('R');
+      }
+      switch (turningLayer)
+      {
+        case 0: layersTurned += 1; break;
+        case 1: layersTurned += 2; break;
+        case 2: layersTurned += 4; break;
+        case 3: layersTurned += 8; break;
+      }
+      switch (turningDirection)
+      {
+        case 1: scramble = scramble.concat('\''); break;
+        case 2: scramble = scramble.concat('2'); break;
+      }
+      previousOrientation = turningOrientation;
+      if (i < length - 1)
+        scramble = scramble.concat(' ');
+    }
+    return scramble;
+  }
+
+  function generate6x6Scramble(length)
+  {
+    var scramble = '', layersTurned = 0, previousOrientation = -1, temp = -1;
+    for (var i = 0; i < length; i++)
+    {
+      var turningOrientation = Math.floor((Math.random() * 3)), turningLayer = Math.floor((Math.random() * 5)), innerTurningLayer = Math.floor((Math.random() * 2)), turningDirection = Math.floor((Math.random() * 3));
+      if (turningOrientation !== previousOrientation)
+        layersTurned = 0;
+      switch (turningLayer)
+      {
+        case 0: temp = 1; break;
+        case 1: temp = 2; break;
+        case 2: temp = 4; break;
+        case 3: temp = 8; break;
+        case 4: temp = 16; break;
+      }
+      while ((previousOrientation === turningOrientation) && ((temp & layersTurned) > 0))
+      {
+        turningOrientation = Math.floor((Math.random() * 3));
+        turningLayer = Math.floor((Math.random() * 5));
+        innerTurningLayer = Math.floor((Math.random() * 2));
+        turningDirection = Math.floor((Math.random() * 3));
+        if (turningOrientation !== previousOrientation)
+          layersTurned = 0;
+      }
+      if (turningOrientation === 0)
+      {
+        if (turningLayer === 0)
+          scramble = scramble.concat('U');
+        else if (turningLayer === 1)
+          scramble = scramble.concat('D');
+        else if (turningLayer === 2)
+          scramble = scramble.concat('Uw');
+        else if (turningLayer === 3)
+          scramble = scramble.concat('Dw');
+        else if (innerTurningLayer === 0)
+          scramble = scramble.concat('3Uw');
+        else
+          scramble = scramble.concat('3Dw');
+      }
+      else if (turningOrientation === 1)
+      {
+        if (turningLayer === 0)
+          scramble = scramble.concat('F');
+        else if (turningLayer === 1)
+          scramble = scramble.concat('B');
+        else if (turningLayer === 2)
+          scramble = scramble.concat('Fw');
+        else if (turningLayer === 3)
+          scramble = scramble.concat('Bw');
+        else if (innerTurningLayer === 0)
+          scramble = scramble.concat('3Fw');
+        else
+          scramble = scramble.concat('3Bw');
+      }
+      else if (turningOrientation === 2)
+      {
+        if (turningLayer === 0)
+          scramble = scramble.concat('L');
+        else if (turningLayer === 1)
+          scramble = scramble.concat('R');
+        else if (turningLayer === 2)
+          scramble = scramble.concat('Lw');
+        else if (turningLayer === 3)
+          scramble = scramble.concat('Rw');
+        else if (innerTurningLayer === 0)
+          scramble = scramble.concat('3Lw');
+        else
+          scramble = scramble.concat('3Rw');
+      }
+      switch (turningLayer)
+      {
+        case 0: layersTurned += 1; break;
+        case 1: layersTurned += 2; break;
+        case 2: layersTurned += 4; break;
+        case 3: layersTurned += 8; break;
+        case 4: layersTurned += 16; break;
+      }
+      switch (turningDirection)
+      {
+        case 1: scramble = scramble.concat('\''); break;
+        case 2: scramble = scramble.concat('2'); break;
+      }
+      previousOrientation = turningOrientation;
+      if (i < length - 1)
+        scramble = scramble.concat(' ');
+    }
+    return scramble;
+  }
+
+  function generate7x7Scramble(length)
+  {
+    var scramble = '', layersTurned = 0, previousOrientation = -1, temp = -1;
+    for (var i = 0; i < length; i++)
+    {
+      var turningOrientation = Math.floor((Math.random() * 3)), turningLayer = Math.floor((Math.random() * 6)), turningDirection = Math.floor((Math.random() * 3));
+      if (turningOrientation !== previousOrientation)
+        layersTurned = 0;
+      switch (turningLayer)
+      {
+        case 0: temp = 1; break;
+        case 1: temp = 2; break;
+        case 2: temp = 4; break;
+        case 3: temp = 8; break;
+        case 4: temp = 16; break;
+        case 5: temp = 32; break;
+      }
+      while ((previousOrientation === turningOrientation) && ((temp & layersTurned) > 0))
+      {
+        turningOrientation = Math.floor((Math.random() * 3));
+        turningLayer = Math.floor((Math.random() * 6));
+        turningDirection = Math.floor((Math.random() * 3));
+        if (turningOrientation !== previousOrientation)
+          layersTurned = 0;
+      }
+      if (turningOrientation === 0)
+      {
+        if (turningLayer === 0)
+          scramble = scramble.concat('U');
+        else if (turningLayer === 1)
+          scramble = scramble.concat('D');
+        else if (turningLayer === 2)
+          scramble = scramble.concat('Uw');
+        else if (turningLayer === 3)
+          scramble = scramble.concat('Dw');
+        else if (turningLayer === 4)
+          scramble = scramble.concat('3Uw');
+        else
+          scramble = scramble.concat('3Dw');
+
+      }
+      else if (turningOrientation === 1)
+      {
+        if (turningLayer === 0)
+          scramble = scramble.concat('F');
+        else if (turningLayer === 1)
+          scramble = scramble.concat('B');
+        else if (turningLayer === 2)
+          scramble = scramble.concat('Fw');
+        else if (turningLayer === 3)
+          scramble = scramble.concat('Bw');
+        else if (turningLayer === 4)
+          scramble = scramble.concat('3Fw');
+        else
+          scramble = scramble.concat('3Bw');
+      }
+      else if (turningOrientation === 2)
+      {
+        if (turningLayer === 0)
+          scramble = scramble.concat('L');
+        else if (turningLayer === 1)
+          scramble = scramble.concat('R');
+        else if (turningLayer === 2)
+          scramble = scramble.concat('Lw');
+        else if (turningLayer === 3)
+          scramble = scramble.concat('Rw');
+        else if (turningLayer === 4)
+          scramble = scramble.concat('3Lw');
+        else
+          scramble = scramble.concat('3Rw');
+      }
+      switch (turningLayer)
+      {
+        case 0: layersTurned += 1; break;
+        case 1: layersTurned += 2; break;
+        case 2: layersTurned += 4; break;
+        case 3: layersTurned += 8; break;
+        case 4: layersTurned += 16; break;
+        case 5: layersTurned += 32; break;
+      }
+      switch (turningDirection)
+      {
+        case 1: scramble = scramble.concat('\''); break;
+        case 2: scramble = scramble.concat('2'); break;
+      }
+      previousOrientation = turningOrientation;
+      if (i < length - 1)
+        scramble = scramble.concat(' ');
+    }
+    return scramble;
+  }
 
 })();
 
@@ -589,7 +582,7 @@
 
   'use strict';
 
-  function MenuBarController($rootScope, MenuBarService) {
+  function MenuBarController($rootScope, $timeout, MenuBarService) {
 
     var self = this;
 
@@ -598,6 +591,13 @@
     self.puzzles = MenuBarService.getPuzzles();
     self.session = MenuBarService.init();
     self.puzzle = self.session.puzzle || MenuBarService.convertScrambleType(self.session.scrambleType);
+    $rootScope.puzzle = self.puzzle;
+
+    // TODO - find a better solution to waiting for controllers to initialize before broadcasting
+    // The cutoff for successful broadcast is ~15-20ms, so 50 should be sufficient for now.
+    $timeout(function() {
+      $rootScope.$broadcast('new scramble', self.puzzle);
+    }, 50);
 
     self.sessions = [];
     for (var i = 0; i < NUMBER_OF_SESSIONS; i++) {
@@ -611,11 +611,15 @@
     self.selectPuzzle = function(puzzle) {
       self.puzzle = MenuBarService.changePuzzle('session' + self.session.name.substr(8, self.session.name.length), puzzle);
       $rootScope.puzzle = self.puzzle;
+      $rootScope.$broadcast('new scramble', self.puzzle);
     };
 
     self.changeSession = function(sessionName) {
       self.session = MenuBarService.changeSession('session' + sessionName.substr(8, sessionName.length));
-      $rootScope.session = self.session;
+      if (self.puzzle !== (self.session.puzzle || MenuBarService.convertScrambleType(self.session.scrambleType))) {
+        $rootScope.$broadcast('new scramble', self.session.puzzle);
+      }
+      self.puzzle = self.session.puzzle || MenuBarService.convertScrambleType(self.session.scrambleType);
     };
 
     self.settings = function() {
@@ -634,7 +638,7 @@
 
   }
 
-  angular.module('menuBar').controller('MenuBarController', ['$rootScope', 'MenuBarService', MenuBarController]);
+  angular.module('menuBar').controller('MenuBarController', ['$rootScope', '$timeout', 'MenuBarService', MenuBarController]);
 
 })();
 (function() {
@@ -846,15 +850,49 @@
 
   'use strict';
 
-  function TimerController($rootScope, TimerService) {
+  function TimerController($scope, $rootScope, $interval, TimerService) {
 
     var self = this;
 
-    self.time = TimerService.getTime();
+    var TIMER_REFRESH_INTERVAL = 50;
+    var timer, isKeydown = false, isTiming = false;
+
+    self.time = moment(0).format('s.SS');
+    self.timerStyle = { 'color': '#000000' };
+
+    $scope.$on('keydown', function(event, args) {
+      if (!isKeydown) {
+        isKeydown = true;
+        if (!isTiming && (args.keyCode === 32)) {
+          self.time = moment(0).format('s.SS');
+          self.timerStyle = { 'color': '#2EB82E' };
+        } else if (isTiming) {
+          $interval.cancel(timer);
+          TimerService.saveResult(self.time, $rootScope.scramble);
+          $rootScope.$broadcast('new scramble', $rootScope.puzzle);
+        }
+      }
+    });
+
+    $scope.$on('keyup', function(event, args) {
+      if (isKeydown && (args.keyCode === 32)) {
+        isKeydown = false;
+        if (!isTiming) {
+          isTiming = 1;
+          self.timerStyle = { 'color': '#000000' };
+          TimerService.startTimer();
+          timer = $interval(function() {
+            self.time = TimerService.getTime();
+          }, TIMER_REFRESH_INTERVAL);
+        } else {
+          isTiming = 0;
+        }
+      }
+    });
 
   }
 
-  angular.module('timer').controller('TimerController', ['$rootScope', 'TimerService', TimerController]);
+  angular.module('timer').controller('TimerController', ['$scope', '$rootScope', '$interval', 'TimerService', TimerController]);
 
 })();
 (function() {
@@ -865,10 +903,49 @@
 
     var self = this;
 
-    self.time = '17:38.625';
+    var startTime;
 
+    /**
+     * Get Time.
+     * @returns {string}
+     */
     self.getTime = function() {
-      return self.time;
+      var time = moment(Date.now() - startTime);
+      if (time < 10000) {
+        return time.format('s.SSS');
+      } else if (time < 60000) {
+        return time.format('ss.SSS');
+      } else if (time < 600000) {
+        return time.format('m:ss.SSS');
+      } else if (time < 3600000) {
+        return time.utc().format('h:mm:ss.SSS');
+      }
+    };
+
+    /**
+     * Starts the Timer.
+     */
+    self.startTimer = function() {
+
+      startTime = Date.now();
+
+    };
+
+    /**
+     * Saves the result.
+     * @param time
+     * @param scramble
+     */
+    self.saveResult = function(time, scramble) {
+
+      var result = {
+        time: time,
+        scramble: scramble,
+        date: new Date()
+      };
+
+      console.log(result);
+
     };
 
   }
