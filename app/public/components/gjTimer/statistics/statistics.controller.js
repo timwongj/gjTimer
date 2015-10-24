@@ -2,27 +2,18 @@
 
   'use strict';
 
-  function StatisticsController($rootScope, StatisticsService) {
+  function StatisticsController($scope, $rootScope, StatisticsService) {
 
     var self = this;
 
-    self.session = {};
+    self.results = StatisticsService.getResults($rootScope.sessionId);
 
-    self.session.solves = [
-      {
-        time: '6.25',
-        avg5: 'DNF',
-        avg12: 'DNF'
-      },
-      {
-        time: '6.44',
-        avg5: 'DNF',
-        avg12: 'DNF'
-      }
-    ];
+    $scope.$on('refresh data', function() {
+      self.results = StatisticsService.getResults($rootScope.sessionId);
+    });
 
   }
 
-  angular.module('statistics').controller('StatisticsController', ['$rootScope', 'StatisticsService', StatisticsController]);
+  angular.module('statistics').controller('StatisticsController', ['$scope', '$rootScope', 'StatisticsService', StatisticsController]);
 
 })();

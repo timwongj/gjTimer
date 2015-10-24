@@ -11,6 +11,7 @@
     self.puzzles = MenuBarService.getPuzzles();
     self.session = MenuBarService.init();
     self.puzzle = self.session.puzzle || MenuBarService.convertScrambleType(self.session.scrambleType);
+    $rootScope.sessionId = 'session' + self.session.name.substr(8, self.session.name.length);
     $rootScope.puzzle = self.puzzle;
 
     // TODO - find a better solution to waiting for controllers to initialize before broadcasting
@@ -47,12 +48,13 @@
     };
 
     self.scramble = function() {
-      console.log('scramble');
+      $rootScope.$broadcast('new scramble', self.session.puzzle);
     };
 
     self.resetSession = function() {
       if (confirm('Are you sure you would like to reset ' + self.session.name + '?')) {
         self.session = MenuBarService.resetSession('session' + self.session.name.substr(8, self.session.name.length));
+        $rootScope.$broadcast('refresh data');
       }
     };
 

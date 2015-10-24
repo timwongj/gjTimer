@@ -11,11 +11,11 @@
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="solve in ctrl.session.solves">
+        <tr ng-repeat="result in ctrl.results | reverse">
           <td ng-bind="$index+1"></td>
-          <td ng-bind="solve.time"></td>
-          <td ng-bind="solve.avg5"></td>
-          <td ng-bind="solve.avg12"></td>
+          <td ng-bind="result.time"></td>
+          <td ng-bind="result.avg5"></td>
+          <td ng-bind="result.avg12"></td>
         </tr>
         </tbody>
       </table>

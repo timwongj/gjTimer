@@ -59,6 +59,24 @@
 
   'use strict';
 
+  function ReverseFilter() {
+
+    return function(items) {
+
+      return items.slice().reverse();
+
+    };
+
+  }
+
+  angular.module('gjTimer').filter('reverse', ReverseFilter);
+
+})();
+
+(function() {
+
+  'use strict';
+
   function cubDirective() {
     return {
       restrict: 'E',
@@ -591,6 +609,7 @@
     self.puzzles = MenuBarService.getPuzzles();
     self.session = MenuBarService.init();
     self.puzzle = self.session.puzzle || MenuBarService.convertScrambleType(self.session.scrambleType);
+    $rootScope.sessionId = 'session' + self.session.name.substr(8, self.session.name.length);
     $rootScope.puzzle = self.puzzle;
 
     // TODO - find a better solution to waiting for controllers to initialize before broadcasting
@@ -627,12 +646,13 @@
     };
 
     self.scramble = function() {
-      console.log('scramble');
+      $rootScope.$broadcast('new scramble', self.session.puzzle);
     };
 
     self.resetSession = function() {
       if (confirm('Are you sure you would like to reset ' + self.session.name + '?')) {
         self.session = MenuBarService.resetSession('session' + self.session.name.substr(8, self.session.name.length));
+        $rootScope.$broadcast('refresh data');
       }
     };
 
@@ -791,28 +811,19 @@
 
   'use strict';
 
-  function StatisticsController($rootScope, StatisticsService) {
+  function StatisticsController($scope, $rootScope, StatisticsService) {
 
     var self = this;
 
-    self.session = {};
+    self.results = StatisticsService.getResults($rootScope.sessionId);
 
-    self.session.solves = [
-      {
-        time: '6.25',
-        avg5: 'DNF',
-        avg12: 'DNF'
-      },
-      {
-        time: '6.44',
-        avg5: 'DNF',
-        avg12: 'DNF'
-      }
-    ];
+    $scope.$on('refresh data', function() {
+      self.results = StatisticsService.getResults($rootScope.sessionId);
+    });
 
   }
 
-  angular.module('statistics').controller('StatisticsController', ['$rootScope', 'StatisticsService', StatisticsController]);
+  angular.module('statistics').controller('StatisticsController', ['$scope', '$rootScope', 'StatisticsService', StatisticsController]);
 
 })();
 (function() {
@@ -822,6 +833,16 @@
   function StatisticsService() {
 
     var self = this;
+
+    /**
+     * Gets results for the session.
+     * @param sessionId
+     */
+    self.getResults = function(sessionId) {
+
+      return JSON.parse(localStorage.getItem(sessionId)).list;
+
+    };
 
   }
 
@@ -868,8 +889,9 @@
           self.timerStyle = { 'color': '#2EB82E' };
         } else if (isTiming) {
           $interval.cancel(timer);
-          TimerService.saveResult(self.time, $rootScope.scramble);
+          TimerService.saveResult(self.time, $rootScope.scramble, $rootScope.sessionId);
           $rootScope.$broadcast('new scramble', $rootScope.puzzle);
+          $rootScope.$broadcast('refresh data');
         }
       }
     });
@@ -935,8 +957,9 @@
      * Saves the result.
      * @param time
      * @param scramble
+     * @param sessionId
      */
-    self.saveResult = function(time, scramble) {
+    self.saveResult = function(time, scramble, sessionId) {
 
       var result = {
         time: time,
@@ -944,7 +967,9 @@
         date: new Date()
       };
 
-      console.log(result);
+      var session = JSON.parse(localStorage.getItem(sessionId));
+      session.list.push(result);
+      localStorage.setItem(sessionId, JSON.stringify(session));
 
     };
 

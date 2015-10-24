@@ -14,6 +14,9 @@
           'app/public/components/gjTimer/gjTimer.directive.js',
           'app/public/components/gjTimer/gjTimer.controller.js',
 
+          // filters
+          'app/public/components/shared/filters/reverse.filter.js',
+
           // Cub
           'app/public/components/gjTimer/cub/cub.directive.js',
           'app/public/components/gjTimer/cub/cub.controller.js',

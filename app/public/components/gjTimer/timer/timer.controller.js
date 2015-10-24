@@ -20,8 +20,9 @@
           self.timerStyle = { 'color': '#2EB82E' };
         } else if (isTiming) {
           $interval.cancel(timer);
-          TimerService.saveResult(self.time, $rootScope.scramble);
+          TimerService.saveResult(self.time, $rootScope.scramble, $rootScope.sessionId);
           $rootScope.$broadcast('new scramble', $rootScope.puzzle);
+          $rootScope.$broadcast('refresh data');
         }
       }
     });
