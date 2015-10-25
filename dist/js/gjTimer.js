@@ -41,6 +41,15 @@
 
   function GjTimerController($scope, $rootScope) {
 
+    var COLOR_WHITE = '#FFFFFF';
+    var COLOR_DARK_GRAY = 'rgba(0, 0 , 0, 0.8)';
+
+    $scope.style = {
+      body: {},
+      section: {},
+      timer: {}
+    };
+
     $scope.keydown = function(event) {
       $rootScope.$broadcast('keydown', event);
     };
@@ -48,6 +57,18 @@
     $scope.keyup = function(event) {
       $rootScope.$broadcast('keyup', event);
     };
+
+    $scope.$on('timer focus', function() {
+      $scope.style.body = { 'background-color': COLOR_DARK_GRAY };
+      $scope.style.section = { 'display': 'none' };
+      $scope.style.timer = { 'margin-top': '4.5625em' };
+    });
+
+    $scope.$on('timer unfocus', function() {
+      $scope.style.body = { 'background-color': COLOR_WHITE };
+      $scope.style.section = { 'display': 'block' };
+      $scope.style.timer = { 'margin-top': '0' };
+    });
 
   }
 
@@ -142,9 +163,17 @@
 
     var self = this;
 
+    var ENTER_KEY_CODE = 13;
+
     $scope.$on('new scramble', function($event, puzzle) {
       self.scramble = ScrambleService.newScramble(puzzle);
       $rootScope.scramble = self.scramble;
+    });
+
+    $scope.$on('keydown', function($event, event) {
+      if (event.keyCode == ENTER_KEY_CODE) {
+        self.scramble = ScrambleService.newScramble($rootScope.puzzle);
+      }
     });
 
   }
@@ -639,6 +668,7 @@
         $rootScope.$broadcast('new scramble', self.session.puzzle);
       }
       self.puzzle = self.session.puzzle || MenuBarService.convertScrambleType(self.session.scrambleType);
+      $rootScope.puzzle = self.puzzle;
     };
 
     self.settings = function() {
@@ -871,16 +901,18 @@
 
   'use strict';
 
-  function TimerController($scope, $rootScope, $interval, TimerService) {
+  function TimerController($scope, $rootScope, $interval, $timeout, TimerService) {
 
     var self = this;
 
     var TIMER_REFRESH_INTERVAL = 50;
     var SPACE_BAR_KEY_CODE = 32;
     var COLOR_BLACK = '#000000';
+    var COLOR_RED = '#FF0000';
     var COLOR_GREEN = '#2EB82E';
     var DEFAULT_TIMER_DISPLAY = moment(0).format('s.SS');
-    var timer, keydown = false, isTiming = false;
+    var FADE_ANIMATION_DELAY = 200;
+    var timer, keydown = false, isTiming = false, falseStart = false;
 
     self.time = DEFAULT_TIMER_DISPLAY;
     self.timerStyle = { 'color': '#000000' };
@@ -888,12 +920,22 @@
     $scope.$on('keydown', function(event, args) {
       if (!keydown) {
         if (!isTiming && (args.keyCode === 32)) {
-          keydown = true;
           self.time = DEFAULT_TIMER_DISPLAY;
-          self.timerStyle = { 'color': COLOR_GREEN };
+          self.timerStyle = { 'color': COLOR_RED };
+          $timeout(function() {
+            if (!falseStart) {
+              keydown = true;
+              self.timerStyle = { 'color': COLOR_GREEN };
+              $rootScope.$broadcast('timer focus');
+            } else {
+              falseStart = false;
+              self.timerStyle = { 'color': COLOR_BLACK };
+            }
+          }, FADE_ANIMATION_DELAY);
         } else if (isTiming) {
           keydown = true;
           $interval.cancel(timer);
+          $rootScope.$broadcast('timer unfocus');
           TimerService.saveResult(self.time, $rootScope.scramble, $rootScope.sessionId);
           $rootScope.$broadcast('new scramble', $rootScope.puzzle);
           $rootScope.$broadcast('refresh data');
@@ -915,12 +957,14 @@
           isTiming = false;
           keydown = false;
         }
+      } else {
+        falseStart = (self.timerStyle.color !== COLOR_GREEN);
       }
     });
 
   }
 
-  angular.module('timer').controller('TimerController', ['$scope', '$rootScope', '$interval', 'TimerService', TimerController]);
+  angular.module('timer').controller('TimerController', ['$scope', '$rootScope', '$interval', '$timeout', 'TimerService', TimerController]);
 
 })();
 (function() {

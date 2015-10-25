@@ -41,6 +41,7 @@
         $rootScope.$broadcast('new scramble', self.session.puzzle);
       }
       self.puzzle = self.session.puzzle || MenuBarService.convertScrambleType(self.session.scrambleType);
+      $rootScope.puzzle = self.puzzle;
     };
 
     self.settings = function() {

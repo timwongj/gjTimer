@@ -9,14 +9,16 @@
   <link rel="shortcut icon" type="image/x-icon" href="dist/img/cubeLogo.png"/>
   <title>gjTimer</title>
 </head>
-<body ng-app="gjTimerApp" ng-controller="gjTimerController" ng-keydown="keydown($event)" ng-keyup="keyup($event)">
+<body ng-app="gjTimerApp" ng-controller="gjTimerController" ng-keydown="keydown($event)" ng-keyup="keyup($event)" ng-style="style.body">
   <div class="container">
-    <menu-bar></menu-bar>
+    <div ng-style="style.section">
+      <menu-bar></menu-bar>
+    </div>
     <div class="row">
-      <div class="col-md-8 section">
+      <div class="col-md-8 section" ng-style="style.timer">
         <timer></timer>
       </div>
-      <div class="col-md-4 section">
+      <div class="col-md-4 section" ng-style="style.section">
         <statistics></statistics>
       </div>
     </div>
