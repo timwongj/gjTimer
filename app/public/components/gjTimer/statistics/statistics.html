@@ -4,18 +4,18 @@
       <table class="table table-condensed table-bordered table-hover table-results">
         <thead>
         <tr>
-          <th>#</th>
-          <th>Time</th>
-          <th>Avg 5</th>
-          <th>Avg 12</th>
+          <th class="index">#</th>
+          <th class="time">Time</th>
+          <th class="avg">Avg 5</th>
+          <th class="avg">Avg 12</th>
         </tr>
         </thead>
         <tbody>
         <tr ng-repeat="result in ctrl.results | reverse">
-          <td ng-bind="$index+1"></td>
-          <td ng-bind="result.time"></td>
-          <td ng-bind="result.avg5"></td>
-          <td ng-bind="result.avg12"></td>
+          <td class="index" ng-bind="ctrl.results.length - $index"></td>
+          <td class="time" ng-bind="result.time"></td>
+          <td class="avg" ng-bind="result.avg5"></td>
+          <td class="avg" ng-bind="result.avg12"></td>
         </tr>
         </tbody>
       </table>

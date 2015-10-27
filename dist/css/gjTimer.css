@@ -35,6 +35,15 @@
 #statistics .table-results {
   margin: 0;
 }
+#statistics .table-results .index {
+  text-align: center;
+}
+#statistics .table-results .time {
+  text-align: center;
+}
+#statistics .table-results .avg {
+  text-align: center;
+}
 #timer {
   text-align: center;
 }
