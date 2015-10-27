@@ -874,6 +874,31 @@
 
     };
 
+    /**
+     * Calculates the average of the results.
+     * @param results
+     */
+    self.calculateAverage = function(results) {
+      var rawTimes = [];
+      angular.forEach(results, function(result) {
+        if ((result.penalty !== undefined) && (result.penalty == '(DNF)')) {
+          rawTimes.push(-1);
+        } else if ((result.penalty !== undefined) && (result.penalty == '(+2)')) {
+          rawTimes.push(moment(result.time).unix() + 2000);
+        } else {
+          rawTimes.push(moment(result.time).unix());
+        }
+      });
+    };
+
+    /**
+     * Calculates the mean of the results.
+     * @param results
+     */
+    self.calculateMean = function(results) {
+
+    };
+
   }
 
   angular.module('results').service('ResultsService', ResultsService);
@@ -907,7 +932,7 @@
 
     var TIMER_REFRESH_INTERVAL = 50, FADE_ANIMATION_DELAY = 200, SPACE_BAR_KEY_CODE = 32;
 
-    self.time = moment(0).format('s.SS');
+    self.time = moment(0).format('s.SSS');
 
     var STYLES = {
       BLACK: { 'color': '#000000' },
@@ -918,7 +943,7 @@
     $scope.$on('keydown', function($event, event) {
       if ((state === 'reset') && (event.keyCode === SPACE_BAR_KEY_CODE)) {
         state = 'keydown';
-        self.time = moment(0).format('s.SS');
+        self.time = moment(0).format('s.SSS');
         self.timerStyle = STYLES.RED;
         $timeout(function() {
           if (state === 'keydown') {

@@ -8,7 +8,7 @@
 
     var TIMER_REFRESH_INTERVAL = 50, FADE_ANIMATION_DELAY = 200, SPACE_BAR_KEY_CODE = 32;
 
-    self.time = moment(0).format('s.SS');
+    self.time = moment(0).format('s.SSS');
 
     var STYLES = {
       BLACK: { 'color': '#000000' },
@@ -19,7 +19,7 @@
     $scope.$on('keydown', function($event, event) {
       if ((state === 'reset') && (event.keyCode === SPACE_BAR_KEY_CODE)) {
         state = 'keydown';
-        self.time = moment(0).format('s.SS');
+        self.time = moment(0).format('s.SSS');
         self.timerStyle = STYLES.RED;
         $timeout(function() {
           if (state === 'keydown') {

@@ -11,12 +11,12 @@
           singleRun: true,
           browsers: ['PhantomJS'],
           files: [
+            // third party dependencies
             'bower_components/jquery/dist/jquery.min.js',
-            'bower_components/jquery-ui/jquery-ui.min.js',
             'bower_components/bootstrap/dist/js/bootstrap.min.js',
             'bower_components/angular/angular.min.js',
             'bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js',
-            'bower_components/angular-resource/angular-resource.min.js',
+            'bower_components/moment/min/moment.min.js',
             'bower_components/angular-mocks/angular-mocks.js',
 
             // gjTimerApp
@@ -40,9 +40,9 @@
             'app/public/components/gjTimer/scramble/scramble.service.js',
 
             // Menu
-            'app/public/components/gjTimer/menu/menuBar.directive.js',
-            'app/public/components/gjTimer/menu/menuBar.controller.js',
-            'app/public/components/gjTimer/menu/menuBar.service.js',
+            'app/public/components/gjTimer/menuBar/menuBar.directive.js',
+            'app/public/components/gjTimer/menuBar/menuBar.controller.js',
+            'app/public/components/gjTimer/menuBar/menuBar.service.js',
 
             // Results
             'app/public/components/gjTimer/results/results.directive.js',
