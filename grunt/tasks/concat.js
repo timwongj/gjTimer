@@ -32,10 +32,10 @@
           'app/public/components/gjTimer/menuBar/menuBar.controller.js',
           'app/public/components/gjTimer/menuBar/menuBar.service.js',
 
-          // Statistics
-          'app/public/components/gjTimer/statistics/statistics.directive.js',
-          'app/public/components/gjTimer/statistics/statistics.controller.js',
-          'app/public/components/gjTimer/statistics/statistics.service.js',
+          // Results
+          'app/public/components/gjTimer/results/results.directive.js',
+          'app/public/components/gjTimer/results/results.controller.js',
+          'app/public/components/gjTimer/results/results.service.js',
 
           // Timer
           'app/public/components/gjTimer/timer/timer.directive.js',
@@ -61,7 +61,7 @@
           'app/public/less/cub.less',
           'app/public/less/scramble.less',
           'app/public/less/menuBar.less',
-          'app/public/less/statistics.less',
+          'app/public/less/results.less',
           'app/public/less/timer.less'
         ],
         dest: 'dist/css/gjTimer.less'

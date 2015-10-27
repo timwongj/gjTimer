@@ -2,7 +2,7 @@
 
   'use strict';
 
-  describe('The statistics service', function() {
+  describe('The results service', function() {
 
     it('should dose gj', function() {
 

@@ -2,7 +2,7 @@
 
   'use strict';
 
-  function StatisticsService() {
+  function ResultsService() {
 
     var self = this;
 
@@ -18,6 +18,6 @@
 
   }
 
-  angular.module('statistics').service('StatisticsService', StatisticsService);
+  angular.module('results').service('ResultsService', ResultsService);
 
 })();

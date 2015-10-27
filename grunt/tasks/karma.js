@@ -44,10 +44,10 @@
             'app/public/components/gjTimer/menu/menuBar.controller.js',
             'app/public/components/gjTimer/menu/menuBar.service.js',
 
-            // Statistics
-            'app/public/components/gjTimer/statistics/statistics.directive.js',
-            'app/public/components/gjTimer/statistics/statistics.controller.js',
-            'app/public/components/gjTimer/statistics/statistics.service.js',
+            // Results
+            'app/public/components/gjTimer/results/results.directive.js',
+            'app/public/components/gjTimer/results/results.controller.js',
+            'app/public/components/gjTimer/results/results.service.js',
 
             // Timer
             'app/public/components/gjTimer/timer/timer.directive.js',

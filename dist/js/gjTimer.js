@@ -31,7 +31,7 @@
    * This is the main gjTimer module. All gjTimer components should be pulled in here as dependencies.
    * This module is pulled into the main app.js 'gjTimerApp' module.
    */
-  angular.module('gjTimer', ['cub', 'menuBar', 'scramble', 'statistics', 'timer']);
+  angular.module('gjTimer', ['cub', 'menuBar', 'scramble', 'results', 'timer']);
 
 })();
 
@@ -824,43 +824,43 @@
 
   'use strict';
 
-  function statisticsDirective() {
+  function resultsDirective() {
     return {
       restrict: 'E',
-      templateUrl: '/dist/components/gjTimer/statistics/statistics.html',
-      controller: 'StatisticsController',
+      templateUrl: '/dist/components/gjTimer/results/results.html',
+      controller: 'ResultsController',
       controllerAs: 'ctrl',
       scope: true
     };
   }
 
-  angular.module('statistics', []).directive('statistics', statisticsDirective);
+  angular.module('results', []).directive('results', resultsDirective);
 
 })();
 (function() {
 
   'use strict';
 
-  function StatisticsController($scope, $rootScope, StatisticsService) {
+  function ResultsController($scope, $rootScope, ResultsService) {
 
     var self = this;
 
-    self.results = StatisticsService.getResults($rootScope.sessionId);
+    self.results = ResultsService.getResults($rootScope.sessionId);
 
     $scope.$on('refresh data', function() {
-      self.results = StatisticsService.getResults($rootScope.sessionId);
+      self.results = ResultsService.getResults($rootScope.sessionId);
     });
 
   }
 
-  angular.module('statistics').controller('StatisticsController', ['$scope', '$rootScope', 'StatisticsService', StatisticsController]);
+  angular.module('results').controller('ResultsController', ['$scope', '$rootScope', 'ResultsService', ResultsController]);
 
 })();
 (function() {
 
   'use strict';
 
-  function StatisticsService() {
+  function ResultsService() {
 
     var self = this;
 
@@ -876,7 +876,7 @@
 
   }
 
-  angular.module('statistics').service('StatisticsService', StatisticsService);
+  angular.module('results').service('ResultsService', ResultsService);
 
 })();
 
