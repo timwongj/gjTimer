@@ -47,13 +47,19 @@
       libJs: {
         src: [
           'bower_components/jquery/dist/jquery.min.js',
-          'bower_components/jquery-ui/jquery-ui.min.js',
           'bower_components/bootstrap/dist/js/bootstrap.min.js',
           'bower_components/angular/angular.min.js',
           'bower_components/angular-bootstrap/ui-bootstrap.min.js',
-          'bower_components/moment/min/moment.min.js'
+          'bower_components/moment/min/moment.min.js',
+          'lib/jsss/scramble_222.js',
+          'lib/jsss/scramble_333.js',
+          'lib/jsss/scramble_clock.js',
+          'lib/jsss/scramble_minx.js',
+          'lib/jsss/scramble_NNN.js',
+          'lib/jsss/scramble_pyram.js',
+          'lib/jsss/scramble_sq1.js'
         ],
-        dest: 'dist/js/lib.min.js'
+        dest: 'dist/js/lib.js'
       },
       gjTimerLess: {
         src: [

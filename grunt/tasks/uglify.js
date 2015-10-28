@@ -9,6 +9,11 @@
         files: {
           'dist/js/gjTimer.min.js': ['dist/js/gjTimer.js']
         }
+      },
+      libJs: {
+        files: {
+          'dist/js/lib.min.js': ['dist/js/lib.js']
+        }
       }
     });
 
