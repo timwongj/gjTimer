@@ -6,7 +6,7 @@
 
     var self = this, timer, state = 'reset';
 
-    var TIMER_REFRESH_INTERVAL = 50, FADE_ANIMATION_DELAY = 200, SPACE_BAR_KEY_CODE = 32;
+    var TIMER_REFRESH_INTERVAL = 50, START_TIMER_DELAY = 100, STOP_TIMER_DELAY = 100, SPACE_BAR_KEY_CODE = 32;
 
     self.time = moment(0).format('s.SSS');
 
@@ -27,7 +27,7 @@
             self.timerStyle = STYLES.GREEN;
             $rootScope.$broadcast('timer focus');
           }
-        }, FADE_ANIMATION_DELAY);
+        }, START_TIMER_DELAY);
       } else if (state === 'timing') {
         state = 'stopped';
         $interval.cancel(timer);
@@ -47,7 +47,9 @@
           self.time = TimerService.getTime();
         }, TIMER_REFRESH_INTERVAL);
       } else if ((state === 'stopped') || (state === 'keydown')) {
-        state = 'reset';
+        $timeout(function() {
+          state = 'reset';
+        }, STOP_TIMER_DELAY);
       }
     });
 
