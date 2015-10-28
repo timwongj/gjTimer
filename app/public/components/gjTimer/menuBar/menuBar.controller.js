@@ -37,6 +37,8 @@
 
     self.changeSession = function(sessionName) {
       self.session = MenuBarService.changeSession('session' + sessionName.substr(8, sessionName.length));
+      $rootScope.sessionId = 'session' + sessionName.substr(8, sessionName.length);
+      $rootScope.$broadcast('refresh data');
       if (self.puzzle !== (self.session.puzzle || MenuBarService.convertScrambleType(self.session.scrambleType))) {
         $rootScope.$broadcast('new scramble', self.session.puzzle);
       }

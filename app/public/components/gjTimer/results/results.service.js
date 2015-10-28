@@ -9,10 +9,27 @@
     /**
      * Gets results for the session.
      * @param sessionId
+     * @param precision
      */
-    self.getResults = function(sessionId) {
+    self.getResults = function(sessionId, precision) {
 
-      return JSON.parse(localStorage.getItem(sessionId)).list;
+      var results = JSON.parse(localStorage.getItem(sessionId)).list;
+
+      angular.forEach(results, function(result, index) {
+        result.time = Number(result.time).toFixed(precision);
+        if (index >= 4) {
+          result.avg5 = self.calculateAverage(results.slice(index - 4, index + 1), precision);
+        } else {
+          result.avg5 = 'DNF';
+        }
+        if (index >= 11) {
+          result.avg12 = self.calculateAverage(results.slice(index - 11, index + 1), precision);
+        } else {
+          result.avg12 = 'DNF';
+        }
+      });
+
+      return results;
 
     };
 
@@ -28,9 +45,9 @@
       }
       var rawTimes = [], DNF = 2147485547;
       angular.forEach(results, function(result) {
-        if ((result.penalty !== undefined) && (result.penalty == '(DNF)')) {
+        if ((result.penalty !== undefined) && (result.penalty === '(DNF)')) {
           rawTimes.push(DNF);
-        } else if ((result.penalty !== undefined) && (result.penalty == '(+2)')) {
+        } else if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
           rawTimes.push(self.timeToMilliseconds(result.time, precision) + 2);
         } else {
           rawTimes.push(self.timeToMilliseconds(result.time, precision));
@@ -48,9 +65,37 @@
     /**
      * Calculates the mean of the results.
      * @param results
+     * @param precision
      */
-    self.calculateMean = function(results) {
+    self.calculateMean = function(results, precision) {
+      var rawTimes = [];
+      angular.forEach(results, function(result) {
+        if ((result.penalty !== undefined) && (result.penalty === '(DNF)')) {
+          return 'DNF';
+        } else if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
+          rawTimes.push(self.timeToMilliseconds(result.time, precision) + 2);
+        } else {
+          rawTimes.push(self.timeToMilliseconds(result.time, precision));
+        }
+      });
+      return (rawTimes.reduce(function(pv, cv) { return pv + cv; }, 0) / rawTimes.length).toFixed(precision);
+    };
 
+    /**
+     * Calculates the mean of the results.
+     * @param results
+     * @param precision
+     */
+    self.calculateLargeMean = function(results, precision) {
+      var rawTimes = [];
+      angular.forEach(results, function(result) {
+        if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
+          rawTimes.push(self.timeToMilliseconds(result.time, precision) + 2);
+        } else if ((result.penalty === undefined) || (result.penalty === '')) {
+          rawTimes.push(self.timeToMilliseconds(result.time, precision));
+        }
+      });
+      return (rawTimes.reduce(function(pv, cv) { return pv + cv; }, 0) / rawTimes.length).toFixed(precision);
     };
 
     /**
@@ -69,7 +114,7 @@
       } else {
         return -1;
       }
-    }
+    };
 
   }
 
