@@ -7,7 +7,6 @@
     var self = this;
 
     var NUMBER_OF_SESSIONS = 20;
-    var PUZZLES = ['Rubik\'s Cube', '4x4 Cube', '5x5 Cube', '2x2 Cube', '6x6 Cube', '7x7 Cube'];
 
     /**
      * Initialize or get session number from local storage.
@@ -26,14 +25,18 @@
       }
 
       var newSession = {
-        puzzle: 'Rubik\'s Cube',
+        event: 'Rubik\'s Cube',
         list: []
       };
 
       for (var i = 1; i <= NUMBER_OF_SESSIONS; i++) {
-        if (localStorage.getItem('session' + i) === null) {
+        var session = JSON.parse(localStorage.getItem('session' + i));
+        if (session === null) {
           newSession.name = 'Session ' + i;
           localStorage.setItem('session' + i, JSON.stringify(newSession));
+        } else if (session.event === null) {
+          session.event = 'Rubik\'s Cube';
+          localStorage.setItem('session' + i, JSON.stringify(session));
         }
       }
 
@@ -78,46 +81,17 @@
     };
 
     /**
-     * Saves the new puzzle in the session.
+     * Saves the new event in the session.
      * @param sessionId
-     * @param puzzle
+     * @param event
      * @returns {*}
      */
-    self.changePuzzle = function(sessionId, puzzle) {
+    self.changeEvent = function(sessionId, event) {
 
       var session = JSON.parse(localStorage.getItem(sessionId));
-      session.puzzle = puzzle;
+      session.event = event;
       localStorage.setItem(sessionId, JSON.stringify(session));
-      return session.puzzle;
-
-    };
-
-    /**
-     * Gets the list of puzzles supported in gjTimer.
-     * @returns {string[]}
-     */
-    self.getPuzzles = function() {
-
-      return PUZZLES;
-
-    };
-
-    /**
-     * Converts scrambleType to puzzle.
-     * This is for handling old session data from legacy gjTimer.
-     * @param scrambleType
-     * @returns {*}
-     */
-    self.convertScrambleType = function(scrambleType) {
-
-      switch(scrambleType) {
-        case 2: return '2x2 Cube';
-        case 3: return 'Rubik\'s Cube';
-        case 4: return '4x4 Cube';
-        case 5: return '5x5 Cube';
-        case 6: return '6x6 Cube';
-        case 7: return '7x7 Cube';
-      }
+      return session.event;
 
     };
 

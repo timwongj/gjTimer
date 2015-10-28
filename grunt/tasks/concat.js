@@ -17,6 +17,9 @@
           // filters
           'app/public/components/shared/filters/reverse.filter.js',
 
+          // services
+          'app/public/components/shared/services/events.service.js',
+
           // Cub
           'app/public/components/gjTimer/cub/cub.directive.js',
           'app/public/components/gjTimer/cub/cub.controller.js',

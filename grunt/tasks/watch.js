@@ -11,7 +11,7 @@
       },
       js: {
         files: ['app/**/*.js', 'test/**/*', 'grunt/**/*', 'Gruntfile.js'],
-        tasks: ['jshint', 'concat', 'uglify']
+        tasks: ['jshint', 'concat', 'uglify:gjTimerJs']
       },
       css: {
         files: ['app/public/less/*.less'],
