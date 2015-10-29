@@ -34,7 +34,7 @@
         $rootScope.$broadcast('timer unfocus');
         TimerService.saveResult(self.time, $rootScope.scramble, $rootScope.sessionId);
         $rootScope.$broadcast('refresh data');
-        $rootScope.$broadcast('new scramble', $rootScope.event);
+        $rootScope.$broadcast('new scramble');
       }
     });
 
