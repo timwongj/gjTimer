@@ -1,14 +1,31 @@
 .section {
   padding: .375em;
 }
+.jumbotron-timer,
+.jumbotron-results {
+  height: calc(100vh - 8em);
+  max-height: 50em;
+  margin-bottom: .5em;
+  padding: .5em !important;
+  border-radius: .25em !important;
+  overflow-y: auto;
+  background-color: #eeeeee;
+}
+#cub {
+  margin: .25em;
+  padding: .25em;
+  text-align: center;
+}
 #scramble {
   margin: .25em;
   padding: .25em;
+  text-align: center;
 }
 #scramble .scramble {
+  margin: .0625em;
+  padding: .0625em;
   font-size: 150%;
-  margin: .125em;
-  padding: .125em;
+  font-family: "Courier New", Courier, monospace;
 }
 #menuBar {
   margin: .5em 0;
@@ -19,23 +36,27 @@
   font-size: 150%;
   font-weight: 400;
 }
-#statistics .jumbotron-statistics {
-  padding: 1em;
-  margin-bottom: .5em;
-}
-#statistics .times {
+#results .times {
   margin: .125em;
   padding: .125em;
+}
+#results .table-results {
+  margin: 0;
+}
+#results .table-results .index {
+  text-align: center;
+}
+#results .table-results .time {
+  text-align: center;
+}
+#results .table-results .avg {
+  text-align: center;
 }
 #timer {
   text-align: center;
 }
-#timer .jumbotron-timer {
-  padding: 1em;
-  margin-bottom: .5em;
-}
 #timer .time {
   font-size: 800%;
-  margin: .0625em;
-  padding: .0625em;
+  margin: .015625em;
+  padding: .015625em;
 }

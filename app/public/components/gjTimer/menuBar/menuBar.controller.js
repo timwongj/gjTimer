@@ -2,22 +2,22 @@
 
   'use strict';
 
-  function MenuBarController($rootScope, $timeout, MenuBarService) {
+  function MenuBarController($rootScope, $timeout, MenuBarService, Events) {
 
     var self = this;
 
     var NUMBER_OF_SESSIONS = 20;
 
-    self.puzzles = MenuBarService.getPuzzles();
+    self.events = Events.getEvents();
     self.session = MenuBarService.init();
-    self.puzzle = self.session.puzzle || MenuBarService.convertScrambleType(self.session.scrambleType);
+    self.event = self.session.event;
     $rootScope.sessionId = 'session' + self.session.name.substr(8, self.session.name.length);
-    $rootScope.puzzle = self.puzzle;
+    $rootScope.event = self.event;
 
     // TODO - find a better solution to waiting for controllers to initialize before broadcasting
     // The cutoff for successful broadcast is ~15-20ms, so 50 should be sufficient for now.
     $timeout(function() {
-      $rootScope.$broadcast('new scramble', self.puzzle);
+      $rootScope.$broadcast('new scramble', self.event);
     }, 50);
 
     self.sessions = [];
@@ -29,18 +29,21 @@
       session.name = 'Session ' + ($index + 1);
     });
 
-    self.selectPuzzle = function(puzzle) {
-      self.puzzle = MenuBarService.changePuzzle('session' + self.session.name.substr(8, self.session.name.length), puzzle);
-      $rootScope.puzzle = self.puzzle;
-      $rootScope.$broadcast('new scramble', self.puzzle);
+    self.selectEvent = function(event) {
+      self.event = MenuBarService.changeEvent('session' + self.session.name.substr(8, self.session.name.length), event);
+      $rootScope.event = self.event;
+      $rootScope.$broadcast('new scramble', self.event);
     };
 
     self.changeSession = function(sessionName) {
       self.session = MenuBarService.changeSession('session' + sessionName.substr(8, sessionName.length));
-      if (self.puzzle !== (self.session.puzzle || MenuBarService.convertScrambleType(self.session.scrambleType))) {
-        $rootScope.$broadcast('new scramble', self.session.puzzle);
+      $rootScope.sessionId = 'session' + sessionName.substr(8, sessionName.length);
+      $rootScope.event = self.session.event;
+      $rootScope.$broadcast('refresh data');
+      if (self.event !== self.session.event) {
+        $rootScope.$broadcast('new scramble', self.session.event);
       }
-      self.puzzle = self.session.puzzle || MenuBarService.convertScrambleType(self.session.scrambleType);
+      self.event = $rootScope.event;
     };
 
     self.settings = function() {
@@ -48,7 +51,7 @@
     };
 
     self.scramble = function() {
-      $rootScope.$broadcast('new scramble', self.session.puzzle);
+      $rootScope.$broadcast('new scramble', self.session.event);
     };
 
     self.resetSession = function() {
@@ -60,6 +63,6 @@
 
   }
 
-  angular.module('menuBar').controller('MenuBarController', ['$rootScope', '$timeout', 'MenuBarService', MenuBarController]);
+  angular.module('menuBar').controller('MenuBarController', ['$rootScope', '$timeout', 'MenuBarService', 'Events', MenuBarController]);
 
 })();

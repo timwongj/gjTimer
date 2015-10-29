@@ -17,6 +17,9 @@
           // filters
           'app/public/components/shared/filters/reverse.filter.js',
 
+          // services
+          'app/public/components/shared/services/events.service.js',
+
           // Cub
           'app/public/components/gjTimer/cub/cub.directive.js',
           'app/public/components/gjTimer/cub/cub.controller.js',
@@ -32,10 +35,10 @@
           'app/public/components/gjTimer/menuBar/menuBar.controller.js',
           'app/public/components/gjTimer/menuBar/menuBar.service.js',
 
-          // Statistics
-          'app/public/components/gjTimer/statistics/statistics.directive.js',
-          'app/public/components/gjTimer/statistics/statistics.controller.js',
-          'app/public/components/gjTimer/statistics/statistics.service.js',
+          // Results
+          'app/public/components/gjTimer/results/results.directive.js',
+          'app/public/components/gjTimer/results/results.controller.js',
+          'app/public/components/gjTimer/results/results.service.js',
 
           // Timer
           'app/public/components/gjTimer/timer/timer.directive.js',
@@ -47,13 +50,20 @@
       libJs: {
         src: [
           'bower_components/jquery/dist/jquery.min.js',
-          'bower_components/jquery-ui/jquery-ui.min.js',
           'bower_components/bootstrap/dist/js/bootstrap.min.js',
           'bower_components/angular/angular.min.js',
           'bower_components/angular-bootstrap/ui-bootstrap.min.js',
-          'bower_components/moment/min/moment.min.js'
+          'bower_components/moment/min/moment.min.js',
+          'lib/jsss/scramble_222.js',
+          'lib/jsss/scramble_333.js',
+          'lib/jsss/scramble_clock.js',
+          'lib/jsss/scramble_minx.js',
+          'lib/jsss/scramble_NNN.js',
+          'lib/jsss/scramble_pyram.js',
+          'lib/jsss/scramble_sq1.js',
+          'lib/jsss/lib/raphael-min.js'
         ],
-        dest: 'dist/js/lib.min.js'
+        dest: 'dist/js/lib.js'
       },
       gjTimerLess: {
         src: [
@@ -61,7 +71,7 @@
           'app/public/less/cub.less',
           'app/public/less/scramble.less',
           'app/public/less/menuBar.less',
-          'app/public/less/statistics.less',
+          'app/public/less/results.less',
           'app/public/less/timer.less'
         ],
         dest: 'dist/css/gjTimer.less'

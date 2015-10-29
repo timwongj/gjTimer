@@ -5,11 +5,11 @@
       <div class="btn-group" role="group">
         <div class="btn-group" role="group">
           <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="true">
-            {{ctrl.puzzle}}&nbsp;<span class="caret"></span>
+            {{ctrl.event}}&nbsp;<span class="caret"></span>
           </button>
           <ul class="dropdown-menu" role="menu">
-            <li role="presentation" ng-repeat="puzzle in ctrl.puzzles">
-              <a role="menuitem" tabindex="-1" href="" ng-bind="puzzle" ng-click="ctrl.selectPuzzle(puzzle)"></a>
+            <li role="presentation" ng-repeat="(event, id) in ctrl.events">
+              <a role="menuitem" tabindex="-1" href="" ng-bind="event" ng-click="ctrl.selectEvent(event)"></a>
             </li>
           </ul>
         </div>

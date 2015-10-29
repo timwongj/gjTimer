@@ -13,7 +13,9 @@
     "test",
     "tests"
   ],
-  "devDependencies": {},
+  "devDependencies": {
+    "angular-mocks": "~1.4.7"
+  },
   "dependencies": {
     "font-awesome": "~4.4.0",
     "angular-bootstrap": "~0.14.2",

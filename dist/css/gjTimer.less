@@ -1,22 +1,44 @@
+@color-jumbotron: #eee;
+@height-section: calc(~"100vh - 8em");
+@max-height-section: 50em;
+
 .section {
   padding: .375em;
 }
 
+.jumbotron-timer, .jumbotron-results {
+  height: @height-section;
+  max-height: @max-height-section;
+  margin-bottom: .5em;
+  padding: .5em !important;
+  border-radius: .25em !important;
+  overflow-y: auto;
+  background-color: @color-jumbotron;
+}
+
 #cub {
 
+  margin: .25em;
+  padding: .25em;
+  text-align: center;
+
 }
+
 #scramble {
 
   margin: .25em;
   padding: .25em;
+  text-align: center;
 
   .scramble {
+    margin: .0625em;
+    padding: .0625em;
     font-size: 150%;
-    margin: .125em;
-    padding: .125em;
+    font-family: "Courier New", Courier, monospace;
   }
 
 }
+
 #menuBar {
 
   margin: .5em 0;
@@ -29,32 +51,40 @@
   }
 
 }
-#statistics {
 
-  .jumbotron-statistics {
-    padding: 1em;
-    margin-bottom: .5em;
-  }
+#results {
 
   .times {
     margin: .125em;
     padding: .125em;
   }
 
+  .table-results {
+    margin: 0;
+  }
+
+  .table-results .index {
+    text-align: center;
+  }
+
+  .table-results .time {
+    text-align: center;
+  }
+
+  .table-results .avg {
+    text-align: center;
+  }
+
 }
+
 #timer {
 
   text-align: center;
 
-  .jumbotron-timer {
-    padding: 1em;
-    margin-bottom: .5em;
-  }
-
   .time {
     font-size: 800%;
-    margin: .0625em;
-    padding: .0625em;
+    margin: .015625em;
+    padding: .015625em;
   }
 
 }
