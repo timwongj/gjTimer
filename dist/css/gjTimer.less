@@ -1,14 +1,15 @@
 @color-jumbotron: #eee;
 @height-section: calc(~"100vh - 8em");
-@max-height-section: 50em;
+@height-results-mobile: 30em;
 
 .section {
   padding: .375em;
 }
 
 .jumbotron-timer, .jumbotron-results {
-  height: @height-section;
-  max-height: @max-height-section;
+  @media screen and (min-width: 62em) {
+    height: @height-section;
+  }
   margin-bottom: .5em;
   padding: .5em !important;
   border-radius: .25em !important;
@@ -16,6 +17,11 @@
   background-color: @color-jumbotron;
 }
 
+.jumbotron-results {
+  @media screen and (max-width: 62em) {
+    height: @height-results-mobile;
+  }
+}
 #cub {
 
   margin: .25em;

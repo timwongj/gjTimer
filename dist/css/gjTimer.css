@@ -3,13 +3,22 @@
 }
 .jumbotron-timer,
 .jumbotron-results {
-  height: calc(100vh - 8em);
-  max-height: 50em;
   margin-bottom: .5em;
   padding: .5em !important;
   border-radius: .25em !important;
   overflow-y: auto;
   background-color: #eeeeee;
+}
+@media screen and (min-width: 62em) {
+  .jumbotron-timer,
+  .jumbotron-results {
+    height: calc(100vh - 8em);
+  }
+}
+@media screen and (max-width: 62em) {
+  .jumbotron-results {
+    height: 30em;
+  }
 }
 #cub {
   margin: .25em;
