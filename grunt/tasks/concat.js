@@ -54,14 +54,14 @@
           'bower_components/angular/angular.min.js',
           'bower_components/angular-bootstrap/ui-bootstrap.min.js',
           'bower_components/moment/min/moment.min.js',
-          'lib/jsss/scramble_222.js',
-          'lib/jsss/scramble_333.js',
-          'lib/jsss/scramble_clock.js',
-          'lib/jsss/scramble_minx.js',
-          'lib/jsss/scramble_NNN.js',
-          'lib/jsss/scramble_pyram.js',
-          'lib/jsss/scramble_sq1.js',
-          'lib/jsss/lib/raphael-min.js'
+          'bower_components/jsss/scramble_222.js',
+          'bower_components/jsss/scramble_333.js',
+          'bower_components/jsss/scramble_clock.js',
+          'bower_components/jsss/scramble_minx.js',
+          'bower_components/jsss/scramble_NNN.js',
+          'bower_components/jsss/scramble_pyram.js',
+          'bower_components/jsss/scramble_sq1.js',
+          'bower_components/jsss/lib/raphael-min.js'
         ],
         dest: 'dist/js/lib.js'
       },
