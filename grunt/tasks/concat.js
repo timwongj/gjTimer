@@ -60,7 +60,8 @@
           'lib/jsss/scramble_minx.js',
           'lib/jsss/scramble_NNN.js',
           'lib/jsss/scramble_pyram.js',
-          'lib/jsss/scramble_sq1.js'
+          'lib/jsss/scramble_sq1.js',
+          'lib/jsss/lib/raphael-min.js'
         ],
         dest: 'dist/js/lib.js'
       },

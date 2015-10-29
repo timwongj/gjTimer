@@ -43,6 +43,7 @@
 
     var COLOR_WHITE = '#FFFFFF';
     var COLOR_DARK_GRAY = 'rgba(0, 0 , 0, 0.8)';
+    var SPACEBAR_KEY_CODE = 32;
 
     $scope.style = {
       body: {},
@@ -51,6 +52,9 @@
     };
 
     $scope.keydown = function(event) {
+      if (event.keyCode === SPACEBAR_KEY_CODE) {
+        event.preventDefault();
+      }
       $rootScope.$broadcast('keydown', event);
     };
 
@@ -102,7 +106,7 @@
 
     var self = this;
 
-    var events = {
+    var eventIds = {
       'Rubik\'s Cube': '333',
       '4x4 Cube': '444',
       '5x5 Cube': '555',
@@ -115,7 +119,6 @@
       'Pyraminx': 'pyram',
       'Square-1': 'sq1',
       'Rubik\'s Clock': 'clock',
-      'Skewb': 'skewb',
       '6x6 Cube': '666',
       '7x7 Cube': '777',
       '4x4 blindfolded': '444bf',
@@ -123,12 +126,36 @@
       '3x3 multi blind': '333mbf'
     };
 
+    var eventSvg = {
+      'Rubik\'s Cube': { ratio: 0.75, width: 200 },
+      '4x4 Cube': { ratio: 0.75, width: 200 },
+      '5x5 Cube': { ratio: 0.75, width: 200 },
+      '2x2 Cube': { ratio: 0.75, width: 200 },
+      '3x3 blindfolded': { ratio: 0.75, width: 200 },
+      '3x3 one-handed': { ratio: 0.75, width: 200 },
+      '3x3 fewest moves': { ratio: 0.75, width: 200 },
+      '3x3 with feet': { ratio: 0.75, width: 200 },
+      'Megaminx': { ratio: 0.51, width: 150 },
+      'Pyraminx': { ratio: 0.69, width: 200 },
+      'Square-1': { ratio: 0.57, width: 150 },
+      'Rubik\'s Clock': { ratio: 0.50, width: 150 },
+      '6x6 Cube': { ratio: 0.75, width: 200 },
+      '7x7 Cube': { ratio: 0.75, width: 200 },
+      '4x4 blindfolded': { ratio: 0.75, width: 200 },
+      '5x5 blindfolded': { ratio: 0.75, width: 200 },
+      '3x3 multi blind': { ratio: 0.75, width: 200 }
+    };
+
     self.getEvents = function() {
-      return events;
+      return eventIds;
     };
 
     self.getEventId = function(event) {
-      return events[event];
+      return eventIds[event];
+    };
+
+    self.getEventSvg = function(event) {
+      return eventSvg[event];
     };
 
   }
@@ -158,13 +185,22 @@
 
   'use strict';
 
-  function CubController($rootScope, CubService) {
+  function CubController($scope, $rootScope, $sce, Events, CubService) {
 
     var self = this;
+    $scope.$on('draw scramble', function($event, state) {
+      var width = Events.getEventSvg($rootScope.event).width;
+      var height = width / Events.getEventSvg($rootScope.event).ratio;
+      var el = document.createElement("div");
+      scramblers[Events.getEventId($rootScope.event)].drawScramble(el, state, height, width);
+      var tmp = document.createElement("div");
+      tmp.appendChild(el);
+      self.cub = $sce.trustAsHtml(tmp.innerHTML);
+    });
 
   }
 
-  angular.module('cub').controller('CubController', ['$rootScope', 'CubService', CubController]);
+  angular.module('cub').controller('CubController', ['$scope', '$rootScope', '$sce', 'Events', 'CubService', CubController]);
 
 })();
 (function() {
@@ -211,12 +247,14 @@
     $scope.$on('new scramble', function($event, event) {
       $rootScope.scramble = ScrambleService.newScramble(event);
       self.scramble = $sce.trustAsHtml($rootScope.scramble);
+      $rootScope.$broadcast('draw scramble', ScrambleService.getScrambleState());
     });
 
     $scope.$on('keydown', function($event, event) {
       if (event.keyCode === ENTER_KEY_CODE) {
         $rootScope.scramble = ScrambleService.newScramble(event);
         self.scramble = $sce.trustAsHtml($rootScope.scramble);
+        $rootScope.$broadcast('draw scramble', ScrambleService.getScrambleState());
       }
     });
 
@@ -234,12 +272,16 @@
     var self = this;
 
     self.getScramble = function() {
-      return self.scramble;
+      return self.scramble.scramble_string;
+    };
+
+    self.getScrambleState = function() {
+      return self.scramble.state;
     };
 
     self.newScramble = function(event) {
-      self.scramble = scramblers[Events.getEventId(event)].getRandomScramble().scramble_string;
-      return self.scramble;
+      self.scramble = scramblers[Events.getEventId(event)].getRandomScramble();
+      return self.scramble.scramble_string;
     };
 
   }
@@ -305,12 +347,12 @@
     self.changeSession = function(sessionName) {
       self.session = MenuBarService.changeSession('session' + sessionName.substr(8, sessionName.length));
       $rootScope.sessionId = 'session' + sessionName.substr(8, sessionName.length);
+      $rootScope.event = self.session.event;
       $rootScope.$broadcast('refresh data');
       if (self.event !== self.session.event) {
         $rootScope.$broadcast('new scramble', self.session.event);
       }
-      self.event = self.session.event;
-      $rootScope.event = self.event;
+      self.event = $rootScope.event;
     };
 
     self.settings = function() {

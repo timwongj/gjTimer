@@ -15,9 +15,17 @@
             'bower_components/jquery/dist/jquery.min.js',
             'bower_components/bootstrap/dist/js/bootstrap.min.js',
             'bower_components/angular/angular.min.js',
-            'bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js',
+            'bower_components/angular-bootstrap/ui-bootstrap.min.js',
             'bower_components/moment/min/moment.min.js',
             'bower_components/angular-mocks/angular-mocks.js',
+            'lib/jsss/scramble_222.js',
+            'lib/jsss/scramble_333.js',
+            'lib/jsss/scramble_clock.js',
+            'lib/jsss/scramble_minx.js',
+            'lib/jsss/scramble_NNN.js',
+            'lib/jsss/scramble_pyram.js',
+            'lib/jsss/scramble_sq1.js',
+            'lib/jsss/lib/raphael-min.js',
 
             // gjTimerApp
             'app/public/components/app.js',

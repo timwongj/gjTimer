@@ -38,12 +38,12 @@
     self.changeSession = function(sessionName) {
       self.session = MenuBarService.changeSession('session' + sessionName.substr(8, sessionName.length));
       $rootScope.sessionId = 'session' + sessionName.substr(8, sessionName.length);
+      $rootScope.event = self.session.event;
       $rootScope.$broadcast('refresh data');
       if (self.event !== self.session.event) {
         $rootScope.$broadcast('new scramble', self.session.event);
       }
-      self.event = self.session.event;
-      $rootScope.event = self.event;
+      self.event = $rootScope.event;
     };
 
     self.settings = function() {

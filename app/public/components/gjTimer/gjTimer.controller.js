@@ -6,6 +6,7 @@
 
     var COLOR_WHITE = '#FFFFFF';
     var COLOR_DARK_GRAY = 'rgba(0, 0 , 0, 0.8)';
+    var SPACEBAR_KEY_CODE = 32;
 
     $scope.style = {
       body: {},
@@ -14,6 +15,9 @@
     };
 
     $scope.keydown = function(event) {
+      if (event.keyCode === SPACEBAR_KEY_CODE) {
+        event.preventDefault();
+      }
       $rootScope.$broadcast('keydown', event);
     };
 

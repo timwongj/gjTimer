@@ -11,14 +11,19 @@
   overflow-y: auto;
   background-color: #eeeeee;
 }
+#cub {
+  margin: .25em;
+  padding: .25em;
+  text-align: center;
+}
 #scramble {
   margin: .25em;
   padding: .25em;
   text-align: center;
 }
 #scramble .scramble {
-  margin: .125em;
-  padding: .125em;
+  margin: .0625em;
+  padding: .0625em;
   font-size: 150%;
   font-family: "Courier New", Courier, monospace;
 }
@@ -52,6 +57,6 @@
 }
 #timer .time {
   font-size: 800%;
-  margin: .0625em;
-  padding: .0625em;
+  margin: .015625em;
+  padding: .015625em;
 }
