@@ -1,14 +1,26 @@
 .section {
   padding: .375em;
 }
+.jumbotron-timer,
+.jumbotron-results {
+  height: calc(100vh - 8em);
+  max-height: 50em;
+  margin-bottom: .5em;
+  padding: .5em !important;
+  border-radius: .25em !important;
+  overflow-y: auto;
+  background-color: #eeeeee;
+}
 #scramble {
   margin: .25em;
   padding: .25em;
+  text-align: center;
 }
 #scramble .scramble {
-  font-size: 150%;
   margin: .125em;
   padding: .125em;
+  font-size: 150%;
+  font-family: "Courier New", Courier, monospace;
 }
 #menuBar {
   margin: .5em 0;
@@ -18,15 +30,6 @@
   margin-right: .5em;
   font-size: 150%;
   font-weight: 400;
-}
-#results .jumbotron-results {
-  height: calc(100vh - 8em);
-  max-height: 50em;
-  overflow-y: auto;
-  padding: 1em;
-  margin-bottom: .5em;
-  border-radius: .375em;
-  background-color: #eeeeee;
 }
 #results .times {
   margin: .125em;
@@ -46,15 +49,6 @@
 }
 #timer {
   text-align: center;
-}
-#timer .jumbotron-timer {
-  height: calc(100vh - 8em);
-  max-height: 50em;
-  overflow-y: auto;
-  padding: 1em;
-  margin-bottom: .5em;
-  border-radius: .375em;
-  background-color: #eeeeee;
 }
 #timer .time {
   font-size: 800%;

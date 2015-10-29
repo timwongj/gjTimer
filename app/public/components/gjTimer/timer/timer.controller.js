@@ -46,7 +46,9 @@
         timer = $interval(function() {
           self.time = TimerService.getTime();
         }, TIMER_REFRESH_INTERVAL);
-      } else if ((state === 'stopped') || (state === 'keydown')) {
+      } else if (state === 'keydown') {
+        state = 'reset';
+      } else if (state === 'stopped') {
         $timeout(function() {
           state = 'reset';
         }, STOP_TIMER_DELAY);
