@@ -25,7 +25,7 @@
           resolve: {
             data: function () {
               return {
-                sessionId: $rootScope.sessionId,
+                sessionId: $scope.sessionId,
                 index: index,
                 avg: avg,
                 numberOfResults: numberOfResults
