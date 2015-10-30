@@ -8,7 +8,11 @@
       templateUrl: '/dist/components/gjTimer/menuBar/menuBar.html',
       controller: 'MenuBarController',
       controllerAs: 'ctrl',
-      scope: true
+      scope: {
+        event: '=',
+        sessionId: '=',
+        settings: '='
+      }
     };
   }
 

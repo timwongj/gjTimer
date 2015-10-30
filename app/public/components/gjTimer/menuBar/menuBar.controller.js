@@ -2,7 +2,7 @@
 
   'use strict';
 
-  function MenuBarController($rootScope, $timeout, MenuBarService, Events) {
+  function MenuBarController($scope, $rootScope, $timeout, MenuBarService, Events) {
 
     var self = this;
 
@@ -11,8 +11,11 @@
     self.events = Events.getEvents();
     self.session = MenuBarService.init();
     self.event = self.session.event;
-    $rootScope.sessionId = 'session' + self.session.name.substr(8, self.session.name.length);
-    $rootScope.event = self.event;
+    $scope.sessionId = 'session' + self.session.name.substr(8, self.session.name.length);
+    $scope.event = self.event;
+    $scope.settings = {
+      precision: 2
+    };
 
     // TODO - find a better solution to waiting for controllers to initialize before broadcasting
     // The cutoff for successful broadcast is ~15-20ms, so 50 should be sufficient for now.
@@ -31,19 +34,19 @@
 
     self.selectEvent = function(event) {
       self.event = MenuBarService.changeEvent('session' + self.session.name.substr(8, self.session.name.length), event);
-      $rootScope.event = self.event;
+      $scope.event = self.event;
       $rootScope.$broadcast('new scramble', self.event);
     };
 
     self.changeSession = function(sessionName) {
       self.session = MenuBarService.changeSession('session' + sessionName.substr(8, sessionName.length));
-      $rootScope.sessionId = 'session' + sessionName.substr(8, sessionName.length);
-      $rootScope.event = self.session.event;
+      $scope.sessionId = 'session' + sessionName.substr(8, sessionName.length);
+      $scope.event = self.session.event;
       $rootScope.$broadcast('refresh data');
       if (self.event !== self.session.event) {
         $rootScope.$broadcast('new scramble', self.session.event);
       }
-      self.event = $rootScope.event;
+      self.event = $scope.event;
     };
 
     self.settings = function() {
@@ -63,6 +66,6 @@
 
   }
 
-  angular.module('menuBar').controller('MenuBarController', ['$rootScope', '$timeout', 'MenuBarService', 'Events', MenuBarController]);
+  angular.module('menuBar').controller('MenuBarController', ['$scope', '$rootScope', '$timeout', 'MenuBarService', 'Events', MenuBarController]);
 
 })();

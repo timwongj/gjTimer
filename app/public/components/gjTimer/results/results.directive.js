@@ -8,7 +8,11 @@
       templateUrl: '/dist/components/gjTimer/results/results.html',
       controller: 'ResultsController',
       controllerAs: 'ctrl',
-      scope: true
+      scope: {
+        results: '=',
+        sessionId: '=',
+        settings: '='
+      }
     };
   }
 
