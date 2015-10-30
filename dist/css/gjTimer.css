@@ -5,7 +5,7 @@
 .jumbotron-results {
   margin-bottom: .5em;
   padding: .5em !important;
-  border-radius: .25em !important;
+  border-radius: 4px !important;
   overflow-y: auto;
   background-color: #eeeeee;
 }
@@ -20,21 +20,16 @@
     height: 30em;
   }
 }
+.modal {
+  top: 20%;
+}
+.popover-title {
+  text-align: center;
+}
 #cub {
   margin: .25em;
   padding: .25em;
   text-align: center;
-}
-#scramble {
-  margin: .25em;
-  padding: .25em;
-  text-align: center;
-}
-#scramble .scramble {
-  margin: .0625em;
-  padding: .0625em;
-  font-size: 150%;
-  font-family: "Courier New", Courier, monospace;
 }
 #menuBar {
   margin: .5em 0;
@@ -61,9 +56,6 @@
 #results .table-results .avg {
   text-align: center;
 }
-.modal {
-  top: 20%;
-}
 #resultsModal .modal-header {
   padding: .5em;
 }
@@ -83,9 +75,6 @@
 #resultsModal .li-results {
   margin-bottom: .125em;
 }
-.popover-title {
-  text-align: center;
-}
 #resultsPopover .form-group-buttons {
   margin-bottom: .25em;
 }
@@ -94,6 +83,33 @@
   padding: .25em .5em;
   width: 8.5em;
   height: 2em;
+}
+#scramble {
+  margin: .25em;
+  padding: .25em;
+  text-align: center;
+}
+#scramble .scramble {
+  margin: .0625em;
+  padding: .0625em;
+  font-size: 150%;
+  font-family: "Courier New", Courier, monospace;
+}
+#settings .modal-header {
+  padding: .5em;
+}
+#settings .modal-title {
+  margin-left: .25em;
+}
+#settings .btn-close {
+  vertical-align: middle;
+}
+#settings .modal-body {
+  padding: .5em;
+}
+#statistics {
+  margin: .125em;
+  padding: .125em;
 }
 #timer {
   text-align: center;

@@ -31,7 +31,7 @@
    * This is the main gjTimer module. All gjTimer components should be pulled in here as dependencies.
    * This module is pulled into the main app.js 'gjTimerApp' module.
    */
-  angular.module('gjTimer', ['cub', 'menuBar', 'scramble', 'results', 'timer']);
+  angular.module('gjTimer', ['cub', 'menuBar', 'results', 'scramble', 'statistics', 'timer']);
 
 })();
 
@@ -177,6 +177,7 @@
   angular.module('cub', []).directive('cub', cubDirective);
 
 })();
+
 (function() {
 
   'use strict';
@@ -199,6 +200,7 @@
   angular.module('cub').controller('CubController', ['$scope', '$sce', 'Events', 'CubService', CubController]);
 
 })();
+
 (function() {
 
   'use strict';
@@ -210,82 +212,6 @@
   }
 
   angular.module('cub').service('CubService', CubService);
-
-})();
-
-(function() {
-
-  'use strict';
-
-  function scrambleDirective() {
-    return {
-      restrict: 'E',
-      templateUrl: '/dist/components/gjTimer/scramble/scramble.html',
-      controller: 'ScrambleController',
-      controllerAs: 'ctrl',
-      scope: {
-        event: '=',
-        scramble: '='
-      }
-    };
-  }
-
-  angular.module('scramble', []).directive('scramble', scrambleDirective);
-
-})();
-(function() {
-
-  'use strict';
-
-  function ScrambleController($scope, $rootScope, $sce, ScrambleService) {
-
-    var self = this;
-
-    var ENTER_KEY_CODE = 13;
-
-    $scope.$on('new scramble', function() {
-      $scope.scramble = ScrambleService.newScramble($scope.event);
-      self.scramble = $sce.trustAsHtml($scope.scramble);
-      $rootScope.$broadcast('draw scramble', ScrambleService.getScrambleState());
-    });
-
-    $scope.$on('keydown', function() {
-      if (event.keyCode === ENTER_KEY_CODE) {
-        $scope.scramble = ScrambleService.newScramble($scope.event);
-        self.scramble = $sce.trustAsHtml($scope.scramble);
-        $rootScope.$broadcast('draw scramble', ScrambleService.getScrambleState());
-      }
-    });
-
-  }
-
-  angular.module('scramble').controller('ScrambleController', ['$scope', '$rootScope', '$sce', 'ScrambleService', ScrambleController]);
-
-})();
-(function() {
-
-  'use strict';
-
-  function ScrambleService(Events) {
-
-    var self = this;
-
-    self.getScramble = function() {
-      return self.scramble.scramble_string;
-    };
-
-    self.getScrambleState = function() {
-      return self.scramble.state;
-    };
-
-    self.newScramble = function(event) {
-      self.scramble = scramblers[Events.getEventId(event)].getRandomScramble();
-      return self.scramble.scramble_string;
-    };
-
-  }
-
-  angular.module('scramble').service('ScrambleService', ['Events', ScrambleService]);
 
 })();
 
@@ -310,11 +236,12 @@
   angular.module('menuBar', []).directive('menuBar', menuBarDirective);
 
 })();
+
 (function() {
 
   'use strict';
 
-  function MenuBarController($scope, $rootScope, $timeout, MenuBarService, Events) {
+  function MenuBarController($scope, $rootScope, $timeout, $uibModal, MenuBarService, Events) {
 
     var self = this;
 
@@ -365,7 +292,18 @@
     };
 
     self.settings = function() {
-      console.log('settings');
+      $uibModal.open({
+        animation: true,
+        templateUrl: 'dist/components/gjTimer/settings/settings.html',
+        controller: 'SettingsController',
+        controllerAs: 'ctrl',
+        size: 'md',
+        resolve: {
+          settings: function () {
+            return $scope.settings;
+          }
+        }
+      });
     };
 
     self.scramble = function() {
@@ -381,9 +319,10 @@
 
   }
 
-  angular.module('menuBar').controller('MenuBarController', ['$scope', '$rootScope', '$timeout', 'MenuBarService', 'Events', MenuBarController]);
+  angular.module('menuBar').controller('MenuBarController', ['$scope', '$rootScope', '$timeout', '$uibModal', 'MenuBarService', 'Events', MenuBarController]);
 
 })();
+
 (function() {
 
   'use strict';
@@ -508,11 +447,12 @@
   angular.module('results', []).directive('results', resultsDirective);
 
 })();
+
 (function() {
 
   'use strict';
 
-  function ResultsController($scope, $rootScope, $uibModal, ResultsService) {
+  function ResultsController($scope, $uibModal, ResultsService) {
 
     var self = this;
 
@@ -528,7 +468,7 @@
       if (index >= numberOfResults) {
         $uibModal.open({
           animation: true,
-          templateUrl: 'dist/components/gjTimer/results/resultsModal.html',
+          templateUrl: 'dist/components/gjTimer/resultsModal/resultsModal.html',
           controller: 'ResultsModalController',
           controllerAs: 'ctrl',
           size: 'md',
@@ -548,40 +488,7 @@
 
   }
 
-  angular.module('results').controller('ResultsController', ['$scope', '$rootScope', '$uibModal', 'ResultsService', ResultsController]);
-
-})();
-
-(function() {
-
-  'use strict';
-
-  function ResultsModalController($modalInstance, data, ResultsService) {
-
-    var self = this;
-
-    self.title = data.avg + ' average of ' + data.numberOfResults;
-    self.results = ResultsService.getModalResults(data.sessionId, data.index, data.numberOfResults);
-
-    self.close = function() {
-      $modalInstance.dismiss();
-    };
-
-  }
-
-  angular.module('results').controller('ResultsModalController', ['$modalInstance', 'data', 'ResultsService', ResultsModalController]);
-
-})();
-
-(function() {
-
-  'use strict';
-
-  function ResultsPopoverController($scope, $rootScope, ResultsService) {
-
-  }
-
-  angular.module('results').controller('ResultsPopoverController', ['$scope', '$rootScope', 'ResultsService', ResultsPopoverController]);
+  angular.module('results').controller('ResultsController', ['$scope', '$uibModal', 'ResultsService', ResultsController]);
 
 })();
 
@@ -742,6 +649,185 @@
 
   'use strict';
 
+  function ResultsModalController($modalInstance, data, ResultsService) {
+
+    var self = this;
+
+    self.title = data.avg + ' average of ' + data.numberOfResults;
+    self.results = ResultsService.getModalResults(data.sessionId, data.index, data.numberOfResults);
+
+    self.close = function() {
+      $modalInstance.dismiss();
+    };
+
+  }
+
+  angular.module('results').controller('ResultsModalController', ['$modalInstance', 'data', 'ResultsService', ResultsModalController]);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function ResultsPopoverController($scope, $rootScope, ResultsService) {
+
+  }
+
+  angular.module('results').controller('ResultsPopoverController', ['$scope', '$rootScope', 'ResultsService', ResultsPopoverController]);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function scrambleDirective() {
+    return {
+      restrict: 'E',
+      templateUrl: '/dist/components/gjTimer/scramble/scramble.html',
+      controller: 'ScrambleController',
+      controllerAs: 'ctrl',
+      scope: {
+        event: '=',
+        scramble: '='
+      }
+    };
+  }
+
+  angular.module('scramble', []).directive('scramble', scrambleDirective);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function ScrambleController($scope, $rootScope, $sce, ScrambleService) {
+
+    var self = this;
+
+    var ENTER_KEY_CODE = 13;
+
+    $scope.$on('new scramble', function() {
+      $scope.scramble = ScrambleService.newScramble($scope.event);
+      self.scramble = $sce.trustAsHtml($scope.scramble);
+      $rootScope.$broadcast('draw scramble', ScrambleService.getScrambleState());
+    });
+
+    $scope.$on('keydown', function() {
+      if (event.keyCode === ENTER_KEY_CODE) {
+        $scope.scramble = ScrambleService.newScramble($scope.event);
+        self.scramble = $sce.trustAsHtml($scope.scramble);
+        $rootScope.$broadcast('draw scramble', ScrambleService.getScrambleState());
+      }
+    });
+
+  }
+
+  angular.module('scramble').controller('ScrambleController', ['$scope', '$rootScope', '$sce', 'ScrambleService', ScrambleController]);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function ScrambleService(Events) {
+
+    var self = this;
+
+    self.getScramble = function() {
+      return self.scramble.scramble_string;
+    };
+
+    self.getScrambleState = function() {
+      return self.scramble.state;
+    };
+
+    self.newScramble = function(event) {
+      self.scramble = scramblers[Events.getEventId(event)].getRandomScramble();
+      return self.scramble.scramble_string;
+    };
+
+  }
+
+  angular.module('scramble').service('ScrambleService', ['Events', ScrambleService]);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function SettingsController($modalInstance, settings, MenuBarService) {
+
+    var self = this;
+    self.settings = settings;
+
+    self.close = function() {
+      $modalInstance.dismiss();
+    };
+
+  }
+
+  angular.module('menuBar').controller('SettingsController', ['$modalInstance', 'settings', 'MenuBarService', SettingsController]);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function statisticsDirective() {
+    return {
+      restrict: 'E',
+      templateUrl: '/dist/components/gjTimer/statistics/statistics.html',
+      controller: 'StatisticsController',
+      controllerAs: 'ctrl',
+      scope: {
+        event: '=',
+        results: '='
+      }
+    };
+  }
+
+  angular.module('statistics', []).directive('statistics', statisticsDirective);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function StatisticsController($scope, StatisticsService) {
+
+    var self = this;
+
+  }
+
+  angular.module('statistics').controller('StatisticsController', ['$scope', 'StatisticsService', StatisticsController]);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function StatisticsService() {
+
+    var self = this;
+    
+  }
+
+  angular.module('statistics').service('StatisticsService', [StatisticsService]);
+
+})();
+
+(function() {
+
+  'use strict';
+
   function timerDirective() {
     return {
       restrict: 'E',
@@ -760,6 +846,7 @@
   angular.module('timer', []).directive('timer', timerDirective);
 
 })();
+
 (function() {
 
   'use strict';
@@ -820,6 +907,7 @@
   angular.module('timer').controller('TimerController', ['$scope', '$rootScope', '$interval', '$timeout', 'TimerService', TimerController]);
 
 })();
+
 (function() {
 
   'use strict';

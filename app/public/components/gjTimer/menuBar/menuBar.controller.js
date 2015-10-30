@@ -2,7 +2,7 @@
 
   'use strict';
 
-  function MenuBarController($scope, $rootScope, $timeout, MenuBarService, Events) {
+  function MenuBarController($scope, $rootScope, $timeout, $uibModal, MenuBarService, Events) {
 
     var self = this;
 
@@ -53,7 +53,18 @@
     };
 
     self.settings = function() {
-      console.log('settings');
+      $uibModal.open({
+        animation: true,
+        templateUrl: 'dist/components/gjTimer/settings/settings.html',
+        controller: 'SettingsController',
+        controllerAs: 'ctrl',
+        size: 'md',
+        resolve: {
+          settings: function () {
+            return $scope.settings;
+          }
+        }
+      });
     };
 
     self.scramble = function() {
@@ -69,6 +80,6 @@
 
   }
 
-  angular.module('menuBar').controller('MenuBarController', ['$scope', '$rootScope', '$timeout', 'MenuBarService', 'Events', MenuBarController]);
+  angular.module('menuBar').controller('MenuBarController', ['$scope', '$rootScope', '$timeout', '$uibModal', 'MenuBarService', 'Events', MenuBarController]);
 
 })();

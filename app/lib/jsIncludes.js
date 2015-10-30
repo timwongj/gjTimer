@@ -53,12 +53,7 @@ module.exports = (function() {
     'app/public/components/gjTimer/cub/cub.controller.js',
     'app/public/components/gjTimer/cub/cub.service.js',
 
-    // Scramble
-    'app/public/components/gjTimer/scramble/scramble.directive.js',
-    'app/public/components/gjTimer/scramble/scramble.controller.js',
-    'app/public/components/gjTimer/scramble/scramble.service.js',
-
-    // Menu
+    // MenuBar
     'app/public/components/gjTimer/menuBar/menuBar.directive.js',
     'app/public/components/gjTimer/menuBar/menuBar.controller.js',
     'app/public/components/gjTimer/menuBar/menuBar.service.js',
@@ -66,9 +61,26 @@ module.exports = (function() {
     // Results
     'app/public/components/gjTimer/results/results.directive.js',
     'app/public/components/gjTimer/results/results.controller.js',
-    'app/public/components/gjTimer/results/resultsModal.controller.js',
-    'app/public/components/gjTimer/results/resultsPopover.controller.js',
     'app/public/components/gjTimer/results/results.service.js',
+
+    // ResultsModal
+    'app/public/components/gjTimer/resultsModal/resultsModal.controller.js',
+
+    // ResultsPopover
+    'app/public/components/gjTimer/resultsPopover/resultsPopover.controller.js',
+
+    // Scramble
+    'app/public/components/gjTimer/scramble/scramble.directive.js',
+    'app/public/components/gjTimer/scramble/scramble.controller.js',
+    'app/public/components/gjTimer/scramble/scramble.service.js',
+
+    // Settings
+    'app/public/components/gjTimer/settings/settings.controller.js',
+
+    // Statistics
+    'app/public/components/gjTimer/statistics/statistics.directive.js',
+    'app/public/components/gjTimer/statistics/statistics.controller.js',
+    'app/public/components/gjTimer/statistics/statistics.service.js',
 
     // Timer
     'app/public/components/gjTimer/timer/timer.directive.js',

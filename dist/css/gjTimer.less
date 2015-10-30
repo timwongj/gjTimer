@@ -12,7 +12,7 @@
   }
   margin-bottom: .5em;
   padding: .5em !important;
-  border-radius: .25em !important;
+  border-radius: 4px !important;
   overflow-y: auto;
   background-color: @color-jumbotron;
 }
@@ -22,26 +22,20 @@
     height: @height-results-mobile;
   }
 }
+
+.modal {
+  top: 20%;
+}
+
+.popover-title {
+  text-align: center;
+}
+
 #cub {
 
   margin: .25em;
   padding: .25em;
   text-align: center;
-
-}
-
-#scramble {
-
-  margin: .25em;
-  padding: .25em;
-  text-align: center;
-
-  .scramble {
-    margin: .0625em;
-    padding: .0625em;
-    font-size: 150%;
-    font-family: "Courier New", Courier, monospace;
-  }
 
 }
 
@@ -83,10 +77,6 @@
 
 }
 
-.modal {
-  top: 20%;
-}
-
 #resultsModal {
 
   .modal-header {
@@ -115,10 +105,6 @@
   }
 
 }
-.popover-title {
-  text-align: center;
-}
-
 #resultsPopover {
 
   .form-group-buttons {
@@ -131,6 +117,48 @@
     width: 8.5em;
     height: 2em;
   }
+
+}
+
+#scramble {
+
+  margin: .25em;
+  padding: .25em;
+  text-align: center;
+
+  .scramble {
+    margin: .0625em;
+    padding: .0625em;
+    font-size: 150%;
+    font-family: "Courier New", Courier, monospace;
+  }
+
+}
+
+#settings {
+
+  .modal-header {
+    padding: .5em;
+  }
+
+  .modal-title {
+    margin-left: .25em;
+  }
+
+  .btn-close {
+    vertical-align: middle;
+  }
+
+  .modal-body {
+    padding: .5em;
+  }
+
+}
+
+#statistics {
+
+  margin: .125em;
+  padding: .125em;
 
 }
 
