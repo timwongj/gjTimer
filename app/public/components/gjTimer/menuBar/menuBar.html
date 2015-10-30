@@ -4,20 +4,7 @@
     <div class="form-group">
       <div class="btn-group" role="group">
         <div class="btn-group" role="group">
-          <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="true">
-            {{ctrl.event}}&nbsp;<span class="caret"></span>
-          </button>
-          <ul class="dropdown-menu" role="menu">
-            <li role="presentation" ng-repeat="(event, id) in ctrl.events">
-              <a role="menuitem" tabindex="-1" href="" ng-bind="event" ng-click="ctrl.selectEvent(event)"></a>
-            </li>
-          </ul>
-        </div>
-        <button type="button" class="btn btn-success" ng-click="ctrl.scramble()" onclick="this.blur()">Scramble</button>
-      </div>
-      <div class="btn-group" role="group">
-        <div class="btn-group" role="group">
-          <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="true">
+          <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="true">
             {{ctrl.session.name}}&nbsp;<span class="caret"></span>
           </button>
           <ul class="dropdown-menu" role="menu">
@@ -26,9 +13,22 @@
             </li>
           </ul>
         </div>
-        <button type="button" class="btn btn-warning" ng-click="ctrl.resetSession()" onclick="this.blur()">Reset</button>
+        <button type="button" class="btn btn-warning btn-sm" ng-click="ctrl.resetSession()" onclick="this.blur()">Reset</button>
       </div>
-      <button type="button" class="btn btn-primary" ng-click="ctrl.settings()" onclick="this.blur()">Settings</button>
+      <div class="btn-group" role="group">
+        <div class="btn-group" role="group">
+          <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="true">
+            {{ctrl.event}}&nbsp;<span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu" role="menu">
+            <li role="presentation" ng-repeat="(event, id) in ctrl.events">
+              <a role="menuitem" tabindex="-1" href="" ng-bind="event" ng-click="ctrl.selectEvent(event)"></a>
+            </li>
+          </ul>
+        </div>
+        <button type="button" class="btn btn-success btn-sm" ng-click="ctrl.scramble()" onclick="this.blur()">Scramble</button>
+      </div>
+      <button type="button" class="btn btn-primary btn-sm" ng-click="ctrl.settings()" onclick="this.blur()">Settings</button>
     </div>
   </div>
 </div>

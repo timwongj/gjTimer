@@ -2,23 +2,27 @@
   padding: .375em;
 }
 .jumbotron-timer,
-.jumbotron-results {
-  margin-bottom: .5em;
-  padding: .5em !important;
+.jumbotron-results,
+.jumbotron-statistics {
+  margin-bottom: 0;
   border-radius: 4px !important;
-  overflow-y: auto;
   background-color: #eeeeee;
 }
 @media screen and (min-width: 62em) {
   .jumbotron-timer,
-  .jumbotron-results {
-    height: calc(100vh - 8em);
+  .jumbotron-results,
+  .jumbotron-statistics {
+    height: calc(100vh - 4em);
   }
 }
-@media screen and (max-width: 62em) {
-  .jumbotron-results {
-    height: 30em;
-  }
+.jumbotron-timer,
+.jumbotron-statistics {
+  padding: .5em !important;
+  overflow-y: auto;
+}
+.jumbotron-results {
+  padding: 0 !important;
+  overflow-y: hidden;
 }
 .modal {
   top: 20%;
@@ -32,29 +36,44 @@
   text-align: center;
 }
 #menuBar {
-  margin: .5em 0;
-  padding: .5em 0;
+  margin: .125em 0;
+  padding: .125em 0;
 }
 #menuBar .title {
   margin-right: .5em;
   font-size: 150%;
   font-weight: 400;
 }
-#results .times {
-  margin: .125em;
-  padding: .125em;
+#results thead {
+  display: block;
 }
-#results .table-results {
-  margin: 0;
+#results tbody {
+  display: block;
+  overflow: auto;
+  height: calc(100vh - 5.875em);
 }
-#results .table-results .index {
+@media screen and (max-width: 62em) {
+  #results tbody {
+    height: 30em;
+  }
+}
+#results tr {
+  height: 1.75em;
+}
+#results th {
+  border-bottom: 2px solid #ddd;
+}
+#results td {
+  border: 1px solid #ddd;
+}
+#results .index {
   text-align: center;
+  width: 10em;
 }
-#results .table-results .time {
+#results .time,
+#results .avg {
   text-align: center;
-}
-#results .table-results .avg {
-  text-align: center;
+  width: 40em;
 }
 #resultsModal .modal-header {
   padding: .5em;

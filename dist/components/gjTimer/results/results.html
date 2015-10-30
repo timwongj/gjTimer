@@ -1,38 +1,36 @@
 <div id="results">
   <div class="jumbotron jumbotron-results">
-    <div class="table-responsive times">
-      <table class="table table-condensed table-bordered table-hover table-results">
-        <thead>
-        <tr>
-          <th class="index">#</th>
-          <th class="time">Time</th>
-          <th class="avg">Avg 5</th>
-          <th class="avg">Avg 12</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr ng-repeat="result in ctrl.results | reverse">
-          <td class="index">
-            <div ng-bind="ctrl.results.length - $index"></div>
-          </td>
-          <td class="time">
-            <div ng-bind="result.time"
-                 popover-trigger="mouseenter"
-                 popover-placement="right"
-                 popover-title="{{result.time}}"
-                 uib-popover-template="'dist/components/gjTimer/resultsPopover/resultsPopover.html'"></div>
-          </td>
-          <td class="avg">
-            <div ng-bind="result.avg5"
-                 ng-click="ctrl.openModal(ctrl.results.length - $index, result.avg5, 5)"></div>
-          </td>
-          <td class="avg">
-            <div ng-bind="result.avg12"
-                 ng-click="ctrl.openModal(ctrl.results.length - $index, result.avg12, 12)"></div>
-          </td>
-        </tr>
-        </tbody>
-      </table>
-    </div>
+    <table class="table-hover">
+      <thead>
+      <tr>
+        <th class="index">#</th>
+        <th class="time">Time</th>
+        <th class="avg">Avg 5</th>
+        <th class="avg">Avg 12</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr ng-repeat="result in ctrl.results | reverse">
+        <td class="index">
+          <div ng-bind="ctrl.results.length - $index"></div>
+        </td>
+        <td class="time">
+          <div ng-bind="result.time"
+               popover-trigger="mouseenter"
+               popover-placement="right"
+               popover-title="{{result.time}}"
+               uib-popover-template="'dist/components/gjTimer/resultsPopover/resultsPopover.html'"></div>
+        </td>
+        <td class="avg">
+          <div ng-bind="result.avg5"
+               ng-click="ctrl.openModal(ctrl.results.length - $index, result.avg5, 5)"></div>
+        </td>
+        <td class="avg">
+          <div ng-bind="result.avg12"
+               ng-click="ctrl.openModal(ctrl.results.length - $index, result.avg12, 12)"></div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
   </div>
 </div>

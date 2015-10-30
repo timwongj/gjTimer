@@ -1,26 +1,28 @@
 @color-jumbotron: #eee;
-@height-section: calc(~"100vh - 8em");
-@height-results-mobile: 30em;
+@height-section: calc(~"100vh - 4em");
+@breakpoint-md: 62em;
 
 .section {
   padding: .375em;
 }
 
-.jumbotron-timer, .jumbotron-results {
-  @media screen and (min-width: 62em) {
+.jumbotron-timer, .jumbotron-results, .jumbotron-statistics {
+  @media screen and (min-width: @breakpoint-md) {
     height: @height-section;
   }
-  margin-bottom: .5em;
-  padding: .5em !important;
+  margin-bottom: 0;
   border-radius: 4px !important;
-  overflow-y: auto;
   background-color: @color-jumbotron;
 }
 
+.jumbotron-timer, .jumbotron-statistics {
+  padding: .5em !important;
+  overflow-y: auto;
+}
+
 .jumbotron-results {
-  @media screen and (max-width: 62em) {
-    height: @height-results-mobile;
-  }
+  padding: 0 !important;
+  overflow-y: hidden;
 }
 
 .modal {
@@ -41,8 +43,8 @@
 
 #menuBar {
 
-  margin: .5em 0;
-  padding: .5em 0;
+  margin: .125em 0;
+  padding: .125em 0;
 
   .title {
     margin-right: .5em;
@@ -52,27 +54,44 @@
 
 }
 
+@height-results: calc(~"100vh - 5.875em");
+@height-results-mobile: 30em;
+
 #results {
 
-  .times {
-    margin: .125em;
-    padding: .125em;
+  thead {
+    display: block;
   }
 
-  .table-results {
-    margin: 0;
+  tbody {
+    display: block;
+    overflow: auto;
+    height: @height-results;
+    @media screen and (max-width: 62em) {
+      height: @height-results-mobile;
+    }
   }
 
-  .table-results .index {
+  tr {
+    height: 1.75em;
+  }
+
+  th {
+    border-bottom: 2px solid #ddd;
+  }
+
+  td {
+    border: 1px solid #ddd;
+  }
+
+  .index {
     text-align: center;
+    width: 10em;
   }
 
-  .table-results .time {
+  .time, .avg {
     text-align: center;
-  }
-
-  .table-results .avg {
-    text-align: center;
+    width: 40em;
   }
 
 }

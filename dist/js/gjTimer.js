@@ -706,7 +706,7 @@
 
   }
 
-  angular.module('results').service('ResultsService', ResultsService);
+  angular.module('results').service('ResultsService', [ResultsService]);
 
 })();
 
