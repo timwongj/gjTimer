@@ -67,8 +67,8 @@
       });
     };
 
-    self.scramble = function() {
-      $rootScope.$broadcast('new scramble');
+    self.graphs = function() {
+      
     };
 
     self.resetSession = function() {

@@ -41,8 +41,8 @@
 
   function GjTimerController($scope, $rootScope) {
 
-    var COLOR_WHITE = '#FFFFFF';
-    var COLOR_DARK_GRAY = 'rgba(0, 0 , 0, 0.8)';
+    var COLOR_BACKGROUND_DEFAULT = '#FFFFFF'; // white
+    var COLOR_BACKGROUND_FOCUS = '#EEEEEE'; // gray
     var SPACEBAR_KEY_CODE = 32, ENTER_KEY_CODE = 13;
 
     $scope.style = {
@@ -70,17 +70,17 @@
 
     $scope.$on('timer focus', function() {
 
-      $scope.style.body = { 'background-color': COLOR_DARK_GRAY };
+      $scope.style.body = { 'background-color': COLOR_BACKGROUND_FOCUS };
       $scope.style.section = { 'display': 'none' };
-      $scope.style.timer = { 'margin-top': '4.5625em' };
+      $scope.style.timer = { 'margin-top': '2.9375em' };
 
     });
 
     $scope.$on('timer unfocus', function() {
 
-      $scope.style.body = { 'background-color': COLOR_WHITE };
+      $scope.style.body = { 'background-color': COLOR_BACKGROUND_DEFAULT };
       $scope.style.section = { 'display': 'block' };
-      $scope.style.timer = { 'margin-top': '0' };
+      $scope.style.timer = {};
 
     });
 
@@ -245,6 +245,95 @@
 
   'use strict';
 
+  function scrambleDirective() {
+    return {
+      restrict: 'E',
+      templateUrl: '/dist/components/gjTimer/scramble/scramble.html',
+      controller: 'ScrambleController',
+      controllerAs: 'ctrl',
+      scope: {
+        event: '=',
+        scramble: '='
+      }
+    };
+  }
+
+  angular.module('scramble', []).directive('scramble', scrambleDirective);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function ScrambleController($scope, $rootScope, $sce, ScrambleService) {
+
+    var self = this;
+
+    $scope.$on('new scramble', function($event, event) {
+      $scope.scramble = ScrambleService.newScramble(event);
+      self.scramble = $sce.trustAsHtml($scope.scramble);
+      $rootScope.$broadcast('draw scramble', event, ScrambleService.getScrambleState());
+    });
+
+  }
+
+  angular.module('scramble').controller('ScrambleController', ['$scope', '$rootScope', '$sce', 'ScrambleService', ScrambleController]);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function ScrambleService(Events) {
+
+    var self = this;
+
+    /**
+     * Gets the current scramble string.
+     * @returns {*}
+     */
+    self.getScramble = function() {
+
+      return self.scramble.scramble_string;
+
+    };
+
+    /**
+     * Gets the scramble state of the current scramble.
+     * This is used by the cub component to draw the scramble.
+     * @returns {*}
+     */
+    self.getScrambleState = function() {
+
+      return self.scramble.state;
+
+    };
+
+    /**
+     * Uses the jsss library to generate a new scramble for the event.
+     * @param event
+     * @returns {*}
+     */
+    self.newScramble = function(event) {
+
+      self.scramble = scramblers[Events.getEventId(event)].getRandomScramble();
+
+      return self.scramble.scramble_string;
+
+    };
+
+  }
+
+  angular.module('scramble').service('ScrambleService', ['Events', ScrambleService]);
+
+})();
+
+(function() {
+
+  'use strict';
+
   function menuBarDirective() {
     return {
       restrict: 'E',
@@ -332,8 +421,8 @@
       });
     };
 
-    self.scramble = function() {
-      $rootScope.$broadcast('new scramble');
+    self.graphs = function() {
+      
     };
 
     self.resetSession = function() {
@@ -714,196 +803,6 @@
 
   'use strict';
 
-  function ResultsModalController($modalInstance, data, ResultsService) {
-
-    var self = this;
-
-    self.title = data.avg + ' average of ' + data.numberOfResults;
-    self.results = ResultsService.getModalResults(data.sessionId, data.index, data.numberOfResults);
-
-    self.close = function() {
-      $modalInstance.dismiss();
-    };
-
-  }
-
-  angular.module('results').controller('ResultsModalController', ['$modalInstance', 'data', 'ResultsService', ResultsModalController]);
-
-})();
-
-(function() {
-
-  'use strict';
-
-  function ResultsPopoverController($scope, $rootScope, ResultsService) {
-
-  }
-
-  angular.module('results').controller('ResultsPopoverController', ['$scope', '$rootScope', 'ResultsService', ResultsPopoverController]);
-
-})();
-
-(function() {
-
-  'use strict';
-
-  function scrambleDirective() {
-    return {
-      restrict: 'E',
-      templateUrl: '/dist/components/gjTimer/scramble/scramble.html',
-      controller: 'ScrambleController',
-      controllerAs: 'ctrl',
-      scope: {
-        event: '=',
-        scramble: '='
-      }
-    };
-  }
-
-  angular.module('scramble', []).directive('scramble', scrambleDirective);
-
-})();
-
-(function() {
-
-  'use strict';
-
-  function ScrambleController($scope, $rootScope, $sce, ScrambleService) {
-
-    var self = this;
-
-    $scope.$on('new scramble', function($event, event) {
-      $scope.scramble = ScrambleService.newScramble(event);
-      self.scramble = $sce.trustAsHtml($scope.scramble);
-      $rootScope.$broadcast('draw scramble', event, ScrambleService.getScrambleState());
-    });
-
-  }
-
-  angular.module('scramble').controller('ScrambleController', ['$scope', '$rootScope', '$sce', 'ScrambleService', ScrambleController]);
-
-})();
-
-(function() {
-
-  'use strict';
-
-  function ScrambleService(Events) {
-
-    var self = this;
-
-    /**
-     * Gets the current scramble string.
-     * @returns {*}
-     */
-    self.getScramble = function() {
-
-      return self.scramble.scramble_string;
-
-    };
-
-    /**
-     * Gets the scramble state of the current scramble.
-     * This is used by the cub component to draw the scramble.
-     * @returns {*}
-     */
-    self.getScrambleState = function() {
-
-      return self.scramble.state;
-
-    };
-
-    /**
-     * Uses the jsss library to generate a new scramble for the event.
-     * @param event
-     * @returns {*}
-     */
-    self.newScramble = function(event) {
-
-      self.scramble = scramblers[Events.getEventId(event)].getRandomScramble();
-
-      return self.scramble.scramble_string;
-
-    };
-
-  }
-
-  angular.module('scramble').service('ScrambleService', ['Events', ScrambleService]);
-
-})();
-
-(function() {
-
-  'use strict';
-
-  function SettingsController($modalInstance, settings, MenuBarService) {
-
-    var self = this;
-    self.settings = settings;
-
-    self.close = function() {
-      $modalInstance.dismiss();
-    };
-
-  }
-
-  angular.module('menuBar').controller('SettingsController', ['$modalInstance', 'settings', 'MenuBarService', SettingsController]);
-
-})();
-
-(function() {
-
-  'use strict';
-
-  function statisticsDirective() {
-    return {
-      restrict: 'E',
-      templateUrl: '/dist/components/gjTimer/statistics/statistics.html',
-      controller: 'StatisticsController',
-      controllerAs: 'ctrl',
-      scope: {
-        event: '=',
-        results: '='
-      }
-    };
-  }
-
-  angular.module('statistics', []).directive('statistics', statisticsDirective);
-
-})();
-
-(function() {
-
-  'use strict';
-
-  function StatisticsController($scope, StatisticsService) {
-
-    var self = this;
-
-  }
-
-  angular.module('statistics').controller('StatisticsController', ['$scope', 'StatisticsService', StatisticsController]);
-
-})();
-
-(function() {
-
-  'use strict';
-
-  function StatisticsService() {
-
-    var self = this;
-    
-  }
-
-  angular.module('statistics').service('StatisticsService', [StatisticsService]);
-
-})();
-
-(function() {
-
-  'use strict';
-
   function timerDirective() {
     return {
       restrict: 'E',
@@ -957,7 +856,7 @@
         $rootScope.$broadcast('timer unfocus');
         TimerService.saveResult(self.time, $scope.scramble, $scope.sessionId);
         $rootScope.$broadcast('refresh data');
-        $rootScope.$broadcast('new scramble');
+        $rootScope.$broadcast('new scramble', $scope.event);
       }
     });
 

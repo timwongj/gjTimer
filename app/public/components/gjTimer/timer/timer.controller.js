@@ -32,7 +32,7 @@
         $rootScope.$broadcast('timer unfocus');
         TimerService.saveResult(self.time, $scope.scramble, $scope.sessionId);
         $rootScope.$broadcast('refresh data');
-        $rootScope.$broadcast('new scramble');
+        $rootScope.$broadcast('new scramble', $scope.event);
       }
     });
 
