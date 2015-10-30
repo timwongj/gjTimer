@@ -6,7 +6,7 @@
 
     var COLOR_WHITE = '#FFFFFF';
     var COLOR_DARK_GRAY = 'rgba(0, 0 , 0, 0.8)';
-    var SPACEBAR_KEY_CODE = 32;
+    var SPACEBAR_KEY_CODE = 32, ENTER_KEY_CODE = 13;
 
     $scope.style = {
       body: {},
@@ -15,26 +15,36 @@
     };
 
     $scope.keydown = function(event) {
-      if (event.keyCode === SPACEBAR_KEY_CODE) {
+
+      if (event.keyCode === ENTER_KEY_CODE) {
+        $rootScope.$broadcast('new scramble', $scope.event);
+      } else if (event.keyCode === SPACEBAR_KEY_CODE) {
         event.preventDefault();
       }
       $rootScope.$broadcast('keydown', event);
+
     };
 
     $scope.keyup = function(event) {
+
       $rootScope.$broadcast('keyup', event);
+
     };
 
     $scope.$on('timer focus', function() {
+
       $scope.style.body = { 'background-color': COLOR_DARK_GRAY };
       $scope.style.section = { 'display': 'none' };
       $scope.style.timer = { 'margin-top': '4.5625em' };
+
     });
 
     $scope.$on('timer unfocus', function() {
+
       $scope.style.body = { 'background-color': COLOR_WHITE };
       $scope.style.section = { 'display': 'block' };
       $scope.style.timer = { 'margin-top': '0' };
+
     });
 
   }

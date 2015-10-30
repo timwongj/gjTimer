@@ -43,7 +43,7 @@
 
     var COLOR_WHITE = '#FFFFFF';
     var COLOR_DARK_GRAY = 'rgba(0, 0 , 0, 0.8)';
-    var SPACEBAR_KEY_CODE = 32;
+    var SPACEBAR_KEY_CODE = 32, ENTER_KEY_CODE = 13;
 
     $scope.style = {
       body: {},
@@ -52,26 +52,36 @@
     };
 
     $scope.keydown = function(event) {
-      if (event.keyCode === SPACEBAR_KEY_CODE) {
+
+      if (event.keyCode === ENTER_KEY_CODE) {
+        $rootScope.$broadcast('new scramble', $scope.event);
+      } else if (event.keyCode === SPACEBAR_KEY_CODE) {
         event.preventDefault();
       }
       $rootScope.$broadcast('keydown', event);
+
     };
 
     $scope.keyup = function(event) {
+
       $rootScope.$broadcast('keyup', event);
+
     };
 
     $scope.$on('timer focus', function() {
+
       $scope.style.body = { 'background-color': COLOR_DARK_GRAY };
       $scope.style.section = { 'display': 'none' };
       $scope.style.timer = { 'margin-top': '4.5625em' };
+
     });
 
     $scope.$on('timer unfocus', function() {
+
       $scope.style.body = { 'background-color': COLOR_WHITE };
       $scope.style.section = { 'display': 'block' };
       $scope.style.timer = { 'margin-top': '0' };
+
     });
 
   }
@@ -182,22 +192,17 @@
 
   'use strict';
 
-  function CubController($scope, $sce, Events, CubService) {
+  function CubController($scope, CubService) {
 
     var self = this;
-    $scope.$on('draw scramble', function($event, state) {
-      var width = Events.getEventSvg($scope.event).width;
-      var height = width / Events.getEventSvg($scope.event).ratio;
-      var el = document.createElement("div");
-      scramblers[Events.getEventId($scope.event)].drawScramble(el, state, height, width);
-      var tmp = document.createElement("div");
-      tmp.appendChild(el);
-      self.cub = $sce.trustAsHtml(tmp.innerHTML);
+
+    $scope.$on('draw scramble', function($event, event, state) {
+      self.cub = CubService.drawScramble(event, state);
     });
 
   }
 
-  angular.module('cub').controller('CubController', ['$scope', '$sce', 'Events', 'CubService', CubController]);
+  angular.module('cub').controller('CubController', ['$scope', 'CubService', CubController]);
 
 })();
 
@@ -205,13 +210,34 @@
 
   'use strict';
 
-  function CubService() {
+  function CubService($sce, Events) {
 
     var self = this;
 
+    /**
+     * Uses the jsss library to create an svg element of the scramble.
+     * @param event
+     * @param state
+     * @returns {*}
+     */
+    self.drawScramble = function(event, state) {
+
+      var width = Events.getEventSvg(event).width;
+      var height = width / Events.getEventSvg(event).ratio;
+
+      var el = document.createElement("div");
+      scramblers[Events.getEventId(event)].drawScramble(el, state, height, width);
+
+      var tmp = document.createElement("div");
+      tmp.appendChild(el);
+
+      return $sce.trustAsHtml(tmp.innerHTML);
+
+    };
+
   }
 
-  angular.module('cub').service('CubService', CubService);
+  angular.module('cub').service('CubService', ['$sce', 'Events', CubService]);
 
 })();
 
@@ -262,7 +288,7 @@
     // TODO - find a better solution to waiting for controllers to initialize before broadcasting
     // The cutoff for successful broadcast is ~15-20ms, so 50 should be sufficient for now.
     $timeout(function() {
-      $rootScope.$broadcast('new scramble', self.event);
+      $rootScope.$broadcast('new scramble', $scope.event);
     }, 50);
 
     self.sessions = [];
@@ -277,7 +303,7 @@
     self.selectEvent = function(event) {
       self.event = MenuBarService.changeEvent('session' + self.session.name.substr(8, self.session.name.length), event);
       $scope.event = self.event;
-      $rootScope.$broadcast('new scramble', self.event);
+      $rootScope.$broadcast('new scramble', $scope.event);
     };
 
     self.changeSession = function(sessionName) {
@@ -286,7 +312,7 @@
       $scope.event = self.session.event;
       $rootScope.$broadcast('refresh data');
       if (self.event !== self.session.event) {
-        $rootScope.$broadcast('new scramble', self.session.event);
+        $rootScope.$broadcast('new scramble', $scope.event);
       }
       self.event = $scope.event;
     };
@@ -307,11 +333,11 @@
     };
 
     self.scramble = function() {
-      $rootScope.$broadcast('new scramble', self.session.event);
+      $rootScope.$broadcast('new scramble');
     };
 
     self.resetSession = function() {
-      if (confirm('Are you sure you would like to reset ' + self.session.name + '?')) {
+      if (confirm('Are you sure you want to reset ' + self.session.name + '?')) {
         self.session = MenuBarService.resetSession('session' + self.session.name.substr(8, self.session.name.length));
         $rootScope.$broadcast('refresh data');
       }
@@ -355,7 +381,9 @@
       };
 
       for (var i = 1; i <= NUMBER_OF_SESSIONS; i++) {
+
         var session = JSON.parse(localStorage.getItem('session' + i));
+
         if (session === null) {
           newSession.name = 'Session ' + i;
           localStorage.setItem('session' + i, JSON.stringify(newSession));
@@ -363,6 +391,7 @@
           session.event = 'Rubik\'s Cube';
           localStorage.setItem('session' + i, JSON.stringify(session));
         }
+
       }
 
       return self.getSession(currentSessionId);
@@ -510,17 +539,21 @@
       var results = JSON.parse(localStorage.getItem(sessionId)).list;
 
       angular.forEach(results, function(result, index) {
+
         result.time = Number(result.time).toFixed(precision);
+
         if (index >= 4) {
           result.avg5 = self.calculateAverage(results.slice(index - 4, index + 1), precision);
         } else {
           result.avg5 = 'DNF';
         }
+
         if (index >= 11) {
           result.avg12 = self.calculateAverage(results.slice(index - 11, index + 1), precision);
         } else {
           result.avg12 = 'DNF';
         }
+
       });
 
       return results;
@@ -534,12 +567,16 @@
      * @param numberOfResults
      */
     self.getModalResults = function(sessionId, index, numberOfResults) {
+
       if (localStorage.getItem(sessionId) === null) {
         return [];
       } else {
+
         var results = JSON.parse(localStorage.getItem(sessionId)).list.slice(index - numberOfResults, index);
         var min, max, rawTimes = [], DNF = 2147485547;
+
         angular.forEach(results, function(result) {
+
           if ((result.penalty !== undefined) && (result.penalty === '(DNF)')) {
             rawTimes.push(DNF);
           } else if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
@@ -547,13 +584,18 @@
           } else {
             rawTimes.push(self.timeToMilliseconds(result.time, 3));
           }
+
         });
+
         min = rawTimes.indexOf(Math.min.apply(null, rawTimes));
         max = rawTimes.indexOf(Math.max.apply(null, rawTimes));
+
         results[min].min = true;
         results[max].max = true;
+
         return results;
       }
+
     };
 
     /**
@@ -563,11 +605,15 @@
      * @returns {*}
      */
     self.calculateAverage = function(results, precision) {
+
       if (results.length < 3) {
         return 'DNF';
       }
+
       var rawTimes = [], DNF = 2147485547;
+
       angular.forEach(results, function(result) {
+
         if ((result.penalty !== undefined) && (result.penalty === '(DNF)')) {
           rawTimes.push(DNF);
         } else if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
@@ -575,14 +621,18 @@
         } else {
           rawTimes.push(self.timeToMilliseconds(result.time, precision));
         }
+
       });
+
       rawTimes.splice(rawTimes.indexOf(Math.min.apply(null, rawTimes)), 1);
       rawTimes.splice(rawTimes.indexOf(Math.max.apply(null, rawTimes)), 1);
+
       if (rawTimes.indexOf(DNF) >= 0) {
         return 'DNF';
       } else {
         return (rawTimes.reduce(function(pv, cv) { return pv + cv; }, 0) / rawTimes.length).toFixed(precision);
       }
+
     };
 
     /**
@@ -591,8 +641,11 @@
      * @param precision
      */
     self.calculateMean = function(results, precision) {
+
       var rawTimes = [];
+
       angular.forEach(results, function(result) {
+
         if ((result.penalty !== undefined) && (result.penalty === '(DNF)')) {
           return 'DNF';
         } else if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
@@ -600,8 +653,11 @@
         } else {
           rawTimes.push(self.timeToMilliseconds(result.time, precision));
         }
+
       });
+
       return (rawTimes.reduce(function(pv, cv) { return pv + cv; }, 0) / rawTimes.length).toFixed(precision);
+
     };
 
     /**
@@ -610,15 +666,21 @@
      * @param precision
      */
     self.calculateLargeMean = function(results, precision) {
+
       var rawTimes = [];
+
       angular.forEach(results, function(result) {
+
         if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
           rawTimes.push(self.timeToMilliseconds(result.time, precision) + 2);
         } else if ((result.penalty === undefined) || (result.penalty === '')) {
           rawTimes.push(self.timeToMilliseconds(result.time, precision));
         }
+
       });
+
       return (rawTimes.reduce(function(pv, cv) { return pv + cv; }, 0) / rawTimes.length).toFixed(precision);
+
     };
 
     /**
@@ -627,7 +689,9 @@
      * @returns {*}
      */
     self.timeToMilliseconds = function(time) {
+
       var res = time.split(':');
+
       if (res.length === 1) {
         return parseFloat(res[0]);
       } else if (res.length === 2) {
@@ -637,6 +701,7 @@
       } else {
         return -1;
       }
+
     };
 
   }
@@ -707,20 +772,10 @@
 
     var self = this;
 
-    var ENTER_KEY_CODE = 13;
-
-    $scope.$on('new scramble', function() {
-      $scope.scramble = ScrambleService.newScramble($scope.event);
+    $scope.$on('new scramble', function($event, event) {
+      $scope.scramble = ScrambleService.newScramble(event);
       self.scramble = $sce.trustAsHtml($scope.scramble);
-      $rootScope.$broadcast('draw scramble', ScrambleService.getScrambleState());
-    });
-
-    $scope.$on('keydown', function() {
-      if (event.keyCode === ENTER_KEY_CODE) {
-        $scope.scramble = ScrambleService.newScramble($scope.event);
-        self.scramble = $sce.trustAsHtml($scope.scramble);
-        $rootScope.$broadcast('draw scramble', ScrambleService.getScrambleState());
-      }
+      $rootScope.$broadcast('draw scramble', event, ScrambleService.getScrambleState());
     });
 
   }
@@ -737,17 +792,38 @@
 
     var self = this;
 
+    /**
+     * Gets the current scramble string.
+     * @returns {*}
+     */
     self.getScramble = function() {
+
       return self.scramble.scramble_string;
+
     };
 
+    /**
+     * Gets the scramble state of the current scramble.
+     * This is used by the cub component to draw the scramble.
+     * @returns {*}
+     */
     self.getScrambleState = function() {
+
       return self.scramble.state;
+
     };
 
+    /**
+     * Uses the jsss library to generate a new scramble for the event.
+     * @param event
+     * @returns {*}
+     */
     self.newScramble = function(event) {
+
       self.scramble = scramblers[Events.getEventId(event)].getRandomScramble();
+
       return self.scramble.scramble_string;
+
     };
 
   }
@@ -919,11 +995,13 @@
     var startTime;
 
     /**
-     * Get Time.
+     * Gets the current time.
      * @returns {string}
      */
     self.getTime = function() {
+
       var time = moment(Date.now() - startTime);
+
       if (time < 10000) {
         return time.format('s.SSS');
       } else if (time < 60000) {
@@ -933,6 +1011,7 @@
       } else if (time < 3600000) {
         return time.utc().format('h:mm:ss.SSS');
       }
+
     };
 
     /**

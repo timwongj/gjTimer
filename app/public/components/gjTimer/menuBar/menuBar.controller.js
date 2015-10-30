@@ -23,7 +23,7 @@
     // TODO - find a better solution to waiting for controllers to initialize before broadcasting
     // The cutoff for successful broadcast is ~15-20ms, so 50 should be sufficient for now.
     $timeout(function() {
-      $rootScope.$broadcast('new scramble', self.event);
+      $rootScope.$broadcast('new scramble', $scope.event);
     }, 50);
 
     self.sessions = [];
@@ -38,7 +38,7 @@
     self.selectEvent = function(event) {
       self.event = MenuBarService.changeEvent('session' + self.session.name.substr(8, self.session.name.length), event);
       $scope.event = self.event;
-      $rootScope.$broadcast('new scramble', self.event);
+      $rootScope.$broadcast('new scramble', $scope.event);
     };
 
     self.changeSession = function(sessionName) {
@@ -47,7 +47,7 @@
       $scope.event = self.session.event;
       $rootScope.$broadcast('refresh data');
       if (self.event !== self.session.event) {
-        $rootScope.$broadcast('new scramble', self.session.event);
+        $rootScope.$broadcast('new scramble', $scope.event);
       }
       self.event = $scope.event;
     };
@@ -68,11 +68,11 @@
     };
 
     self.scramble = function() {
-      $rootScope.$broadcast('new scramble', self.session.event);
+      $rootScope.$broadcast('new scramble');
     };
 
     self.resetSession = function() {
-      if (confirm('Are you sure you would like to reset ' + self.session.name + '?')) {
+      if (confirm('Are you sure you want to reset ' + self.session.name + '?')) {
         self.session = MenuBarService.resetSession('session' + self.session.name.substr(8, self.session.name.length));
         $rootScope.$broadcast('refresh data');
       }
