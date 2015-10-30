@@ -8,7 +8,10 @@
       templateUrl: '/dist/components/gjTimer/scramble/scramble.html',
       controller: 'ScrambleController',
       controllerAs: 'ctrl',
-      scope: true
+      scope: {
+        event: '=',
+        scramble: '='
+      }
     };
   }
 

@@ -168,7 +168,9 @@
       templateUrl: '/dist/components/gjTimer/cub/cub.html',
       controller: 'CubController',
       controllerAs: 'ctrl',
-      scope: true
+      scope: {
+        event: '='
+      }
     };
   }
 
@@ -179,14 +181,14 @@
 
   'use strict';
 
-  function CubController($scope, $rootScope, $sce, Events, CubService) {
+  function CubController($scope, $sce, Events, CubService) {
 
     var self = this;
     $scope.$on('draw scramble', function($event, state) {
-      var width = Events.getEventSvg($rootScope.event).width;
-      var height = width / Events.getEventSvg($rootScope.event).ratio;
+      var width = Events.getEventSvg($scope.event).width;
+      var height = width / Events.getEventSvg($scope.event).ratio;
       var el = document.createElement("div");
-      scramblers[Events.getEventId($rootScope.event)].drawScramble(el, state, height, width);
+      scramblers[Events.getEventId($scope.event)].drawScramble(el, state, height, width);
       var tmp = document.createElement("div");
       tmp.appendChild(el);
       self.cub = $sce.trustAsHtml(tmp.innerHTML);
@@ -194,7 +196,7 @@
 
   }
 
-  angular.module('cub').controller('CubController', ['$scope', '$rootScope', '$sce', 'Events', 'CubService', CubController]);
+  angular.module('cub').controller('CubController', ['$scope', '$sce', 'Events', 'CubService', CubController]);
 
 })();
 (function() {
@@ -221,7 +223,10 @@
       templateUrl: '/dist/components/gjTimer/scramble/scramble.html',
       controller: 'ScrambleController',
       controllerAs: 'ctrl',
-      scope: true
+      scope: {
+        event: '=',
+        scramble: '='
+      }
     };
   }
 
@@ -239,15 +244,15 @@
     var ENTER_KEY_CODE = 13;
 
     $scope.$on('new scramble', function() {
-      $rootScope.scramble = ScrambleService.newScramble($rootScope.event);
-      self.scramble = $sce.trustAsHtml($rootScope.scramble);
+      $scope.scramble = ScrambleService.newScramble($scope.event);
+      self.scramble = $sce.trustAsHtml($scope.scramble);
       $rootScope.$broadcast('draw scramble', ScrambleService.getScrambleState());
     });
 
     $scope.$on('keydown', function() {
       if (event.keyCode === ENTER_KEY_CODE) {
-        $rootScope.scramble = ScrambleService.newScramble($rootScope.event);
-        self.scramble = $sce.trustAsHtml($rootScope.scramble);
+        $scope.scramble = ScrambleService.newScramble($scope.event);
+        self.scramble = $sce.trustAsHtml($scope.scramble);
         $rootScope.$broadcast('draw scramble', ScrambleService.getScrambleState());
       }
     });
@@ -294,7 +299,11 @@
       templateUrl: '/dist/components/gjTimer/menuBar/menuBar.html',
       controller: 'MenuBarController',
       controllerAs: 'ctrl',
-      scope: true
+      scope: {
+        event: '=',
+        sessionId: '=',
+        settings: '='
+      }
     };
   }
 
@@ -305,7 +314,7 @@
 
   'use strict';
 
-  function MenuBarController($rootScope, $timeout, MenuBarService, Events) {
+  function MenuBarController($scope, $rootScope, $timeout, MenuBarService, Events) {
 
     var self = this;
 
@@ -314,8 +323,11 @@
     self.events = Events.getEvents();
     self.session = MenuBarService.init();
     self.event = self.session.event;
-    $rootScope.sessionId = 'session' + self.session.name.substr(8, self.session.name.length);
-    $rootScope.event = self.event;
+    $scope.sessionId = 'session' + self.session.name.substr(8, self.session.name.length);
+    $scope.event = self.event;
+    $scope.settings = {
+      precision: 2
+    };
 
     // TODO - find a better solution to waiting for controllers to initialize before broadcasting
     // The cutoff for successful broadcast is ~15-20ms, so 50 should be sufficient for now.
@@ -334,19 +346,19 @@
 
     self.selectEvent = function(event) {
       self.event = MenuBarService.changeEvent('session' + self.session.name.substr(8, self.session.name.length), event);
-      $rootScope.event = self.event;
+      $scope.event = self.event;
       $rootScope.$broadcast('new scramble', self.event);
     };
 
     self.changeSession = function(sessionName) {
       self.session = MenuBarService.changeSession('session' + sessionName.substr(8, sessionName.length));
-      $rootScope.sessionId = 'session' + sessionName.substr(8, sessionName.length);
-      $rootScope.event = self.session.event;
+      $scope.sessionId = 'session' + sessionName.substr(8, sessionName.length);
+      $scope.event = self.session.event;
       $rootScope.$broadcast('refresh data');
       if (self.event !== self.session.event) {
         $rootScope.$broadcast('new scramble', self.session.event);
       }
-      self.event = $rootScope.event;
+      self.event = $scope.event;
     };
 
     self.settings = function() {
@@ -366,7 +378,7 @@
 
   }
 
-  angular.module('menuBar').controller('MenuBarController', ['$rootScope', '$timeout', 'MenuBarService', 'Events', MenuBarController]);
+  angular.module('menuBar').controller('MenuBarController', ['$scope', '$rootScope', '$timeout', 'MenuBarService', 'Events', MenuBarController]);
 
 })();
 (function() {
@@ -482,7 +494,11 @@
       templateUrl: '/dist/components/gjTimer/results/results.html',
       controller: 'ResultsController',
       controllerAs: 'ctrl',
-      scope: true
+      scope: {
+        results: '=',
+        sessionId: '=',
+        settings: '='
+      }
     };
   }
 
@@ -496,17 +512,18 @@
   function ResultsController($scope, $rootScope, $uibModal, ResultsService) {
 
     var self = this;
-    var precision = 2;
 
-    self.results = ResultsService.getResults($rootScope.sessionId, precision);
+    $scope.results = ResultsService.getResults($scope.sessionId, $scope.settings.precision);
+    self.results = $scope.results;
 
     $scope.$on('refresh data', function() {
-      self.results = ResultsService.getResults($rootScope.sessionId, precision);
+      $scope.results = ResultsService.getResults($scope.sessionId, $scope.settings.precision);
+      self.results = $scope.results;
     });
 
     self.openModal = function(index, avg, numberOfResults) {
       if (index >= numberOfResults) {
-        var modalInstance = $uibModal.open({
+        $uibModal.open({
           animation: true,
           templateUrl: 'dist/components/gjTimer/results/resultsModal.html',
           controller: 'ResultsModalController',
@@ -610,7 +627,8 @@
       if (localStorage.getItem(sessionId) === null) {
         return [];
       } else {
-        var min, max, rawTimes = [], results = JSON.parse(localStorage.getItem(sessionId)).list.slice(index - numberOfResults, index);
+        var results = JSON.parse(localStorage.getItem(sessionId)).list.slice(index - numberOfResults, index);
+        var min, max, rawTimes = [], DNF = 2147485547;
         angular.forEach(results, function(result) {
           if ((result.penalty !== undefined) && (result.penalty === '(DNF)')) {
             rawTimes.push(DNF);
@@ -727,7 +745,11 @@
       templateUrl: '/dist/components/gjTimer/timer/timer.html',
       controller: 'TimerController',
       controllerAs: 'ctrl',
-      scope: true
+      scope: {
+        event: '=',
+        scramble: '=',
+        sessionId: '='
+      }
     };
   }
 
@@ -768,7 +790,7 @@
         state = 'stopped';
         $interval.cancel(timer);
         $rootScope.$broadcast('timer unfocus');
-        TimerService.saveResult(self.time, $rootScope.scramble, $rootScope.sessionId);
+        TimerService.saveResult(self.time, $scope.scramble, $scope.sessionId);
         $rootScope.$broadcast('refresh data');
         $rootScope.$broadcast('new scramble');
       }
