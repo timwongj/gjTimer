@@ -11,7 +11,8 @@
       scope: {
         event: '=',
         scramble: '=',
-        sessionId: '='
+        sessionId: '=',
+        settings: '='
       }
     };
   }

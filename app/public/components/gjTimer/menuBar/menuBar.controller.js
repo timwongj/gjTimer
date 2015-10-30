@@ -14,7 +14,10 @@
     $scope.sessionId = 'session' + self.session.name.substr(8, self.session.name.length);
     $scope.event = self.event;
     $scope.settings = {
-      precision: 2
+      precision: 2, // 2 digits after decimal
+      timerStartDelay: 100, // milliseconds
+      timerStopDelay: 100, // milliseconds
+      timerRefreshInterval: 50 // milliseconds
     };
 
     // TODO - find a better solution to waiting for controllers to initialize before broadcasting

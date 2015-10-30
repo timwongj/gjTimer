@@ -326,7 +326,10 @@
     $scope.sessionId = 'session' + self.session.name.substr(8, self.session.name.length);
     $scope.event = self.event;
     $scope.settings = {
-      precision: 2
+      precision: 2, // 2 digits after decimal
+      timerStartDelay: 100, // milliseconds
+      timerStopDelay: 100, // milliseconds
+      timerRefreshInterval: 50 // milliseconds
     };
 
     // TODO - find a better solution to waiting for controllers to initialize before broadcasting
@@ -748,7 +751,8 @@
       scope: {
         event: '=',
         scramble: '=',
-        sessionId: '='
+        sessionId: '=',
+        settings: '='
       }
     };
   }
@@ -762,9 +766,7 @@
 
   function TimerController($scope, $rootScope, $interval, $timeout, TimerService) {
 
-    var self = this, timer, state = 'reset';
-
-    var TIMER_REFRESH_INTERVAL = 50, START_TIMER_DELAY = 100, STOP_TIMER_DELAY = 100, SPACE_BAR_KEY_CODE = 32;
+    var self = this, timer, state = 'reset', SPACE_BAR_KEY_CODE = 32;
 
     self.time = moment(0).format('s.SSS');
 
@@ -785,7 +787,7 @@
             self.timerStyle = STYLES.GREEN;
             $rootScope.$broadcast('timer focus');
           }
-        }, START_TIMER_DELAY);
+        }, $scope.settings.timerStartDelay);
       } else if (state === 'timing') {
         state = 'stopped';
         $interval.cancel(timer);
@@ -803,13 +805,13 @@
         TimerService.startTimer();
         timer = $interval(function() {
           self.time = TimerService.getTime();
-        }, TIMER_REFRESH_INTERVAL);
+        }, $scope.settings.timerRefreshInterval);
       } else if (state === 'keydown') {
         state = 'reset';
       } else if (state === 'stopped') {
         $timeout(function() {
           state = 'reset';
-        }, STOP_TIMER_DELAY);
+        }, $scope.settings.timerStopDelay);
       }
     });
 
