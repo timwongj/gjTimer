@@ -12,10 +12,22 @@
         </thead>
         <tbody>
         <tr ng-repeat="result in ctrl.results | reverse">
-          <td class="index" ng-bind="ctrl.results.length - $index"></td>
-          <td class="time" ng-bind="result.time"></td>
-          <td class="avg" ng-bind="result.avg5"></td>
-          <td class="avg" ng-bind="result.avg12"></td>
+          <td class="index">
+            <div ng-bind="ctrl.results.length - $index"></div>
+          </td>
+          <td class="time">
+            <div ng-bind="result.time"
+                 popover-trigger="mouseenter"
+                 popover-placement="right"
+                 popover-title="{{result.time}}"
+                 uib-popover-template="'dist/components/gjTimer/results/resultsPopoverTemplate.html'"></div>
+          </td>
+          <td class="avg">
+            <div ng-bind="result.avg5"></div>
+          </td>
+          <td class="avg">
+            <div ng-bind="result.avg12"></div>
+          </td>
         </tr>
         </tbody>
       </table>

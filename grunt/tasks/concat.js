@@ -53,6 +53,7 @@
           'bower_components/bootstrap/dist/js/bootstrap.min.js',
           'bower_components/angular/angular.min.js',
           'bower_components/angular-bootstrap/ui-bootstrap.min.js',
+          'bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js',
           'bower_components/moment/min/moment.min.js',
           'bower_components/jsss/scramble_222.js',
           'bower_components/jsss/scramble_333.js',
@@ -72,6 +73,7 @@
           'app/public/less/scramble.less',
           'app/public/less/menuBar.less',
           'app/public/less/results.less',
+          'app/public/less/resultsPopover.less',
           'app/public/less/timer.less'
         ],
         dest: 'dist/css/gjTimer.less'
@@ -79,8 +81,7 @@
       libCss: {
         src: [
           'bower_components/bootstrap/dist/css/bootstrap.min.css',
-          'bower_components/bootstrap/dist/css/bootstrap-theme.min.css',
-          'bower_components/components-font-awesome/css/font-awesome.min.css'
+          'bower_components/bootstrap/dist/css/bootstrap-theme.min.css'
         ],
         dest: 'dist/css/lib.css'
       }
