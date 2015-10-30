@@ -9,11 +9,13 @@
     var startTime;
 
     /**
-     * Get Time.
+     * Gets the current time.
      * @returns {string}
      */
     self.getTime = function() {
+
       var time = moment(Date.now() - startTime);
+
       if (time < 10000) {
         return time.format('s.SSS');
       } else if (time < 60000) {
@@ -23,6 +25,7 @@
       } else if (time < 3600000) {
         return time.utc().format('h:mm:ss.SSS');
       }
+
     };
 
     /**

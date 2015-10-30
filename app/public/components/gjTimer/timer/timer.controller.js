@@ -4,9 +4,7 @@
 
   function TimerController($scope, $rootScope, $interval, $timeout, TimerService) {
 
-    var self = this, timer, state = 'reset';
-
-    var TIMER_REFRESH_INTERVAL = 50, START_TIMER_DELAY = 100, STOP_TIMER_DELAY = 100, SPACE_BAR_KEY_CODE = 32;
+    var self = this, timer, state = 'reset', SPACE_BAR_KEY_CODE = 32;
 
     self.time = moment(0).format('s.SSS');
 
@@ -27,14 +25,14 @@
             self.timerStyle = STYLES.GREEN;
             $rootScope.$broadcast('timer focus');
           }
-        }, START_TIMER_DELAY);
+        }, $scope.settings.timerStartDelay);
       } else if (state === 'timing') {
         state = 'stopped';
         $interval.cancel(timer);
         $rootScope.$broadcast('timer unfocus');
         TimerService.saveResult(self.time, $scope.scramble, $scope.sessionId);
         $rootScope.$broadcast('refresh data');
-        $rootScope.$broadcast('new scramble');
+        $rootScope.$broadcast('new scramble', $scope.event);
       }
     });
 
@@ -45,13 +43,13 @@
         TimerService.startTimer();
         timer = $interval(function() {
           self.time = TimerService.getTime();
-        }, TIMER_REFRESH_INTERVAL);
+        }, $scope.settings.timerRefreshInterval);
       } else if (state === 'keydown') {
         state = 'reset';
       } else if (state === 'stopped') {
         $timeout(function() {
           state = 'reset';
-        }, STOP_TIMER_DELAY);
+        }, $scope.settings.timerStopDelay);
       }
     });
 

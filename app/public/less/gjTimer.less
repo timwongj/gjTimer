@@ -1,24 +1,37 @@
 @color-jumbotron: #eee;
-@height-section: calc(~"100vh - 8em");
-@height-results-mobile: 30em;
+@height-section: calc(~"100vh - 4em");
+@breakpoint-md: 62em;
 
 .section {
   padding: .375em;
 }
 
-.jumbotron-timer, .jumbotron-results {
-  @media screen and (min-width: 62em) {
+.jumbotron-timer, .jumbotron-results, .jumbotron-statistics {
+  @media screen and (min-width: @breakpoint-md) {
     height: @height-section;
   }
-  margin-bottom: .5em;
-  padding: .5em !important;
-  border-radius: .25em !important;
-  overflow-y: auto;
+  margin-bottom: 0;
+  overflow-y: hidden;
+  border-radius: 2px !important;
   background-color: @color-jumbotron;
 }
 
+.jumbotron-timer, .jumbotron-statistics {
+  padding: .5em !important;
+}
+
 .jumbotron-results {
-  @media screen and (max-width: 62em) {
-    height: @height-results-mobile;
-  }
+  padding: 0 !important;
+}
+
+.modal {
+  top: 20%;
+}
+
+.popover-title {
+  text-align: center;
+}
+
+.btn {
+  border-radius: 2px;
 }

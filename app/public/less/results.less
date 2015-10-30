@@ -1,24 +1,41 @@
+@height-results: calc(~"100vh - 5.875em");
+@height-results-mobile: 30em;
+
 #results {
 
-  .times {
-    margin: .125em;
-    padding: .125em;
+  thead {
+    display: block;
   }
 
-  .table-results {
-    margin: 0;
+  tbody {
+    display: block;
+    overflow: auto;
+    height: @height-results;
+    @media screen and (max-width: 62em) {
+      height: @height-results-mobile;
+    }
   }
 
-  .table-results .index {
+  tr {
+    height: 1.75em;
+  }
+
+  th {
+    border-bottom: 2px solid #ddd;
+  }
+
+  td {
+    border: 1px solid #ddd;
+  }
+
+  .index {
     text-align: center;
+    width: 10em;
   }
 
-  .table-results .time {
+  .time, .avg {
     text-align: center;
-  }
-
-  .table-results .avg {
-    text-align: center;
+    width: 40em;
   }
 
 }

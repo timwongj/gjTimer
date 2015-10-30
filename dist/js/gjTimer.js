@@ -31,7 +31,7 @@
    * This is the main gjTimer module. All gjTimer components should be pulled in here as dependencies.
    * This module is pulled into the main app.js 'gjTimerApp' module.
    */
-  angular.module('gjTimer', ['cub', 'menuBar', 'scramble', 'results', 'timer']);
+  angular.module('gjTimer', ['cub', 'menuBar', 'results', 'scramble', 'statistics', 'timer']);
 
 })();
 
@@ -41,9 +41,9 @@
 
   function GjTimerController($scope, $rootScope) {
 
-    var COLOR_WHITE = '#FFFFFF';
-    var COLOR_DARK_GRAY = 'rgba(0, 0 , 0, 0.8)';
-    var SPACEBAR_KEY_CODE = 32;
+    var COLOR_BACKGROUND_DEFAULT = '#FFFFFF'; // white
+    var COLOR_BACKGROUND_FOCUS = '#EEEEEE'; // gray
+    var SPACEBAR_KEY_CODE = 32, ENTER_KEY_CODE = 13;
 
     $scope.style = {
       body: {},
@@ -52,26 +52,36 @@
     };
 
     $scope.keydown = function(event) {
-      if (event.keyCode === SPACEBAR_KEY_CODE) {
+
+      if (event.keyCode === ENTER_KEY_CODE) {
+        $rootScope.$broadcast('new scramble', $scope.event);
+      } else if (event.keyCode === SPACEBAR_KEY_CODE) {
         event.preventDefault();
       }
       $rootScope.$broadcast('keydown', event);
+
     };
 
     $scope.keyup = function(event) {
+
       $rootScope.$broadcast('keyup', event);
+
     };
 
     $scope.$on('timer focus', function() {
-      $scope.style.body = { 'background-color': COLOR_DARK_GRAY };
+
+      $scope.style.body = { 'background-color': COLOR_BACKGROUND_FOCUS };
       $scope.style.section = { 'display': 'none' };
-      $scope.style.timer = { 'margin-top': '4.5625em' };
+      $scope.style.timer = { 'margin-top': '2.9375em' };
+
     });
 
     $scope.$on('timer unfocus', function() {
-      $scope.style.body = { 'background-color': COLOR_WHITE };
+
+      $scope.style.body = { 'background-color': COLOR_BACKGROUND_DEFAULT };
       $scope.style.section = { 'display': 'block' };
-      $scope.style.timer = { 'margin-top': '0' };
+      $scope.style.timer = {};
+
     });
 
   }
@@ -177,115 +187,57 @@
   angular.module('cub', []).directive('cub', cubDirective);
 
 })();
+
 (function() {
 
   'use strict';
 
-  function CubController($scope, $sce, Events, CubService) {
+  function CubController($scope, CubService) {
 
     var self = this;
-    $scope.$on('draw scramble', function($event, state) {
-      var width = Events.getEventSvg($scope.event).width;
-      var height = width / Events.getEventSvg($scope.event).ratio;
+
+    $scope.$on('draw scramble', function($event, event, state) {
+      self.cub = CubService.drawScramble(event, state);
+    });
+
+  }
+
+  angular.module('cub').controller('CubController', ['$scope', 'CubService', CubController]);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function CubService($sce, Events) {
+
+    var self = this;
+
+    /**
+     * Uses the jsss library to create an svg element of the scramble.
+     * @param event
+     * @param state
+     * @returns {*}
+     */
+    self.drawScramble = function(event, state) {
+
+      var width = Events.getEventSvg(event).width;
+      var height = width / Events.getEventSvg(event).ratio;
+
       var el = document.createElement("div");
-      scramblers[Events.getEventId($scope.event)].drawScramble(el, state, height, width);
+      scramblers[Events.getEventId(event)].drawScramble(el, state, height, width);
+
       var tmp = document.createElement("div");
       tmp.appendChild(el);
-      self.cub = $sce.trustAsHtml(tmp.innerHTML);
-    });
 
-  }
+      return $sce.trustAsHtml(tmp.innerHTML);
 
-  angular.module('cub').controller('CubController', ['$scope', '$sce', 'Events', 'CubService', CubController]);
-
-})();
-(function() {
-
-  'use strict';
-
-  function CubService() {
-
-    var self = this;
-
-  }
-
-  angular.module('cub').service('CubService', CubService);
-
-})();
-
-(function() {
-
-  'use strict';
-
-  function scrambleDirective() {
-    return {
-      restrict: 'E',
-      templateUrl: '/dist/components/gjTimer/scramble/scramble.html',
-      controller: 'ScrambleController',
-      controllerAs: 'ctrl',
-      scope: {
-        event: '=',
-        scramble: '='
-      }
-    };
-  }
-
-  angular.module('scramble', []).directive('scramble', scrambleDirective);
-
-})();
-(function() {
-
-  'use strict';
-
-  function ScrambleController($scope, $rootScope, $sce, ScrambleService) {
-
-    var self = this;
-
-    var ENTER_KEY_CODE = 13;
-
-    $scope.$on('new scramble', function() {
-      $scope.scramble = ScrambleService.newScramble($scope.event);
-      self.scramble = $sce.trustAsHtml($scope.scramble);
-      $rootScope.$broadcast('draw scramble', ScrambleService.getScrambleState());
-    });
-
-    $scope.$on('keydown', function() {
-      if (event.keyCode === ENTER_KEY_CODE) {
-        $scope.scramble = ScrambleService.newScramble($scope.event);
-        self.scramble = $sce.trustAsHtml($scope.scramble);
-        $rootScope.$broadcast('draw scramble', ScrambleService.getScrambleState());
-      }
-    });
-
-  }
-
-  angular.module('scramble').controller('ScrambleController', ['$scope', '$rootScope', '$sce', 'ScrambleService', ScrambleController]);
-
-})();
-(function() {
-
-  'use strict';
-
-  function ScrambleService(Events) {
-
-    var self = this;
-
-    self.getScramble = function() {
-      return self.scramble.scramble_string;
-    };
-
-    self.getScrambleState = function() {
-      return self.scramble.state;
-    };
-
-    self.newScramble = function(event) {
-      self.scramble = scramblers[Events.getEventId(event)].getRandomScramble();
-      return self.scramble.scramble_string;
     };
 
   }
 
-  angular.module('scramble').service('ScrambleService', ['Events', ScrambleService]);
+  angular.module('cub').service('CubService', ['$sce', 'Events', CubService]);
 
 })();
 
@@ -310,11 +262,12 @@
   angular.module('menuBar', []).directive('menuBar', menuBarDirective);
 
 })();
+
 (function() {
 
   'use strict';
 
-  function MenuBarController($scope, $rootScope, $timeout, MenuBarService, Events) {
+  function MenuBarController($scope, $rootScope, $timeout, $uibModal, MenuBarService, Events) {
 
     var self = this;
 
@@ -326,13 +279,16 @@
     $scope.sessionId = 'session' + self.session.name.substr(8, self.session.name.length);
     $scope.event = self.event;
     $scope.settings = {
-      precision: 2
+      precision: 2, // 2 digits after decimal
+      timerStartDelay: 100, // milliseconds
+      timerStopDelay: 100, // milliseconds
+      timerRefreshInterval: 50 // milliseconds
     };
 
     // TODO - find a better solution to waiting for controllers to initialize before broadcasting
     // The cutoff for successful broadcast is ~15-20ms, so 50 should be sufficient for now.
     $timeout(function() {
-      $rootScope.$broadcast('new scramble', self.event);
+      $rootScope.$broadcast('new scramble', $scope.event);
     }, 50);
 
     self.sessions = [];
@@ -347,7 +303,7 @@
     self.selectEvent = function(event) {
       self.event = MenuBarService.changeEvent('session' + self.session.name.substr(8, self.session.name.length), event);
       $scope.event = self.event;
-      $rootScope.$broadcast('new scramble', self.event);
+      $rootScope.$broadcast('new scramble', $scope.event);
     };
 
     self.changeSession = function(sessionName) {
@@ -356,21 +312,32 @@
       $scope.event = self.session.event;
       $rootScope.$broadcast('refresh data');
       if (self.event !== self.session.event) {
-        $rootScope.$broadcast('new scramble', self.session.event);
+        $rootScope.$broadcast('new scramble', $scope.event);
       }
       self.event = $scope.event;
     };
 
     self.settings = function() {
-      console.log('settings');
+      $uibModal.open({
+        animation: true,
+        templateUrl: 'dist/components/gjTimer/settings/settings.html',
+        controller: 'SettingsController',
+        controllerAs: 'ctrl',
+        size: 'md',
+        resolve: {
+          settings: function () {
+            return $scope.settings;
+          }
+        }
+      });
     };
 
-    self.scramble = function() {
-      $rootScope.$broadcast('new scramble', self.session.event);
+    self.graphs = function() {
+      
     };
 
     self.resetSession = function() {
-      if (confirm('Are you sure you would like to reset ' + self.session.name + '?')) {
+      if (confirm('Are you sure you want to reset ' + self.session.name + '?')) {
         self.session = MenuBarService.resetSession('session' + self.session.name.substr(8, self.session.name.length));
         $rootScope.$broadcast('refresh data');
       }
@@ -378,9 +345,10 @@
 
   }
 
-  angular.module('menuBar').controller('MenuBarController', ['$scope', '$rootScope', '$timeout', 'MenuBarService', 'Events', MenuBarController]);
+  angular.module('menuBar').controller('MenuBarController', ['$scope', '$rootScope', '$timeout', '$uibModal', 'MenuBarService', 'Events', MenuBarController]);
 
 })();
+
 (function() {
 
   'use strict';
@@ -413,7 +381,9 @@
       };
 
       for (var i = 1; i <= NUMBER_OF_SESSIONS; i++) {
+
         var session = JSON.parse(localStorage.getItem('session' + i));
+
         if (session === null) {
           newSession.name = 'Session ' + i;
           localStorage.setItem('session' + i, JSON.stringify(newSession));
@@ -421,6 +391,7 @@
           session.event = 'Rubik\'s Cube';
           localStorage.setItem('session' + i, JSON.stringify(session));
         }
+
       }
 
       return self.getSession(currentSessionId);
@@ -505,11 +476,12 @@
   angular.module('results', []).directive('results', resultsDirective);
 
 })();
+
 (function() {
 
   'use strict';
 
-  function ResultsController($scope, $rootScope, $uibModal, ResultsService) {
+  function ResultsController($scope, $uibModal, ResultsService) {
 
     var self = this;
 
@@ -525,7 +497,7 @@
       if (index >= numberOfResults) {
         $uibModal.open({
           animation: true,
-          templateUrl: 'dist/components/gjTimer/results/resultsModal.html',
+          templateUrl: 'dist/components/gjTimer/resultsModal/resultsModal.html',
           controller: 'ResultsModalController',
           controllerAs: 'ctrl',
           size: 'md',
@@ -545,7 +517,196 @@
 
   }
 
-  angular.module('results').controller('ResultsController', ['$scope', '$rootScope', '$uibModal', 'ResultsService', ResultsController]);
+  angular.module('results').controller('ResultsController', ['$scope', '$uibModal', 'ResultsService', ResultsController]);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function ResultsService() {
+
+    var self = this;
+
+    /**
+     * Gets results for the session.
+     * @param sessionId
+     * @param precision
+     */
+    self.getResults = function(sessionId, precision) {
+
+      var results = JSON.parse(localStorage.getItem(sessionId)).list;
+
+      angular.forEach(results, function(result, index) {
+
+        result.time = Number(result.time).toFixed(precision);
+
+        if (index >= 4) {
+          result.avg5 = self.calculateAverage(results.slice(index - 4, index + 1), precision);
+        } else {
+          result.avg5 = 'DNF';
+        }
+
+        if (index >= 11) {
+          result.avg12 = self.calculateAverage(results.slice(index - 11, index + 1), precision);
+        } else {
+          result.avg12 = 'DNF';
+        }
+
+      });
+
+      return results;
+
+    };
+
+    /**
+     * Get results for the avg5/avg12 modal.
+     * @param sessionId
+     * @param index
+     * @param numberOfResults
+     */
+    self.getModalResults = function(sessionId, index, numberOfResults) {
+
+      if (localStorage.getItem(sessionId) === null) {
+        return [];
+      } else {
+
+        var results = JSON.parse(localStorage.getItem(sessionId)).list.slice(index - numberOfResults, index);
+        var min, max, rawTimes = [], DNF = 2147485547;
+
+        angular.forEach(results, function(result) {
+
+          if ((result.penalty !== undefined) && (result.penalty === '(DNF)')) {
+            rawTimes.push(DNF);
+          } else if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
+            rawTimes.push(self.timeToMilliseconds(result.time, 3) + 2);
+          } else {
+            rawTimes.push(self.timeToMilliseconds(result.time, 3));
+          }
+
+        });
+
+        min = rawTimes.indexOf(Math.min.apply(null, rawTimes));
+        max = rawTimes.indexOf(Math.max.apply(null, rawTimes));
+
+        results[min].min = true;
+        results[max].max = true;
+
+        return results;
+      }
+
+    };
+
+    /**
+     * Calculates the average of the results.
+     * @param results
+     * @param precision
+     * @returns {*}
+     */
+    self.calculateAverage = function(results, precision) {
+
+      if (results.length < 3) {
+        return 'DNF';
+      }
+
+      var rawTimes = [], DNF = 2147485547;
+
+      angular.forEach(results, function(result) {
+
+        if ((result.penalty !== undefined) && (result.penalty === '(DNF)')) {
+          rawTimes.push(DNF);
+        } else if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
+          rawTimes.push(self.timeToMilliseconds(result.time, precision) + 2);
+        } else {
+          rawTimes.push(self.timeToMilliseconds(result.time, precision));
+        }
+
+      });
+
+      rawTimes.splice(rawTimes.indexOf(Math.min.apply(null, rawTimes)), 1);
+      rawTimes.splice(rawTimes.indexOf(Math.max.apply(null, rawTimes)), 1);
+
+      if (rawTimes.indexOf(DNF) >= 0) {
+        return 'DNF';
+      } else {
+        return (rawTimes.reduce(function(pv, cv) { return pv + cv; }, 0) / rawTimes.length).toFixed(precision);
+      }
+
+    };
+
+    /**
+     * Calculates the mean of the results.
+     * @param results
+     * @param precision
+     */
+    self.calculateMean = function(results, precision) {
+
+      var rawTimes = [];
+
+      angular.forEach(results, function(result) {
+
+        if ((result.penalty !== undefined) && (result.penalty === '(DNF)')) {
+          return 'DNF';
+        } else if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
+          rawTimes.push(self.timeToMilliseconds(result.time, precision) + 2);
+        } else {
+          rawTimes.push(self.timeToMilliseconds(result.time, precision));
+        }
+
+      });
+
+      return (rawTimes.reduce(function(pv, cv) { return pv + cv; }, 0) / rawTimes.length).toFixed(precision);
+
+    };
+
+    /**
+     * Calculates the mean of the results.
+     * @param results
+     * @param precision
+     */
+    self.calculateLargeMean = function(results, precision) {
+
+      var rawTimes = [];
+
+      angular.forEach(results, function(result) {
+
+        if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
+          rawTimes.push(self.timeToMilliseconds(result.time, precision) + 2);
+        } else if ((result.penalty === undefined) || (result.penalty === '')) {
+          rawTimes.push(self.timeToMilliseconds(result.time, precision));
+        }
+
+      });
+
+      return (rawTimes.reduce(function(pv, cv) { return pv + cv; }, 0) / rawTimes.length).toFixed(precision);
+
+    };
+
+    /**
+     * Converts time from string to milliseconds.
+     * @param time
+     * @returns {*}
+     */
+    self.timeToMilliseconds = function(time) {
+
+      var res = time.split(':');
+
+      if (res.length === 1) {
+        return parseFloat(res[0]);
+      } else if (res.length === 2) {
+        return (parseFloat(res[0]) * 60) + parseFloat(res[1]);
+      } else if (res.length === 3) {
+        return (parseFloat(res[0]) * 3600) + (parseFloat(res[1]) * 60) + parseFloat(res[2]);
+      } else {
+        return -1;
+      }
+
+    };
+
+  }
+
+  angular.module('results').service('ResultsService', [ResultsService]);
 
 })();
 
@@ -586,152 +747,156 @@
 
   'use strict';
 
-  function ResultsService() {
+  function scrambleDirective() {
+    return {
+      restrict: 'E',
+      templateUrl: '/dist/components/gjTimer/scramble/scramble.html',
+      controller: 'ScrambleController',
+      controllerAs: 'ctrl',
+      scope: {
+        event: '=',
+        scramble: '='
+      }
+    };
+  }
+
+  angular.module('scramble', []).directive('scramble', scrambleDirective);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function ScrambleController($scope, $rootScope, $sce, ScrambleService) {
+
+    var self = this;
+
+    $scope.$on('new scramble', function($event, event) {
+      $scope.scramble = ScrambleService.newScramble(event);
+      self.scramble = $sce.trustAsHtml($scope.scramble);
+      $rootScope.$broadcast('draw scramble', event, ScrambleService.getScrambleState());
+    });
+
+  }
+
+  angular.module('scramble').controller('ScrambleController', ['$scope', '$rootScope', '$sce', 'ScrambleService', ScrambleController]);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function ScrambleService(Events) {
 
     var self = this;
 
     /**
-     * Gets results for the session.
-     * @param sessionId
-     * @param precision
-     */
-    self.getResults = function(sessionId, precision) {
-
-      var results = JSON.parse(localStorage.getItem(sessionId)).list;
-
-      angular.forEach(results, function(result, index) {
-        result.time = Number(result.time).toFixed(precision);
-        if (index >= 4) {
-          result.avg5 = self.calculateAverage(results.slice(index - 4, index + 1), precision);
-        } else {
-          result.avg5 = 'DNF';
-        }
-        if (index >= 11) {
-          result.avg12 = self.calculateAverage(results.slice(index - 11, index + 1), precision);
-        } else {
-          result.avg12 = 'DNF';
-        }
-      });
-
-      return results;
-
-    };
-
-    /**
-     * Get results for the avg5/avg12 modal.
-     * @param sessionId
-     * @param index
-     * @param numberOfResults
-     */
-    self.getModalResults = function(sessionId, index, numberOfResults) {
-      if (localStorage.getItem(sessionId) === null) {
-        return [];
-      } else {
-        var results = JSON.parse(localStorage.getItem(sessionId)).list.slice(index - numberOfResults, index);
-        var min, max, rawTimes = [], DNF = 2147485547;
-        angular.forEach(results, function(result) {
-          if ((result.penalty !== undefined) && (result.penalty === '(DNF)')) {
-            rawTimes.push(DNF);
-          } else if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
-            rawTimes.push(self.timeToMilliseconds(result.time, 3) + 2);
-          } else {
-            rawTimes.push(self.timeToMilliseconds(result.time, 3));
-          }
-        });
-        min = rawTimes.indexOf(Math.min.apply(null, rawTimes));
-        max = rawTimes.indexOf(Math.max.apply(null, rawTimes));
-        results[min].min = true;
-        results[max].max = true;
-        return results;
-      }
-    };
-
-    /**
-     * Calculates the average of the results.
-     * @param results
-     * @param precision
+     * Gets the current scramble string.
      * @returns {*}
      */
-    self.calculateAverage = function(results, precision) {
-      if (results.length < 3) {
-        return 'DNF';
-      }
-      var rawTimes = [], DNF = 2147485547;
-      angular.forEach(results, function(result) {
-        if ((result.penalty !== undefined) && (result.penalty === '(DNF)')) {
-          rawTimes.push(DNF);
-        } else if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
-          rawTimes.push(self.timeToMilliseconds(result.time, precision) + 2);
-        } else {
-          rawTimes.push(self.timeToMilliseconds(result.time, precision));
-        }
-      });
-      rawTimes.splice(rawTimes.indexOf(Math.min.apply(null, rawTimes)), 1);
-      rawTimes.splice(rawTimes.indexOf(Math.max.apply(null, rawTimes)), 1);
-      if (rawTimes.indexOf(DNF) >= 0) {
-        return 'DNF';
-      } else {
-        return (rawTimes.reduce(function(pv, cv) { return pv + cv; }, 0) / rawTimes.length).toFixed(precision);
-      }
+    self.getScramble = function() {
+
+      return self.scramble.scramble_string;
+
     };
 
     /**
-     * Calculates the mean of the results.
-     * @param results
-     * @param precision
-     */
-    self.calculateMean = function(results, precision) {
-      var rawTimes = [];
-      angular.forEach(results, function(result) {
-        if ((result.penalty !== undefined) && (result.penalty === '(DNF)')) {
-          return 'DNF';
-        } else if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
-          rawTimes.push(self.timeToMilliseconds(result.time, precision) + 2);
-        } else {
-          rawTimes.push(self.timeToMilliseconds(result.time, precision));
-        }
-      });
-      return (rawTimes.reduce(function(pv, cv) { return pv + cv; }, 0) / rawTimes.length).toFixed(precision);
-    };
-
-    /**
-     * Calculates the mean of the results.
-     * @param results
-     * @param precision
-     */
-    self.calculateLargeMean = function(results, precision) {
-      var rawTimes = [];
-      angular.forEach(results, function(result) {
-        if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
-          rawTimes.push(self.timeToMilliseconds(result.time, precision) + 2);
-        } else if ((result.penalty === undefined) || (result.penalty === '')) {
-          rawTimes.push(self.timeToMilliseconds(result.time, precision));
-        }
-      });
-      return (rawTimes.reduce(function(pv, cv) { return pv + cv; }, 0) / rawTimes.length).toFixed(precision);
-    };
-
-    /**
-     * Converts time from string to milliseconds.
-     * @param time
+     * Gets the scramble state of the current scramble.
+     * This is used by the cub component to draw the scramble.
      * @returns {*}
      */
-    self.timeToMilliseconds = function(time) {
-      var res = time.split(':');
-      if (res.length === 1) {
-        return parseFloat(res[0]);
-      } else if (res.length === 2) {
-        return (parseFloat(res[0]) * 60) + parseFloat(res[1]);
-      } else if (res.length === 3) {
-        return (parseFloat(res[0]) * 3600) + (parseFloat(res[1]) * 60) + parseFloat(res[2]);
-      } else {
-        return -1;
-      }
+    self.getScrambleState = function() {
+
+      return self.scramble.state;
+
+    };
+
+    /**
+     * Uses the jsss library to generate a new scramble for the event.
+     * @param event
+     * @returns {*}
+     */
+    self.newScramble = function(event) {
+
+      self.scramble = scramblers[Events.getEventId(event)].getRandomScramble();
+
+      return self.scramble.scramble_string;
+
     };
 
   }
 
-  angular.module('results').service('ResultsService', ResultsService);
+  angular.module('scramble').service('ScrambleService', ['Events', ScrambleService]);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function SettingsController($modalInstance, settings, MenuBarService) {
+
+    var self = this;
+    self.settings = settings;
+
+    self.close = function() {
+      $modalInstance.dismiss();
+    };
+
+  }
+
+  angular.module('menuBar').controller('SettingsController', ['$modalInstance', 'settings', 'MenuBarService', SettingsController]);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function statisticsDirective() {
+    return {
+      restrict: 'E',
+      templateUrl: '/dist/components/gjTimer/statistics/statistics.html',
+      controller: 'StatisticsController',
+      controllerAs: 'ctrl',
+      scope: {
+        event: '=',
+        results: '='
+      }
+    };
+  }
+
+  angular.module('statistics', []).directive('statistics', statisticsDirective);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function StatisticsController($scope, StatisticsService) {
+
+    var self = this;
+
+  }
+
+  angular.module('statistics').controller('StatisticsController', ['$scope', 'StatisticsService', StatisticsController]);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function StatisticsService() {
+
+    var self = this;
+    
+  }
+
+  angular.module('statistics').service('StatisticsService', [StatisticsService]);
 
 })();
 
@@ -748,7 +913,8 @@
       scope: {
         event: '=',
         scramble: '=',
-        sessionId: '='
+        sessionId: '=',
+        settings: '='
       }
     };
   }
@@ -756,15 +922,14 @@
   angular.module('timer', []).directive('timer', timerDirective);
 
 })();
+
 (function() {
 
   'use strict';
 
   function TimerController($scope, $rootScope, $interval, $timeout, TimerService) {
 
-    var self = this, timer, state = 'reset';
-
-    var TIMER_REFRESH_INTERVAL = 50, START_TIMER_DELAY = 100, STOP_TIMER_DELAY = 100, SPACE_BAR_KEY_CODE = 32;
+    var self = this, timer, state = 'reset', SPACE_BAR_KEY_CODE = 32;
 
     self.time = moment(0).format('s.SSS');
 
@@ -785,14 +950,14 @@
             self.timerStyle = STYLES.GREEN;
             $rootScope.$broadcast('timer focus');
           }
-        }, START_TIMER_DELAY);
+        }, $scope.settings.timerStartDelay);
       } else if (state === 'timing') {
         state = 'stopped';
         $interval.cancel(timer);
         $rootScope.$broadcast('timer unfocus');
         TimerService.saveResult(self.time, $scope.scramble, $scope.sessionId);
         $rootScope.$broadcast('refresh data');
-        $rootScope.$broadcast('new scramble');
+        $rootScope.$broadcast('new scramble', $scope.event);
       }
     });
 
@@ -803,13 +968,13 @@
         TimerService.startTimer();
         timer = $interval(function() {
           self.time = TimerService.getTime();
-        }, TIMER_REFRESH_INTERVAL);
+        }, $scope.settings.timerRefreshInterval);
       } else if (state === 'keydown') {
         state = 'reset';
       } else if (state === 'stopped') {
         $timeout(function() {
           state = 'reset';
-        }, STOP_TIMER_DELAY);
+        }, $scope.settings.timerStopDelay);
       }
     });
 
@@ -818,6 +983,7 @@
   angular.module('timer').controller('TimerController', ['$scope', '$rootScope', '$interval', '$timeout', 'TimerService', TimerController]);
 
 })();
+
 (function() {
 
   'use strict';
@@ -829,11 +995,13 @@
     var startTime;
 
     /**
-     * Get Time.
+     * Gets the current time.
      * @returns {string}
      */
     self.getTime = function() {
+
       var time = moment(Date.now() - startTime);
+
       if (time < 10000) {
         return time.format('s.SSS');
       } else if (time < 60000) {
@@ -843,6 +1011,7 @@
       } else if (time < 3600000) {
         return time.utc().format('h:mm:ss.SSS');
       }
+
     };
 
     /**

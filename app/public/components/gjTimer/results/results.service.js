@@ -16,17 +16,21 @@
       var results = JSON.parse(localStorage.getItem(sessionId)).list;
 
       angular.forEach(results, function(result, index) {
+
         result.time = Number(result.time).toFixed(precision);
+
         if (index >= 4) {
           result.avg5 = self.calculateAverage(results.slice(index - 4, index + 1), precision);
         } else {
           result.avg5 = 'DNF';
         }
+
         if (index >= 11) {
           result.avg12 = self.calculateAverage(results.slice(index - 11, index + 1), precision);
         } else {
           result.avg12 = 'DNF';
         }
+
       });
 
       return results;
@@ -40,12 +44,16 @@
      * @param numberOfResults
      */
     self.getModalResults = function(sessionId, index, numberOfResults) {
+
       if (localStorage.getItem(sessionId) === null) {
         return [];
       } else {
+
         var results = JSON.parse(localStorage.getItem(sessionId)).list.slice(index - numberOfResults, index);
         var min, max, rawTimes = [], DNF = 2147485547;
+
         angular.forEach(results, function(result) {
+
           if ((result.penalty !== undefined) && (result.penalty === '(DNF)')) {
             rawTimes.push(DNF);
           } else if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
@@ -53,13 +61,18 @@
           } else {
             rawTimes.push(self.timeToMilliseconds(result.time, 3));
           }
+
         });
+
         min = rawTimes.indexOf(Math.min.apply(null, rawTimes));
         max = rawTimes.indexOf(Math.max.apply(null, rawTimes));
+
         results[min].min = true;
         results[max].max = true;
+
         return results;
       }
+
     };
 
     /**
@@ -69,11 +82,15 @@
      * @returns {*}
      */
     self.calculateAverage = function(results, precision) {
+
       if (results.length < 3) {
         return 'DNF';
       }
+
       var rawTimes = [], DNF = 2147485547;
+
       angular.forEach(results, function(result) {
+
         if ((result.penalty !== undefined) && (result.penalty === '(DNF)')) {
           rawTimes.push(DNF);
         } else if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
@@ -81,14 +98,18 @@
         } else {
           rawTimes.push(self.timeToMilliseconds(result.time, precision));
         }
+
       });
+
       rawTimes.splice(rawTimes.indexOf(Math.min.apply(null, rawTimes)), 1);
       rawTimes.splice(rawTimes.indexOf(Math.max.apply(null, rawTimes)), 1);
+
       if (rawTimes.indexOf(DNF) >= 0) {
         return 'DNF';
       } else {
         return (rawTimes.reduce(function(pv, cv) { return pv + cv; }, 0) / rawTimes.length).toFixed(precision);
       }
+
     };
 
     /**
@@ -97,8 +118,11 @@
      * @param precision
      */
     self.calculateMean = function(results, precision) {
+
       var rawTimes = [];
+
       angular.forEach(results, function(result) {
+
         if ((result.penalty !== undefined) && (result.penalty === '(DNF)')) {
           return 'DNF';
         } else if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
@@ -106,8 +130,11 @@
         } else {
           rawTimes.push(self.timeToMilliseconds(result.time, precision));
         }
+
       });
+
       return (rawTimes.reduce(function(pv, cv) { return pv + cv; }, 0) / rawTimes.length).toFixed(precision);
+
     };
 
     /**
@@ -116,15 +143,21 @@
      * @param precision
      */
     self.calculateLargeMean = function(results, precision) {
+
       var rawTimes = [];
+
       angular.forEach(results, function(result) {
+
         if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
           rawTimes.push(self.timeToMilliseconds(result.time, precision) + 2);
         } else if ((result.penalty === undefined) || (result.penalty === '')) {
           rawTimes.push(self.timeToMilliseconds(result.time, precision));
         }
+
       });
+
       return (rawTimes.reduce(function(pv, cv) { return pv + cv; }, 0) / rawTimes.length).toFixed(precision);
+
     };
 
     /**
@@ -133,7 +166,9 @@
      * @returns {*}
      */
     self.timeToMilliseconds = function(time) {
+
       var res = time.split(':');
+
       if (res.length === 1) {
         return parseFloat(res[0]);
       } else if (res.length === 2) {
@@ -143,10 +178,11 @@
       } else {
         return -1;
       }
+
     };
 
   }
 
-  angular.module('results').service('ResultsService', ResultsService);
+  angular.module('results').service('ResultsService', [ResultsService]);
 
 })();

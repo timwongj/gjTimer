@@ -30,7 +30,9 @@
       };
 
       for (var i = 1; i <= NUMBER_OF_SESSIONS; i++) {
+
         var session = JSON.parse(localStorage.getItem('session' + i));
+
         if (session === null) {
           newSession.name = 'Session ' + i;
           localStorage.setItem('session' + i, JSON.stringify(newSession));
@@ -38,6 +40,7 @@
           session.event = 'Rubik\'s Cube';
           localStorage.setItem('session' + i, JSON.stringify(session));
         }
+
       }
 
       return self.getSession(currentSessionId);

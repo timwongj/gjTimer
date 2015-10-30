@@ -2,7 +2,7 @@
 
   'use strict';
 
-  function ResultsController($scope, $rootScope, $uibModal, ResultsService) {
+  function ResultsController($scope, $uibModal, ResultsService) {
 
     var self = this;
 
@@ -18,7 +18,7 @@
       if (index >= numberOfResults) {
         $uibModal.open({
           animation: true,
-          templateUrl: 'dist/components/gjTimer/results/resultsModal.html',
+          templateUrl: 'dist/components/gjTimer/resultsModal/resultsModal.html',
           controller: 'ResultsModalController',
           controllerAs: 'ctrl',
           size: 'md',
@@ -38,6 +38,6 @@
 
   }
 
-  angular.module('results').controller('ResultsController', ['$scope', '$rootScope', '$uibModal', 'ResultsService', ResultsController]);
+  angular.module('results').controller('ResultsController', ['$scope', '$uibModal', 'ResultsService', ResultsController]);
 
 })();
