@@ -17,7 +17,6 @@
     "angular-mocks": "~1.4.7"
   },
   "dependencies": {
-    "font-awesome": "~4.4.0",
     "angular-bootstrap": "~0.14.2",
     "angular": "~1.4.7",
     "bootstrap": "~3.3.5",
