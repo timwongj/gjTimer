@@ -4,8 +4,8 @@
 
   function GjTimerController($scope, $rootScope) {
 
-    var COLOR_WHITE = '#FFFFFF';
-    var COLOR_DARK_GRAY = 'rgba(0, 0 , 0, 0.8)';
+    var COLOR_BACKGROUND_DEFAULT = '#FFFFFF'; // white
+    var COLOR_BACKGROUND_FOCUS = '#EEEEEE'; // gray
     var SPACEBAR_KEY_CODE = 32, ENTER_KEY_CODE = 13;
 
     $scope.style = {
@@ -33,17 +33,17 @@
 
     $scope.$on('timer focus', function() {
 
-      $scope.style.body = { 'background-color': COLOR_DARK_GRAY };
+      $scope.style.body = { 'background-color': COLOR_BACKGROUND_FOCUS };
       $scope.style.section = { 'display': 'none' };
-      $scope.style.timer = { 'margin-top': '4.5625em' };
+      $scope.style.timer = { 'margin-top': '2.9375em' };
 
     });
 
     $scope.$on('timer unfocus', function() {
 
-      $scope.style.body = { 'background-color': COLOR_WHITE };
+      $scope.style.body = { 'background-color': COLOR_BACKGROUND_DEFAULT };
       $scope.style.section = { 'display': 'block' };
-      $scope.style.timer = { 'margin-top': '0' };
+      $scope.style.timer = {};
 
     });
 

@@ -11,18 +11,17 @@
     height: @height-section;
   }
   margin-bottom: 0;
-  border-radius: 4px !important;
+  overflow-y: hidden;
+  border-radius: 2px !important;
   background-color: @color-jumbotron;
 }
 
 .jumbotron-timer, .jumbotron-statistics {
   padding: .5em !important;
-  overflow-y: auto;
 }
 
 .jumbotron-results {
   padding: 0 !important;
-  overflow-y: hidden;
 }
 
 .modal {
@@ -31,6 +30,10 @@
 
 .popover-title {
   text-align: center;
+}
+
+.btn {
+  border-radius: 2px;
 }
 
 #cub {
@@ -47,9 +50,25 @@
   padding: .125em 0;
 
   .title {
-    margin-right: .5em;
+    margin-right: .25em;
     font-size: 150%;
     font-weight: 400;
+  }
+
+  .dropdown-menu {
+    min-width: 0;
+  }
+
+  .btn-session {
+    -webkit-border-radius: 2px 0 0 2px;
+    -moz-border-radius: 2px 0 0 2px;
+    border-radius: 2px 0 0 2px;
+  }
+
+  .btn-reset {
+    -webkit-border-radius: 0 2px 2px 0;
+    -moz-border-radius: 0 2px 2px 0;
+    border-radius: 0 2px 2px 0;
   }
 
 }
@@ -141,8 +160,6 @@
 
 #scramble {
 
-  margin: .25em;
-  padding: .25em;
   text-align: center;
 
   .scramble {
@@ -187,8 +204,8 @@
 
   .time {
     font-size: 800%;
-    margin: .015625em;
-    padding: .015625em;
+    margin: .0625em;
+    padding: .0625em;
   }
 
 }
