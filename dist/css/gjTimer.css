@@ -61,6 +61,28 @@
 #results .table-results .avg {
   text-align: center;
 }
+.modal {
+  top: 20%;
+}
+#resultsModal .modal-header {
+  padding: .5em;
+}
+#resultsModal .modal-title {
+  margin-left: .25em;
+}
+#resultsModal .btn-close {
+  vertical-align: middle;
+}
+#resultsModal .modal-body {
+  padding: .5em;
+}
+#resultsModal .ol-results {
+  margin: 0;
+  padding-left: 2em;
+}
+#resultsModal .li-results {
+  margin-bottom: .125em;
+}
 .popover-title {
   text-align: center;
 }

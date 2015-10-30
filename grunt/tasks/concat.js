@@ -38,6 +38,8 @@
           // Results
           'app/public/components/gjTimer/results/results.directive.js',
           'app/public/components/gjTimer/results/results.controller.js',
+          'app/public/components/gjTimer/results/resultsModal.controller.js',
+          'app/public/components/gjTimer/results/resultsPopover.controller.js',
           'app/public/components/gjTimer/results/results.service.js',
 
           // Timer
@@ -73,6 +75,7 @@
           'app/public/less/scramble.less',
           'app/public/less/menuBar.less',
           'app/public/less/results.less',
+          'app/public/less/resultsModal.less',
           'app/public/less/resultsPopover.less',
           'app/public/less/timer.less'
         ],

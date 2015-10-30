@@ -493,7 +493,7 @@
 
   'use strict';
 
-  function ResultsController($scope, $rootScope, ResultsService) {
+  function ResultsController($scope, $rootScope, $uibModal, ResultsService) {
 
     var self = this;
     var precision = 2;
@@ -504,11 +504,67 @@
       self.results = ResultsService.getResults($rootScope.sessionId, precision);
     });
 
+    self.openModal = function(index, avg, numberOfResults) {
+      if (index >= numberOfResults) {
+        var modalInstance = $uibModal.open({
+          animation: true,
+          templateUrl: 'dist/components/gjTimer/results/resultsModal.html',
+          controller: 'ResultsModalController',
+          controllerAs: 'ctrl',
+          size: 'md',
+          resolve: {
+            data: function () {
+              return {
+                sessionId: $rootScope.sessionId,
+                index: index,
+                avg: avg,
+                numberOfResults: numberOfResults
+              };
+            }
+          }
+        });
+      }
+    };
+
   }
 
-  angular.module('results').controller('ResultsController', ['$scope', '$rootScope', 'ResultsService', ResultsController]);
+  angular.module('results').controller('ResultsController', ['$scope', '$rootScope', '$uibModal', 'ResultsService', ResultsController]);
 
 })();
+
+(function() {
+
+  'use strict';
+
+  function ResultsModalController($modalInstance, data, ResultsService) {
+
+    var self = this;
+
+    self.title = data.avg + ' average of ' + data.numberOfResults;
+    self.results = ResultsService.getModalResults(data.sessionId, data.index, data.numberOfResults);
+
+    self.close = function() {
+      $modalInstance.dismiss();
+    };
+
+  }
+
+  angular.module('results').controller('ResultsModalController', ['$modalInstance', 'data', 'ResultsService', ResultsModalController]);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function ResultsPopoverController($scope, $rootScope, ResultsService) {
+
+  }
+
+  angular.module('results').controller('ResultsPopoverController', ['$scope', '$rootScope', 'ResultsService', ResultsPopoverController]);
+
+})();
+
 (function() {
 
   'use strict';
@@ -542,6 +598,34 @@
 
       return results;
 
+    };
+
+    /**
+     * Get results for the avg5/avg12 modal.
+     * @param sessionId
+     * @param index
+     * @param numberOfResults
+     */
+    self.getModalResults = function(sessionId, index, numberOfResults) {
+      if (localStorage.getItem(sessionId) === null) {
+        return [];
+      } else {
+        var min, max, rawTimes = [], results = JSON.parse(localStorage.getItem(sessionId)).list.slice(index - numberOfResults, index);
+        angular.forEach(results, function(result) {
+          if ((result.penalty !== undefined) && (result.penalty === '(DNF)')) {
+            rawTimes.push(DNF);
+          } else if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
+            rawTimes.push(self.timeToMilliseconds(result.time, 3) + 2);
+          } else {
+            rawTimes.push(self.timeToMilliseconds(result.time, 3));
+          }
+        });
+        min = rawTimes.indexOf(Math.min.apply(null, rawTimes));
+        max = rawTimes.indexOf(Math.max.apply(null, rawTimes));
+        results[min].min = true;
+        results[max].max = true;
+        return results;
+      }
     };
 
     /**

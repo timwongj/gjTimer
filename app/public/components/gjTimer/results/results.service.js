@@ -34,6 +34,34 @@
     };
 
     /**
+     * Get results for the avg5/avg12 modal.
+     * @param sessionId
+     * @param index
+     * @param numberOfResults
+     */
+    self.getModalResults = function(sessionId, index, numberOfResults) {
+      if (localStorage.getItem(sessionId) === null) {
+        return [];
+      } else {
+        var min, max, rawTimes = [], results = JSON.parse(localStorage.getItem(sessionId)).list.slice(index - numberOfResults, index);
+        angular.forEach(results, function(result) {
+          if ((result.penalty !== undefined) && (result.penalty === '(DNF)')) {
+            rawTimes.push(DNF);
+          } else if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
+            rawTimes.push(self.timeToMilliseconds(result.time, 3) + 2);
+          } else {
+            rawTimes.push(self.timeToMilliseconds(result.time, 3));
+          }
+        });
+        min = rawTimes.indexOf(Math.min.apply(null, rawTimes));
+        max = rawTimes.indexOf(Math.max.apply(null, rawTimes));
+        results[min].min = true;
+        results[max].max = true;
+        return results;
+      }
+    };
+
+    /**
      * Calculates the average of the results.
      * @param results
      * @param precision

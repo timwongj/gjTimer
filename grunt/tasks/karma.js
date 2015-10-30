@@ -59,6 +59,8 @@
             // Results
             'app/public/components/gjTimer/results/results.directive.js',
             'app/public/components/gjTimer/results/results.controller.js',
+            'app/public/components/gjTimer/results/resultsModal.controller.js',
+            'app/public/components/gjTimer/results/resultsPopover.controller.js',
             'app/public/components/gjTimer/results/results.service.js',
 
             // Timer
