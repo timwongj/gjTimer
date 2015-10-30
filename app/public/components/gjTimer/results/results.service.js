@@ -43,7 +43,8 @@
       if (localStorage.getItem(sessionId) === null) {
         return [];
       } else {
-        var min, max, rawTimes = [], results = JSON.parse(localStorage.getItem(sessionId)).list.slice(index - numberOfResults, index);
+        var results = JSON.parse(localStorage.getItem(sessionId)).list.slice(index - numberOfResults, index);
+        var min, max, rawTimes = [], DNF = 2147485547;
         angular.forEach(results, function(result) {
           if ((result.penalty !== undefined) && (result.penalty === '(DNF)')) {
             rawTimes.push(DNF);
