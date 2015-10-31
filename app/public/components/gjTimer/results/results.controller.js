@@ -9,8 +9,8 @@
     $scope.results = ResultsService.getResults($scope.sessionId, $scope.settings.precision);
     self.results = $scope.results;
 
-    $scope.$on('refresh data', function() {
-      $scope.results = ResultsService.getResults($scope.sessionId, $scope.settings.precision);
+    $scope.$on('refresh data', function($event, sessionId) {
+      $scope.results = ResultsService.getResults(sessionId, $scope.settings.precision);
       self.results = $scope.results;
     });
 
