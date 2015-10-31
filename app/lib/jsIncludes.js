@@ -67,6 +67,7 @@ module.exports = (function() {
     'app/public/components/gjTimer/resultsModal/resultsModal.controller.js',
 
     // ResultsPopover
+    'app/public/components/gjTimer/resultsPopover/resultsPopover.directive.js',
     'app/public/components/gjTimer/resultsPopover/resultsPopover.controller.js',
 
     // Scramble

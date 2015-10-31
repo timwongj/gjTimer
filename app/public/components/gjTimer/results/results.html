@@ -15,11 +15,9 @@
           <div ng-bind="ctrl.results.length - $index"></div>
         </td>
         <td class="time">
-          <div ng-bind="result.time"
-               popover-trigger="mouseenter"
-               popover-placement="right"
-               popover-title="{{result.time}}"
-               uib-popover-template="'dist/components/gjTimer/resultsPopover/resultsPopover.html'"></div>
+          <results-popover result="result">
+            <div ng-bind="result.time"></div>
+          </results-popover>
         </td>
         <td class="avg">
           <div ng-bind="result.avg5"

@@ -45,7 +45,7 @@
       self.session = MenuBarService.changeSession('session' + sessionName.substr(8, sessionName.length));
       $scope.sessionId = 'session' + sessionName.substr(8, sessionName.length);
       $scope.event = self.session.event;
-      $rootScope.$broadcast('refresh data');
+      $rootScope.$broadcast('refresh data', $scope.sessionId);
       if (self.event !== self.session.event) {
         $rootScope.$broadcast('new scramble', $scope.event);
       }

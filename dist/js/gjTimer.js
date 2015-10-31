@@ -245,95 +245,6 @@
 
   'use strict';
 
-  function scrambleDirective() {
-    return {
-      restrict: 'E',
-      templateUrl: '/dist/components/gjTimer/scramble/scramble.html',
-      controller: 'ScrambleController',
-      controllerAs: 'ctrl',
-      scope: {
-        event: '=',
-        scramble: '='
-      }
-    };
-  }
-
-  angular.module('scramble', []).directive('scramble', scrambleDirective);
-
-})();
-
-(function() {
-
-  'use strict';
-
-  function ScrambleController($scope, $rootScope, $sce, ScrambleService) {
-
-    var self = this;
-
-    $scope.$on('new scramble', function($event, event) {
-      $scope.scramble = ScrambleService.newScramble(event);
-      self.scramble = $sce.trustAsHtml($scope.scramble);
-      $rootScope.$broadcast('draw scramble', event, ScrambleService.getScrambleState());
-    });
-
-  }
-
-  angular.module('scramble').controller('ScrambleController', ['$scope', '$rootScope', '$sce', 'ScrambleService', ScrambleController]);
-
-})();
-
-(function() {
-
-  'use strict';
-
-  function ScrambleService(Events) {
-
-    var self = this;
-
-    /**
-     * Gets the current scramble string.
-     * @returns {*}
-     */
-    self.getScramble = function() {
-
-      return self.scramble.scramble_string;
-
-    };
-
-    /**
-     * Gets the scramble state of the current scramble.
-     * This is used by the cub component to draw the scramble.
-     * @returns {*}
-     */
-    self.getScrambleState = function() {
-
-      return self.scramble.state;
-
-    };
-
-    /**
-     * Uses the jsss library to generate a new scramble for the event.
-     * @param event
-     * @returns {*}
-     */
-    self.newScramble = function(event) {
-
-      self.scramble = scramblers[Events.getEventId(event)].getRandomScramble();
-
-      return self.scramble.scramble_string;
-
-    };
-
-  }
-
-  angular.module('scramble').service('ScrambleService', ['Events', ScrambleService]);
-
-})();
-
-(function() {
-
-  'use strict';
-
   function menuBarDirective() {
     return {
       restrict: 'E',
@@ -399,7 +310,7 @@
       self.session = MenuBarService.changeSession('session' + sessionName.substr(8, sessionName.length));
       $scope.sessionId = 'session' + sessionName.substr(8, sessionName.length);
       $scope.event = self.session.event;
-      $rootScope.$broadcast('refresh data');
+      $rootScope.$broadcast('refresh data', $scope.sessionId);
       if (self.event !== self.session.event) {
         $rootScope.$broadcast('new scramble', $scope.event);
       }
@@ -577,8 +488,8 @@
     $scope.results = ResultsService.getResults($scope.sessionId, $scope.settings.precision);
     self.results = $scope.results;
 
-    $scope.$on('refresh data', function() {
-      $scope.results = ResultsService.getResults($scope.sessionId, $scope.settings.precision);
+    $scope.$on('refresh data', function($event, sessionId) {
+      $scope.results = ResultsService.getResults(sessionId, $scope.settings.precision);
       self.results = $scope.results;
     });
 
@@ -796,6 +707,263 @@
   }
 
   angular.module('results').service('ResultsService', [ResultsService]);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function ResultsModalController($modalInstance, data, ResultsService) {
+
+    var self = this;
+
+    self.title = data.avg + ' average of ' + data.numberOfResults;
+    self.results = ResultsService.getModalResults(data.sessionId, data.index, data.numberOfResults);
+
+    self.close = function() {
+      $modalInstance.dismiss();
+    };
+
+  }
+
+  angular.module('results').controller('ResultsModalController', ['$modalInstance', 'data', 'ResultsService', ResultsModalController]);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function resultsPopoverDirective($rootScope, $http, $q, $templateCache) {
+
+    var getTemplate = function() {
+      var def = $q.defer(), template = $templateCache.get('dist/components/gjTimer/resultsPopover/resultsPopover.html');
+      if (typeof template === "undefined") {
+        $http.get('dist/components/gjTimer/resultsPopover/resultsPopover.html')
+          .success(function(data) {
+            $templateCache.put('dist/components/gjTimer/resultsPopover/resultsPopover.html', data);
+            def.resolve(data);
+          });
+      } else {
+        def.resolve(template);
+      }
+      return def.promise;
+    };
+
+    return {
+      restrict: 'E',
+      scope: {
+        result: '='
+      },
+      controller: 'ResultsPopoverController',
+      link: function (scope, element, attrs) {
+        scope.$watch(function () {
+          return scope.result;
+        }, function () {
+          getTemplate().then(function(content) {
+            $rootScope.insidePopover = false;
+            $(element).popover({
+              animation: true,
+              content: content,
+              html: true,
+              placement: 'right',
+              title: scope.result.time
+            });
+            $(element).bind('mouseenter', function () {
+              $(element).popover('show');
+              scope.attachEvents(element);
+            });
+            $(element).bind('mouseleave', function () {
+              if (!$rootScope.insidePopover)
+                $(element).popover('hide');
+            });
+          });
+        });
+      }
+    };
+
+  }
+
+  angular.module('results').directive('resultsPopover', ['$rootScope', '$http', '$q', '$templateCache', resultsPopoverDirective]);
+
+})();
+(function() {
+
+  'use strict';
+
+  function ResultsPopoverController($scope, $rootScope) {
+    $scope.attachEvents = function (element) {
+      $('.popover').on('mouseenter', function () {
+        $rootScope.insidePopover = true;
+      }).on('mouseleave', function () {
+        $rootScope.insidePopover = false;
+        $(element).popover('hide');
+      }).on('mouseclick', function () {
+        $rootScope.insidePopover = false;
+        $(element).popover('hide');
+      });
+    };
+  }
+
+  angular.module('results').controller('ResultsPopoverController', ['$scope', '$rootScope', ResultsPopoverController]);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function scrambleDirective() {
+    return {
+      restrict: 'E',
+      templateUrl: '/dist/components/gjTimer/scramble/scramble.html',
+      controller: 'ScrambleController',
+      controllerAs: 'ctrl',
+      scope: {
+        event: '=',
+        scramble: '='
+      }
+    };
+  }
+
+  angular.module('scramble', []).directive('scramble', scrambleDirective);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function ScrambleController($scope, $rootScope, $sce, ScrambleService) {
+
+    var self = this;
+
+    $scope.$on('new scramble', function($event, event) {
+      $scope.scramble = ScrambleService.newScramble(event);
+      self.scramble = $sce.trustAsHtml($scope.scramble);
+      $rootScope.$broadcast('draw scramble', event, ScrambleService.getScrambleState());
+    });
+
+  }
+
+  angular.module('scramble').controller('ScrambleController', ['$scope', '$rootScope', '$sce', 'ScrambleService', ScrambleController]);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function ScrambleService(Events) {
+
+    var self = this;
+
+    /**
+     * Gets the current scramble string.
+     * @returns {*}
+     */
+    self.getScramble = function() {
+
+      return self.scramble.scramble_string;
+
+    };
+
+    /**
+     * Gets the scramble state of the current scramble.
+     * This is used by the cub component to draw the scramble.
+     * @returns {*}
+     */
+    self.getScrambleState = function() {
+
+      return self.scramble.state;
+
+    };
+
+    /**
+     * Uses the jsss library to generate a new scramble for the event.
+     * @param event
+     * @returns {*}
+     */
+    self.newScramble = function(event) {
+
+      self.scramble = scramblers[Events.getEventId(event)].getRandomScramble();
+
+      return self.scramble.scramble_string;
+
+    };
+
+  }
+
+  angular.module('scramble').service('ScrambleService', ['Events', ScrambleService]);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function SettingsController($modalInstance, settings, MenuBarService) {
+
+    var self = this;
+    self.settings = settings;
+
+    self.close = function() {
+      $modalInstance.dismiss();
+    };
+
+  }
+
+  angular.module('menuBar').controller('SettingsController', ['$modalInstance', 'settings', 'MenuBarService', SettingsController]);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function statisticsDirective() {
+    return {
+      restrict: 'E',
+      templateUrl: '/dist/components/gjTimer/statistics/statistics.html',
+      controller: 'StatisticsController',
+      controllerAs: 'ctrl',
+      scope: {
+        event: '=',
+        results: '='
+      }
+    };
+  }
+
+  angular.module('statistics', []).directive('statistics', statisticsDirective);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function StatisticsController($scope, StatisticsService) {
+
+    var self = this;
+
+  }
+
+  angular.module('statistics').controller('StatisticsController', ['$scope', 'StatisticsService', StatisticsController]);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function StatisticsService() {
+
+    var self = this;
+    
+  }
+
+  angular.module('statistics').service('StatisticsService', [StatisticsService]);
 
 })();
 
