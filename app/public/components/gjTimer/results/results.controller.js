@@ -12,6 +12,9 @@
     $scope.$on('refresh data', function($event, sessionId) {
       $scope.results = ResultsService.getResults(sessionId, $scope.settings.precision);
       self.results = $scope.results;
+      if ($scope.$root.$$phase != '$apply' && $scope.$root.$$phase != '$digest') {
+        $scope.$apply();
+      }
     });
 
     self.openModal = function(index, avg, numberOfResults) {
@@ -34,6 +37,10 @@
           }
         });
       }
+    };
+
+    self.plus2 = function(time) {
+      return ResultsService.plus2(time);
     };
 
   }

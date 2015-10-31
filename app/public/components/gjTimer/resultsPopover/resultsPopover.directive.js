@@ -2,7 +2,7 @@
 
   'use strict';
 
-  function resultsPopoverDirective($rootScope, $timeout, $http, $q, $templateCache) {
+  function resultsPopoverDirective($rootScope, $timeout, $http, $q, $templateCache, ResultsService) {
 
     var getTemplate = function() {
       var def = $q.defer(), template = $templateCache.get('dist/components/gjTimer/resultsPopover/resultsPopover.html');
@@ -22,19 +22,27 @@
       restrict: 'E',
       scope: {
         index: '=',
-        result: '='
+        result: '=',
+        sessionId: '='
       },
       controller: 'ResultsPopoverController',
+      controllerAs: 'ctrl',
       link: function (scope, element, attrs) {
         getTemplate().then(function(content) {
           scope.popoverDelay = 1; // just needs to be at least 1
           $rootScope.insidePopover = -1;
+          var title = scope.result.time;
+          if (scope.result.penalty === '+2') {
+            title = ResultsService.plus2(scope.result.time) + '+';
+          } else if (scope.result.penalty === 'DNF') {
+            title = 'DNF(' + scope.result.time + ')';
+          }
           $(element).popover({
             animation: false,
             content: content,
             html: true,
             placement: 'right',
-            title: scope.result.time
+            title: title
           });
           $(element).bind('mouseenter', function () {
             scope.insideDiv = scope.index;
@@ -56,6 +64,6 @@
 
   }
 
-  angular.module('results').directive('resultsPopover', ['$rootScope', '$timeout', '$http', '$q', '$templateCache', resultsPopoverDirective]);
+  angular.module('results').directive('resultsPopover', ['$rootScope', '$timeout', '$http', '$q', '$templateCache', 'ResultsService', resultsPopoverDirective]);
 
 })();

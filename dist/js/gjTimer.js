@@ -332,10 +332,6 @@
       });
     };
 
-    self.graphs = function() {
-      
-    };
-
     self.resetSession = function() {
       if (confirm('Are you sure you want to reset ' + self.session.name + '?')) {
         self.session = MenuBarService.resetSession('session' + self.session.name.substr(8, self.session.name.length));
@@ -491,6 +487,9 @@
     $scope.$on('refresh data', function($event, sessionId) {
       $scope.results = ResultsService.getResults(sessionId, $scope.settings.precision);
       self.results = $scope.results;
+      if ($scope.$root.$$phase != '$apply' && $scope.$root.$$phase != '$digest') {
+        $scope.$apply();
+      }
     });
 
     self.openModal = function(index, avg, numberOfResults) {
@@ -513,6 +512,10 @@
           }
         });
       }
+    };
+
+    self.plus2 = function(time) {
+      return ResultsService.plus2(time);
     };
 
   }
@@ -540,7 +543,7 @@
 
       angular.forEach(results, function(result, index) {
 
-        result.time = Number(result.time).toFixed(precision);
+        result.time = Number(result.time).toFixed(3);
 
         if (index >= 4) {
           result.avg5 = self.calculateAverage(results.slice(index - 4, index + 1), precision);
@@ -580,9 +583,9 @@
           if ((result.penalty !== undefined) && (result.penalty === '(DNF)')) {
             rawTimes.push(DNF);
           } else if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
-            rawTimes.push(self.timeToMilliseconds(result.time, 3) + 2);
+            rawTimes.push(self.timeToSeconds(result.time, 3) + 2);
           } else {
-            rawTimes.push(self.timeToMilliseconds(result.time, 3));
+            rawTimes.push(self.timeToSeconds(result.time, 3));
           }
 
         });
@@ -617,9 +620,9 @@
         if ((result.penalty !== undefined) && (result.penalty === '(DNF)')) {
           rawTimes.push(DNF);
         } else if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
-          rawTimes.push(self.timeToMilliseconds(result.time, precision) + 2);
+          rawTimes.push(self.timeToSeconds(result.time, precision) + 2);
         } else {
-          rawTimes.push(self.timeToMilliseconds(result.time, precision));
+          rawTimes.push(self.timeToSeconds(result.time, precision));
         }
 
       });
@@ -649,9 +652,9 @@
         if ((result.penalty !== undefined) && (result.penalty === '(DNF)')) {
           return 'DNF';
         } else if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
-          rawTimes.push(self.timeToMilliseconds(result.time, precision) + 2);
+          rawTimes.push(self.timeToSeconds(result.time, precision) + 2);
         } else {
-          rawTimes.push(self.timeToMilliseconds(result.time, precision));
+          rawTimes.push(self.timeToSeconds(result.time, precision));
         }
 
       });
@@ -672,9 +675,9 @@
       angular.forEach(results, function(result) {
 
         if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
-          rawTimes.push(self.timeToMilliseconds(result.time, precision) + 2);
+          rawTimes.push(self.timeToSeconds(result.time, precision) + 2);
         } else if ((result.penalty === undefined) || (result.penalty === '')) {
-          rawTimes.push(self.timeToMilliseconds(result.time, precision));
+          rawTimes.push(self.timeToSeconds(result.time, precision));
         }
 
       });
@@ -684,11 +687,22 @@
     };
 
     /**
-     * Converts time from string to milliseconds.
+     * Adds 2 seconds to the displayed time.
      * @param time
      * @returns {*}
      */
-    self.timeToMilliseconds = function(time) {
+    self.plus2 = function(time) {
+
+      return self.millisecondsToString((self.timeToSeconds(time) + 2) * 1000);
+
+    };
+
+    /**
+     * Converts time from string to seconds.
+     * @param time
+     * @returns {*}
+     */
+    self.timeToSeconds = function(time) {
 
       var res = time.split(':');
 
@@ -700,6 +714,27 @@
         return (parseFloat(res[0]) * 3600) + (parseFloat(res[1]) * 60) + parseFloat(res[2]);
       } else {
         return -1;
+      }
+
+    };
+
+    /**
+     * Converts time from milliseconds to string
+     * @param milliseconds
+     * @returns {*}
+     */
+    self.millisecondsToString = function(milliseconds) {
+
+      var time = moment(milliseconds);
+
+      if (time < 10000) {
+        return time.format('s.SSS');
+      } else if (time < 60000) {
+        return time.format('ss.SSS');
+      } else if (time < 600000) {
+        return time.format('m:ss.SSS');
+      } else if (time < 3600000) {
+        return time.utc().format('h:mm:ss.SSS');
       }
 
     };
@@ -735,7 +770,7 @@
 
   'use strict';
 
-  function resultsPopoverDirective($rootScope, $timeout, $http, $q, $templateCache) {
+  function resultsPopoverDirective($rootScope, $timeout, $http, $q, $templateCache, ResultsService) {
 
     var getTemplate = function() {
       var def = $q.defer(), template = $templateCache.get('dist/components/gjTimer/resultsPopover/resultsPopover.html');
@@ -755,19 +790,27 @@
       restrict: 'E',
       scope: {
         index: '=',
-        result: '='
+        result: '=',
+        sessionId: '='
       },
       controller: 'ResultsPopoverController',
+      controllerAs: 'ctrl',
       link: function (scope, element, attrs) {
         getTemplate().then(function(content) {
           scope.popoverDelay = 1; // just needs to be at least 1
           $rootScope.insidePopover = -1;
+          var title = scope.result.time;
+          if (scope.result.penalty === '+2') {
+            title = ResultsService.plus2(scope.result.time) + '+';
+          } else if (scope.result.penalty === 'DNF') {
+            title = 'DNF(' + scope.result.time + ')';
+          }
           $(element).popover({
             animation: false,
             content: content,
             html: true,
             placement: 'right',
-            title: scope.result.time
+            title: title
           });
           $(element).bind('mouseenter', function () {
             scope.insideDiv = scope.index;
@@ -789,15 +832,19 @@
 
   }
 
-  angular.module('results').directive('resultsPopover', ['$rootScope', '$timeout', '$http', '$q', '$templateCache', resultsPopoverDirective]);
+  angular.module('results').directive('resultsPopover', ['$rootScope', '$timeout', '$http', '$q', '$templateCache', 'ResultsService', resultsPopoverDirective]);
 
 })();
 (function() {
 
   'use strict';
 
-  function ResultsPopoverController($scope, $rootScope, $timeout, ResultsService) {
+  function ResultsPopoverController($scope, $rootScope, $timeout, ResultsPopoverService) {
+
+    var self = this;
+
     $scope.attachEvents = function (element) {
+
       $('.popover').on('mouseenter', function () {
         $rootScope.insidePopover = $scope.index;
       }).on('mouseleave', function () {
@@ -808,10 +855,99 @@
           }
         }, $scope.popoverDelay);
       });
+
+      $('.popover-btn-penalty-ok').on('click', function() {
+        ResultsPopoverService.penalty($scope.sessionId, $scope.index, '');
+        $rootScope.$broadcast('refresh data', $scope.sessionId);
+        $(element).popover('hide');
+      });
+
+      $('.popover-btn-penalty-plus').on('click', function() {
+        ResultsPopoverService.penalty($scope.sessionId, $scope.index, '+2');
+        $rootScope.$broadcast('refresh data', $scope.sessionId);
+        $(element).popover('hide');
+      });
+
+      $('.popover-btn-penalty-dnf').on('click', function() {
+        ResultsPopoverService.penalty($scope.sessionId, $scope.index, 'DNF');
+        $rootScope.$broadcast('refresh data', $scope.sessionId);
+        $(element).popover('hide');
+      });
+
+      $('.popover-btn-remove').on('click', function() {
+        if (confirm('Are you sure you want to delete this time?')) {
+          ResultsPopoverService.remove($scope.sessionId, $scope.index);
+          $rootScope.$broadcast('refresh data', $scope.sessionId);
+        }
+        $(element).popover('hide');
+      });
+
     };
+
   }
 
-  angular.module('results').controller('ResultsPopoverController', ['$scope', '$rootScope', '$timeout', 'ResultsService', ResultsPopoverController]);
+  angular.module('results').controller('ResultsPopoverController', ['$scope', '$rootScope', '$timeout', 'ResultsPopoverService', ResultsPopoverController]);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function ResultsPopoverService() {
+
+    var self = this;
+
+    /**
+     * Changes the penalty for a solve.
+     * @param sessionId
+     * @param index
+     * @param penalty
+     */
+    self.penalty = function(sessionId, index, penalty) {
+      var session = JSON.parse(localStorage.getItem(sessionId));
+      switch(penalty) {
+        case '':
+          if (session.list[index].penalty !== undefined) {
+            delete session.list[index].penalty;
+            localStorage.setItem(sessionId, JSON.stringify(session));
+          }
+          break;
+        case '+2':
+          session.list[index].penalty = '+2';
+          localStorage.setItem(sessionId, JSON.stringify(session));
+          break;
+        case 'DNF':
+          session.list[index].penalty = 'DNF';
+          localStorage.setItem(sessionId, JSON.stringify(session));
+          break;
+      }
+    };
+
+    /**
+     * Removes a solve.
+     * @param sessionId
+     * @param index
+     */
+    self.remove = function(sessionId, index) {
+      var session = JSON.parse(localStorage.getItem(sessionId));
+      session.list.splice(index, 1);
+      localStorage.setItem(sessionId, JSON.stringify(session));
+    };
+
+    /**
+     * Adds or edits a comment for a solve.
+     * @param sessionId
+     * @param index
+     * @param comment
+     */
+    self.comment = function(sessionId, index, comment) {
+      console.log('comment ' + sessionId + ' - ' + index + ' - ' + comment);
+    };
+
+  }
+
+  angular.module('results').service('ResultsPopoverService', ResultsPopoverService);
 
 })();
 

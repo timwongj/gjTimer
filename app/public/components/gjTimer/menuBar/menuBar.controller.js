@@ -67,10 +67,6 @@
       });
     };
 
-    self.graphs = function() {
-      
-    };
-
     self.resetSession = function() {
       if (confirm('Are you sure you want to reset ' + self.session.name + '?')) {
         self.session = MenuBarService.resetSession('session' + self.session.name.substr(8, self.session.name.length));

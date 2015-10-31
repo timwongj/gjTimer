@@ -17,7 +17,7 @@
 
       angular.forEach(results, function(result, index) {
 
-        result.time = Number(result.time).toFixed(precision);
+        result.time = Number(result.time).toFixed(3);
 
         if (index >= 4) {
           result.avg5 = self.calculateAverage(results.slice(index - 4, index + 1), precision);
@@ -57,9 +57,9 @@
           if ((result.penalty !== undefined) && (result.penalty === '(DNF)')) {
             rawTimes.push(DNF);
           } else if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
-            rawTimes.push(self.timeToMilliseconds(result.time, 3) + 2);
+            rawTimes.push(self.timeToSeconds(result.time, 3) + 2);
           } else {
-            rawTimes.push(self.timeToMilliseconds(result.time, 3));
+            rawTimes.push(self.timeToSeconds(result.time, 3));
           }
 
         });
@@ -94,9 +94,9 @@
         if ((result.penalty !== undefined) && (result.penalty === '(DNF)')) {
           rawTimes.push(DNF);
         } else if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
-          rawTimes.push(self.timeToMilliseconds(result.time, precision) + 2);
+          rawTimes.push(self.timeToSeconds(result.time, precision) + 2);
         } else {
-          rawTimes.push(self.timeToMilliseconds(result.time, precision));
+          rawTimes.push(self.timeToSeconds(result.time, precision));
         }
 
       });
@@ -126,9 +126,9 @@
         if ((result.penalty !== undefined) && (result.penalty === '(DNF)')) {
           return 'DNF';
         } else if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
-          rawTimes.push(self.timeToMilliseconds(result.time, precision) + 2);
+          rawTimes.push(self.timeToSeconds(result.time, precision) + 2);
         } else {
-          rawTimes.push(self.timeToMilliseconds(result.time, precision));
+          rawTimes.push(self.timeToSeconds(result.time, precision));
         }
 
       });
@@ -149,9 +149,9 @@
       angular.forEach(results, function(result) {
 
         if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
-          rawTimes.push(self.timeToMilliseconds(result.time, precision) + 2);
+          rawTimes.push(self.timeToSeconds(result.time, precision) + 2);
         } else if ((result.penalty === undefined) || (result.penalty === '')) {
-          rawTimes.push(self.timeToMilliseconds(result.time, precision));
+          rawTimes.push(self.timeToSeconds(result.time, precision));
         }
 
       });
@@ -161,11 +161,22 @@
     };
 
     /**
-     * Converts time from string to milliseconds.
+     * Adds 2 seconds to the displayed time.
      * @param time
      * @returns {*}
      */
-    self.timeToMilliseconds = function(time) {
+    self.plus2 = function(time) {
+
+      return self.millisecondsToString((self.timeToSeconds(time) + 2) * 1000);
+
+    };
+
+    /**
+     * Converts time from string to seconds.
+     * @param time
+     * @returns {*}
+     */
+    self.timeToSeconds = function(time) {
 
       var res = time.split(':');
 
@@ -177,6 +188,27 @@
         return (parseFloat(res[0]) * 3600) + (parseFloat(res[1]) * 60) + parseFloat(res[2]);
       } else {
         return -1;
+      }
+
+    };
+
+    /**
+     * Converts time from milliseconds to string
+     * @param milliseconds
+     * @returns {*}
+     */
+    self.millisecondsToString = function(milliseconds) {
+
+      var time = moment(milliseconds);
+
+      if (time < 10000) {
+        return time.format('s.SSS');
+      } else if (time < 60000) {
+        return time.format('ss.SSS');
+      } else if (time < 600000) {
+        return time.format('m:ss.SSS');
+      } else if (time < 3600000) {
+        return time.utc().format('h:mm:ss.SSS');
       }
 
     };

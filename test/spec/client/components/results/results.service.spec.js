@@ -44,7 +44,7 @@
 
     });
 
-    describe('timeToMilliseconds function', function() {
+    describe('timeToSeconds function', function() {
 
     });
 
