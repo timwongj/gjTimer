@@ -23,12 +23,6 @@
 .jumbotron-results {
   padding: 0 !important;
 }
-.modal {
-  top: 20%;
-}
-.popover-title {
-  text-align: center;
-}
 .btn {
   border-radius: 2px;
 }
@@ -90,6 +84,9 @@
   text-align: center;
   width: 40em;
 }
+.modal {
+  top: 20%;
+}
 #resultsModal .modal-header {
   padding: .5em;
 }
@@ -108,6 +105,11 @@
 }
 #resultsModal .li-results {
   margin-bottom: .125em;
+}
+.popover-title,
+.popover-content {
+  padding: .5em;
+  text-align: center;
 }
 #resultsPopover .form-group-buttons {
   margin-bottom: .25em;

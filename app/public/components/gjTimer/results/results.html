@@ -15,8 +15,10 @@
           <div ng-bind="ctrl.results.length - $index"></div>
         </td>
         <td class="time">
-          <results-popover index="ctrl.results.length - $index" result="result">
-            <div ng-bind="result.time"></div>
+          <results-popover index="ctrl.results.length - $index - 1" result="result" session-id="sessionId">
+            <div ng-if="result.penalty === undefined" ng-bind="result.time.substring(0, result.time.length - 1)"></div>
+            <div ng-if="result.penalty === '+2'" ng-bind="ctrl.plus2(result.time).substring(0, ctrl.plus2(result.time).length - 1) + '+'"></div>
+            <div ng-if="result.penalty === 'DNF'">DNF</div>
           </results-popover>
         </td>
         <td class="avg">
