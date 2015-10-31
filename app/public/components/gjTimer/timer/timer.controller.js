@@ -31,7 +31,7 @@
         $interval.cancel(timer);
         $rootScope.$broadcast('timer unfocus');
         TimerService.saveResult(self.time, $scope.scramble, $scope.sessionId);
-        $rootScope.$broadcast('refresh data');
+        $rootScope.$broadcast('refresh data', $scope.sessionId);
         $rootScope.$broadcast('new scramble', $scope.event);
       }
     });
