@@ -735,7 +735,7 @@
 
   'use strict';
 
-  function resultsPopoverDirective($rootScope, $http, $q, $templateCache) {
+  function resultsPopoverDirective($rootScope, $timeout, $http, $q, $templateCache) {
 
     var getTemplate = function() {
       var def = $q.defer(), template = $templateCache.get('dist/components/gjTimer/resultsPopover/resultsPopover.html');
@@ -754,30 +754,34 @@
     return {
       restrict: 'E',
       scope: {
+        index: '=',
         result: '='
       },
       controller: 'ResultsPopoverController',
       link: function (scope, element, attrs) {
-        scope.$watch(function () {
-          return scope.result;
-        }, function () {
-          getTemplate().then(function(content) {
-            $rootScope.insidePopover = false;
-            $(element).popover({
-              animation: true,
-              content: content,
-              html: true,
-              placement: 'right',
-              title: scope.result.time
-            });
-            $(element).bind('mouseenter', function () {
+        getTemplate().then(function(content) {
+          scope.popoverDelay = 1; // just needs to be at least 1
+          $rootScope.insidePopover = -1;
+          $(element).popover({
+            animation: false,
+            content: content,
+            html: true,
+            placement: 'right',
+            title: scope.result.time
+          });
+          $(element).bind('mouseenter', function () {
+            scope.insideDiv = scope.index;
+            $timeout(function() {
               $(element).popover('show');
               scope.attachEvents(element);
-            });
-            $(element).bind('mouseleave', function () {
-              if (!$rootScope.insidePopover)
+            }, scope.popoverDelay);
+          });
+          $(element).bind('mouseleave', function () {
+            scope.insideDiv = -1;
+            $timeout(function() {
+              if ($rootScope.insidePopover !== scope.index)
                 $(element).popover('hide');
-            });
+            }, scope.popoverDelay);
           });
         });
       }
@@ -785,28 +789,29 @@
 
   }
 
-  angular.module('results').directive('resultsPopover', ['$rootScope', '$http', '$q', '$templateCache', resultsPopoverDirective]);
+  angular.module('results').directive('resultsPopover', ['$rootScope', '$timeout', '$http', '$q', '$templateCache', resultsPopoverDirective]);
 
 })();
 (function() {
 
   'use strict';
 
-  function ResultsPopoverController($scope, $rootScope) {
+  function ResultsPopoverController($scope, $rootScope, $timeout, ResultsService) {
     $scope.attachEvents = function (element) {
       $('.popover').on('mouseenter', function () {
-        $rootScope.insidePopover = true;
+        $rootScope.insidePopover = $scope.index;
       }).on('mouseleave', function () {
-        $rootScope.insidePopover = false;
-        $(element).popover('hide');
-      }).on('mouseclick', function () {
-        $rootScope.insidePopover = false;
-        $(element).popover('hide');
+        $rootScope.insidePopover = -1;
+        $timeout(function() {
+          if ($scope.insideDiv !== $scope.index) {
+            $(element).popover('hide');
+          }
+        }, $scope.popoverDelay);
       });
     };
   }
 
-  angular.module('results').controller('ResultsPopoverController', ['$scope', '$rootScope', ResultsPopoverController]);
+  angular.module('results').controller('ResultsPopoverController', ['$scope', '$rootScope', '$timeout', 'ResultsService', ResultsPopoverController]);
 
 })();
 
