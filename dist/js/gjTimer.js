@@ -133,33 +133,93 @@
       '5x5 blindfolded': '555bf'
     };
 
-    var eventSvg = {
-      'Rubik\'s Cube': { ratio: 0.75, width: 200 },
-      '4x4 Cube': { ratio: 0.75, width: 200 },
-      '5x5 Cube': { ratio: 0.75, width: 200 },
-      '2x2 Cube': { ratio: 0.75, width: 200 },
-      '3x3 blindfolded': { ratio: 0.75, width: 200 },
-      '3x3 one-handed': { ratio: 0.75, width: 200 },
-      'Megaminx': { ratio: 0.51, width: 150 },
-      'Pyraminx': { ratio: 0.69, width: 200 },
-      'Square-1': { ratio: 0.57, width: 150 },
-      'Rubik\'s Clock': { ratio: 0.50, width: 150 },
-      '6x6 Cube': { ratio: 0.75, width: 200 },
-      '7x7 Cube': { ratio: 0.75, width: 200 },
-      '4x4 blindfolded': { ratio: 0.75, width: 200 },
-      '5x5 blindfolded': { ratio: 0.75, width: 200 }
+    var eventSvgs = {
+      'Rubik\'s Cube': { ratio: 0.75, width: 250 },
+      '4x4 Cube': { ratio: 0.75, width: 250 },
+      '5x5 Cube': { ratio: 0.75, width: 250 },
+      '2x2 Cube': { ratio: 0.75, width: 250 },
+      '3x3 blindfolded': { ratio: 0.75, width: 250 },
+      '3x3 one-handed': { ratio: 0.75, width: 250 },
+      'Megaminx': { ratio: 0.51, width: 175 },
+      'Pyraminx': { ratio: 0.69, width: 250 },
+      'Square-1': { ratio: 0.57, width: 175 },
+      'Rubik\'s Clock': { ratio: 0.50, width: 175 },
+      '6x6 Cube': { ratio: 0.75, width: 250 },
+      '7x7 Cube': { ratio: 0.75, width: 250 },
+      '4x4 blindfolded': { ratio: 0.75, width: 250 },
+      '5x5 blindfolded': { ratio: 0.75, width: 250 }
     };
 
+    var eventStyles = {
+      'Rubik\'s Cube': { 'font-size' : '16pt' },
+      '4x4 Cube': { 'font-size' : '15pt' },
+      '5x5 Cube': { 'font-size' : '15pt' },
+      '2x2 Cube': { 'font-size' : '16pt' },
+      '3x3 blindfolded': { 'font-size' : '16pt' },
+      '3x3 one-handed': { 'font-size' : '16pt' },
+      'Megaminx': { 'font-size' : '13pt' },
+      'Pyraminx': { 'font-size' : '16pt' },
+      'Square-1': { 'font-size' : '15pt' },
+      'Rubik\'s Clock': { 'font-size' : '15pt' },
+      '6x6 Cube': { 'font-size' : '13pt' },
+      '7x7 Cube': { 'font-size' : '13pt' },
+      '4x4 blindfolded': { 'font-size' : '15pt' },
+      '5x5 blindfolded': { 'font-size' : '15pt' }
+    };
+
+    /**
+     * Gets the list of events supported by gjTimer.
+     * @returns {}
+     */
     self.getEvents = function() {
+
       return eventIds;
+
     };
 
+    /**
+     * Gets the eventId of the event.
+     * @param event
+     * @returns {*}
+     */
     self.getEventId = function(event) {
-      return eventIds[event];
+
+      if (eventIds.hasOwnProperty(event)) {
+        return eventIds[event];
+      } else {
+        return eventIds['Rubik\'s Cube'];
+      }
+
     };
 
+    /**
+     * Gets the css style for the scramble of the event.
+     * @param event
+     * @returns {*}
+     */
+    self.getEventStyle = function(event) {
+
+      if (eventStyles.hasOwnProperty(event)) {
+        return eventStyles[event];
+      } else {
+        return eventStyles['Rubik\'s Cube'];
+      }
+
+    };
+
+    /**
+     * Gets the svg properties of the event.
+     * @param event
+     * @returns {*}
+     */
     self.getEventSvg = function(event) {
-      return eventSvg[event];
+
+      if (eventSvgs.hasOwnProperty(event)) {
+        return eventSvgs[event];
+      } else {
+        return eventSvgs['Rubik\'s Cube'];
+      }
+
     };
 
   }
@@ -976,19 +1036,20 @@
 
   'use strict';
 
-  function ScrambleController($scope, $rootScope, $sce, ScrambleService) {
+  function ScrambleController($scope, $rootScope, $sce, ScrambleService, Events) {
 
     var self = this;
 
     $scope.$on('new scramble', function($event, event) {
       $scope.scramble = ScrambleService.newScramble(event);
       self.scramble = $sce.trustAsHtml($scope.scramble);
+      self.scrambleStyle = Events.getEventStyle(event);
       $rootScope.$broadcast('draw scramble', event, ScrambleService.getScrambleState());
     });
 
   }
 
-  angular.module('scramble').controller('ScrambleController', ['$scope', '$rootScope', '$sce', 'ScrambleService', ScrambleController]);
+  angular.module('scramble').controller('ScrambleController', ['$scope', '$rootScope', '$sce', 'ScrambleService', 'Events', ScrambleController]);
 
 })();
 
