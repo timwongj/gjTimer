@@ -2,7 +2,7 @@
 
   'use strict';
 
-  describe('The scramble service', function() {
+  describe('The statistics controller', function() {
 
     it('should dose gj', function() {
 

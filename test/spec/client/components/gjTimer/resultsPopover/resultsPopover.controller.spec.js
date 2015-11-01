@@ -2,7 +2,7 @@
 
   'use strict';
 
-  describe('The timer controller', function() {
+  describe('The resultsPopover controller', function() {
 
     it('should dose gj', function() {
 

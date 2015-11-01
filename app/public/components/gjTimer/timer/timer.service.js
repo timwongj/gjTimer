@@ -2,11 +2,9 @@
 
   'use strict';
 
-  function TimerService(Calculator, LocalStorage) {
+  function TimerService(LocalStorage, Calculator) {
 
     var self = this;
-
-    var startTime;
 
     /**
      * Gets the current time.
@@ -15,7 +13,7 @@
      */
     self.getTime = function(precision) {
 
-      return Calculator.convertTimeFromMillisecondsToString(moment(Date.now() - startTime), precision);
+      return Calculator.convertTimeFromMillisecondsToString(moment(Date.now() - self.startTime), precision);
 
     };
 
@@ -24,7 +22,7 @@
      */
     self.startTimer = function() {
 
-      startTime = Date.now();
+      self.startTime = Date.now();
 
     };
 
@@ -44,6 +42,6 @@
 
   }
 
-  angular.module('timer').service('TimerService', ['Calculator', 'LocalStorage', TimerService]);
+  angular.module('timer').service('TimerService', ['LocalStorage', 'Calculator', TimerService]);
 
 })();

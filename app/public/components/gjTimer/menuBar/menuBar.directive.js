@@ -5,7 +5,7 @@
   function menuBarDirective() {
     return {
       restrict: 'E',
-      templateUrl: '/dist/components/gjTimer/menuBar/menuBar.html',
+      templateUrl: 'dist/components/gjTimer/menuBar/menuBar.html',
       controller: 'MenuBarController',
       controllerAs: 'ctrl',
       scope: {

@@ -9,7 +9,7 @@
     /**
      * Gets the scramble state of the current scramble.
      * This is used by the cub component to draw the scramble.
-     * @returns {*}
+     * @returns {string}
      */
     self.getScrambleState = function() {
 
@@ -20,7 +20,7 @@
     /**
      * Uses the jsss library to generate a new scramble for the event.
      * @param eventId
-     * @returns {*}
+     * @returns {string}
      */
     self.getNewScramble = function(eventId) {
 
@@ -36,6 +36,6 @@
 
   }
 
-  angular.module('scramble').service('ScrambleService', [ScrambleService]);
+  angular.module('scramble').service('ScrambleService', ScrambleService);
 
 })();

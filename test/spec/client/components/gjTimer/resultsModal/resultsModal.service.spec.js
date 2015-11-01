@@ -2,7 +2,7 @@
 
   'use strict';
 
-  describe('The timer service', function() {
+  describe('The resultsModal service', function() {
 
     it('should dose gj', function() {
 

@@ -498,7 +498,7 @@
   function cubDirective() {
     return {
       restrict: 'E',
-      templateUrl: '/dist/components/gjTimer/cub/cub.html',
+      templateUrl: 'dist/components/gjTimer/cub/cub.html',
       controller: 'CubController',
       controllerAs: 'ctrl',
       scope: {
@@ -520,7 +520,9 @@
     var self = this;
 
     $scope.$on('draw scramble', function($event, eventId, state) {
+
       self.cub = CubService.drawScramble(eventId, state);
+
     });
 
   }
@@ -548,10 +550,10 @@
       var width = Events.getEventSvg(eventId).width;
       var height = width / Events.getEventSvg(eventId).ratio;
 
-      var el = document.createElement("div");
+      var el = document.createElement('div');
       scramblers[eventId].drawScramble(el, state, height, width);
 
-      var tmp = document.createElement("div");
+      var tmp = document.createElement('div');
       tmp.appendChild(el);
 
       return $sce.trustAsHtml(tmp.innerHTML);
@@ -571,7 +573,7 @@
   function menuBarDirective() {
     return {
       restrict: 'E',
-      templateUrl: '/dist/components/gjTimer/menuBar/menuBar.html',
+      templateUrl: 'dist/components/gjTimer/menuBar/menuBar.html',
       controller: 'MenuBarController',
       controllerAs: 'ctrl',
       scope: {
@@ -774,7 +776,7 @@
   function resultsDirective() {
     return {
       restrict: 'E',
-      templateUrl: '/dist/components/gjTimer/results/results.html',
+      templateUrl: 'dist/components/gjTimer/results/results.html',
       controller: 'ResultsController',
       controllerAs: 'ctrl',
       scope: {
@@ -1169,7 +1171,7 @@
   function scrambleDirective() {
     return {
       restrict: 'E',
-      templateUrl: '/dist/components/gjTimer/scramble/scramble.html',
+      templateUrl: 'dist/components/gjTimer/scramble/scramble.html',
       controller: 'ScrambleController',
       controllerAs: 'ctrl',
       scope: {
@@ -1192,10 +1194,12 @@
     var self = this;
 
     $scope.$on('new scramble', function($event, eventId) {
+
       $scope.scramble = ScrambleService.getNewScramble(eventId);
       self.scramble = $sce.trustAsHtml($scope.scramble);
       self.scrambleStyle = Events.getEventStyle(eventId);
       $rootScope.$broadcast('draw scramble', eventId, ScrambleService.getScrambleState());
+
     });
 
   }
@@ -1215,7 +1219,7 @@
     /**
      * Gets the scramble state of the current scramble.
      * This is used by the cub component to draw the scramble.
-     * @returns {*}
+     * @returns {string}
      */
     self.getScrambleState = function() {
 
@@ -1226,7 +1230,7 @@
     /**
      * Uses the jsss library to generate a new scramble for the event.
      * @param eventId
-     * @returns {*}
+     * @returns {string}
      */
     self.getNewScramble = function(eventId) {
 
@@ -1242,7 +1246,7 @@
 
   }
 
-  angular.module('scramble').service('ScrambleService', [ScrambleService]);
+  angular.module('scramble').service('ScrambleService', ScrambleService);
 
 })();
 
@@ -1272,7 +1276,7 @@
   function statisticsDirective() {
     return {
       restrict: 'E',
-      templateUrl: '/dist/components/gjTimer/statistics/statistics.html',
+      templateUrl: 'dist/components/gjTimer/statistics/statistics.html',
       controller: 'StatisticsController',
       controllerAs: 'ctrl',
       scopeId: {
@@ -1321,7 +1325,7 @@
   function timerDirective() {
     return {
       restrict: 'E',
-      templateUrl: '/dist/components/gjTimer/timer/timer.html',
+      templateUrl: 'dist/components/gjTimer/timer/timer.html',
       controller: 'TimerController',
       controllerAs: 'ctrl',
       scope: {
@@ -1402,11 +1406,9 @@
 
   'use strict';
 
-  function TimerService(Calculator, LocalStorage) {
+  function TimerService(LocalStorage, Calculator) {
 
     var self = this;
-
-    var startTime;
 
     /**
      * Gets the current time.
@@ -1415,7 +1417,7 @@
      */
     self.getTime = function(precision) {
 
-      return Calculator.convertTimeFromMillisecondsToString(moment(Date.now() - startTime), precision);
+      return Calculator.convertTimeFromMillisecondsToString(moment(Date.now() - self.startTime), precision);
 
     };
 
@@ -1424,7 +1426,7 @@
      */
     self.startTimer = function() {
 
-      startTime = Date.now();
+      self.startTime = Date.now();
 
     };
 
@@ -1444,6 +1446,6 @@
 
   }
 
-  angular.module('timer').service('TimerService', ['Calculator', 'LocalStorage', TimerService]);
+  angular.module('timer').service('TimerService', ['LocalStorage', 'Calculator', TimerService]);
 
 })();

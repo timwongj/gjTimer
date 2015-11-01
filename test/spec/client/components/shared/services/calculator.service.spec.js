@@ -2,7 +2,7 @@
 
   'use strict';
 
-  describe('The cub service', function() {
+  describe('The calculator service', function() {
 
     it('should dose gj', function() {
 

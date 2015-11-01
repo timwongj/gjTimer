@@ -5,7 +5,7 @@
   function scrambleDirective() {
     return {
       restrict: 'E',
-      templateUrl: '/dist/components/gjTimer/scramble/scramble.html',
+      templateUrl: 'dist/components/gjTimer/scramble/scramble.html',
       controller: 'ScrambleController',
       controllerAs: 'ctrl',
       scope: {

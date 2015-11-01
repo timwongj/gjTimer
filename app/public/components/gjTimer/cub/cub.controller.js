@@ -7,7 +7,9 @@
     var self = this;
 
     $scope.$on('draw scramble', function($event, eventId, state) {
+
       self.cub = CubService.drawScramble(eventId, state);
+
     });
 
   }
