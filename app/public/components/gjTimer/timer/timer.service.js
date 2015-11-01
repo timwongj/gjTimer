@@ -2,7 +2,7 @@
 
   'use strict';
 
-  function TimerService() {
+  function TimerService(Calculator, LocalStorage) {
 
     var self = this;
 
@@ -10,21 +10,12 @@
 
     /**
      * Gets the current time.
+     * @param precision
      * @returns {string}
      */
-    self.getTime = function() {
+    self.getTime = function(precision) {
 
-      var time = moment(Date.now() - startTime);
-
-      if (time < 10000) {
-        return time.format('s.SSS');
-      } else if (time < 60000) {
-        return time.format('ss.SSS');
-      } else if (time < 600000) {
-        return time.format('m:ss.SSS');
-      } else if (time < 3600000) {
-        return time.utc().format('h:mm:ss.SSS');
-      }
+      return Calculator.convertTimeFromMillisecondsToString(moment(Date.now() - startTime), precision);
 
     };
 
@@ -38,27 +29,21 @@
     };
 
     /**
-     * Saves the result.
+     * Saves the result in the format of 'Time in milliseconds'|'Scramble'|'Date in milliseconds'.
      * @param time
      * @param scramble
      * @param sessionId
      */
     self.saveResult = function(time, scramble, sessionId) {
 
-      var result = {
-        time: time,
-        scramble: scramble,
-        date: new Date()
-      };
-
-      var session = JSON.parse(localStorage.getItem(sessionId));
-      session.list.push(result);
-      localStorage.setItem(sessionId, JSON.stringify(session));
+      var session = LocalStorage.getJSON(sessionId);
+      session.results.push(Calculator.convertTimeFromStringToMilliseconds(time) + '|' + scramble + '|' + (new Date()).getTime());
+      LocalStorage.setJSON(sessionId, session);
 
     };
 
   }
 
-  angular.module('timer').service('TimerService', TimerService);
+  angular.module('timer').service('TimerService', ['Calculator', 'LocalStorage', TimerService]);
 
 })();

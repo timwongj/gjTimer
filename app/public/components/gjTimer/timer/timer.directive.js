@@ -9,7 +9,7 @@
       controller: 'TimerController',
       controllerAs: 'ctrl',
       scope: {
-        event: '=',
+        eventId: '=',
         scramble: '=',
         sessionId: '=',
         settings: '='

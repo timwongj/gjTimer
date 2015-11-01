@@ -6,15 +6,15 @@
 
     var self = this;
 
-    var NUMBER_OF_SESSIONS = 20;
-
+    self.sessions = MenuBarService.initSessions();
+    self.session = MenuBarService.initSession();
     self.events = Events.getEvents();
-    self.session = MenuBarService.init();
-    self.event = self.session.event;
-    $scope.sessionId = 'session' + self.session.name.substr(8, self.session.name.length);
-    $scope.event = self.event;
+    self.event = { eventId: self.session.eventId, event: Events.getEvent(self.session.eventId) };
+    $scope.sessionId = self.session.sessionId;
+    $scope.eventId = self.session.eventId;
     $scope.settings = {
       precision: 2, // 2 digits after decimal
+      timerPrecision: 3, // 3 digits after decimal
       timerStartDelay: 100, // milliseconds
       timerStopDelay: 100, // milliseconds
       timerRefreshInterval: 50 // milliseconds
@@ -23,33 +23,25 @@
     // TODO - find a better solution to waiting for controllers to initialize before broadcasting
     // The cutoff for successful broadcast is ~15-20ms, so 50 should be sufficient for now.
     $timeout(function() {
-      $rootScope.$broadcast('new scramble', $scope.event);
+      $rootScope.$broadcast('new scramble', $scope.eventId);
     }, 50);
 
-    self.sessions = [];
-    for (var i = 0; i < NUMBER_OF_SESSIONS; i++) {
-      self.sessions[i] = {};
-    }
-
-    angular.forEach(self.sessions, function(session, $index) {
-      session.name = 'Session ' + ($index + 1);
-    });
-
-    self.selectEvent = function(event) {
-      self.event = MenuBarService.changeEvent('session' + self.session.name.substr(8, self.session.name.length), event);
-      $scope.event = self.event;
-      $rootScope.$broadcast('new scramble', $scope.event);
+    self.changeSession = function(sessionId) {
+      self.session = MenuBarService.changeSession(sessionId);
+      $scope.sessionId = sessionId;
+      $scope.eventId = self.session.eventId;
+      $rootScope.$broadcast('refresh data', sessionId);
+      if (self.event.eventId !== self.session.eventId) {
+        $rootScope.$broadcast('new scramble', $scope.eventId);
+      }
+      self.event = { eventId: $scope.eventId, event: Events.getEvent($scope.eventId) };
     };
 
-    self.changeSession = function(sessionName) {
-      self.session = MenuBarService.changeSession('session' + sessionName.substr(8, sessionName.length));
-      $scope.sessionId = 'session' + sessionName.substr(8, sessionName.length);
-      $scope.event = self.session.event;
-      $rootScope.$broadcast('refresh data', $scope.sessionId);
-      if (self.event !== self.session.event) {
-        $rootScope.$broadcast('new scramble', $scope.event);
-      }
-      self.event = $scope.event;
+    self.changeEvent = function(event) {
+      $scope.eventId = MenuBarService.changeEvent($scope.sessionId, Events.getEventId(event));
+      self.session.eventId = $scope.eventId;
+      self.event = { eventId: $scope.eventId, event: Events.getEvent($scope.eventId) };
+      $rootScope.$broadcast('new scramble', $scope.eventId);
     };
 
     self.settings = function() {
@@ -68,9 +60,9 @@
     };
 
     self.resetSession = function() {
-      if (confirm('Are you sure you want to reset ' + self.session.name + '?')) {
-        self.session = MenuBarService.resetSession('session' + self.session.name.substr(8, self.session.name.length));
-        $rootScope.$broadcast('refresh data');
+      if (confirm('Are you sure you want to reset ' + $scope.sessionId + '?')) {
+        self.session = MenuBarService.resetSession($scope.sessionId);
+        $rootScope.$broadcast('refresh data', $scope.sessionId);
       }
     };
 

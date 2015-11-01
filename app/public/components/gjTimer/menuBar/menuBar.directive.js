@@ -9,7 +9,7 @@
       controller: 'MenuBarController',
       controllerAs: 'ctrl',
       scope: {
-        event: '=',
+        eventId: '=',
         sessionId: '=',
         settings: '='
       }

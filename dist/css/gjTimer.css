@@ -102,6 +102,9 @@
 #resultsModal .modal-title {
   margin-left: .25em;
 }
+#resultsModal .modal-footer {
+  padding: .5em;
+}
 #resultsModal .btn-close {
   vertical-align: middle;
 }

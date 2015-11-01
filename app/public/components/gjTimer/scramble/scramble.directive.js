@@ -9,7 +9,7 @@
       controller: 'ScrambleController',
       controllerAs: 'ctrl',
       scope: {
-        event: '=',
+        eventId: '=',
         scramble: '='
       }
     };

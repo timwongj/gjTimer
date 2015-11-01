@@ -2,19 +2,9 @@
 
   'use strict';
 
-  function ScrambleService(Events) {
+  function ScrambleService() {
 
     var self = this;
-
-    /**
-     * Gets the current scramble string.
-     * @returns {*}
-     */
-    self.getScramble = function() {
-
-      return self.scramble.scramble_string;
-
-    };
 
     /**
      * Gets the scramble state of the current scramble.
@@ -29,19 +19,23 @@
 
     /**
      * Uses the jsss library to generate a new scramble for the event.
-     * @param event
+     * @param eventId
      * @returns {*}
      */
-    self.newScramble = function(event) {
+    self.getNewScramble = function(eventId) {
 
-      self.scramble = scramblers[Events.getEventId(event)].getRandomScramble();
+      self.scramble = scramblers[eventId].getRandomScramble();
 
-      return self.scramble.scramble_string;
+      if (self.scramble.scramble_string.substring(self.scramble.scramble_string.length - 1, self.scramble.scramble_string.length) === ' ') {
+        return self.scramble.scramble_string.substring(0, self.scramble.scramble_string.length - 1);
+      } else {
+        return self.scramble.scramble_string;
+      }
 
     };
 
   }
 
-  angular.module('scramble').service('ScrambleService', ['Events', ScrambleService]);
+  angular.module('scramble').service('ScrambleService', [ScrambleService]);
 
 })();

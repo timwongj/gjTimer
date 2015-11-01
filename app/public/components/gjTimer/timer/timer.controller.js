@@ -6,7 +6,7 @@
 
     var self = this, timer, state = 'reset', SPACE_BAR_KEY_CODE = 32;
 
-    self.time = moment(0).format('s.SSS');
+    self.time = $scope.settings.timerPrecision === 2 ? moment(0).format('s.SS') : moment(0).format('s.SSS');
 
     var STYLES = {
       BLACK: { 'color': '#000000' },
@@ -17,7 +17,7 @@
     $scope.$on('keydown', function($event, event) {
       if ((state === 'reset') && (event.keyCode === SPACE_BAR_KEY_CODE)) {
         state = 'keydown';
-        self.time = moment(0).format('s.SSS');
+        self.time = $scope.settings.timerPrecision === 2 ? moment(0).format('s.SS') : moment(0).format('s.SSS');
         self.timerStyle = STYLES.RED;
         $timeout(function() {
           if (state === 'keydown') {
@@ -32,7 +32,7 @@
         $rootScope.$broadcast('timer unfocus');
         TimerService.saveResult(self.time, $scope.scramble, $scope.sessionId);
         $rootScope.$broadcast('refresh data', $scope.sessionId);
-        $rootScope.$broadcast('new scramble', $scope.event);
+        $rootScope.$broadcast('new scramble', $scope.eventId);
       }
     });
 
@@ -42,7 +42,7 @@
         state = 'timing';
         TimerService.startTimer();
         timer = $interval(function() {
-          self.time = TimerService.getTime();
+          self.time = TimerService.getTime($scope.settings.timerPrecision);
         }, $scope.settings.timerRefreshInterval);
       } else if (state === 'keydown') {
         state = 'reset';

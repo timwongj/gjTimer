@@ -46,7 +46,9 @@ module.exports = (function() {
     'app/public/components/shared/filters/reverse.filter.js',
 
     // services
+    'app/public/components/shared/services/calculator.service.js',
     'app/public/components/shared/services/events.service.js',
+    'app/public/components/shared/services/localStorage.service.js',
 
     // Cub
     'app/public/components/gjTimer/cub/cub.directive.js',
@@ -65,6 +67,7 @@ module.exports = (function() {
 
     // ResultsModal
     'app/public/components/gjTimer/resultsModal/resultsModal.controller.js',
+    'app/public/components/gjTimer/resultsModal/resultsModal.service.js',
 
     // ResultsPopover
     'app/public/components/gjTimer/resultsPopover/resultsPopover.directive.js',

@@ -8,12 +8,14 @@
   <div class="modal-body">
     <ol class="ol-results">
       <li class="li-results" ng-repeat="result in ctrl.results">
-        <span ng-if="(result.min !== undefined) || (result.max !== undefined)" ng-bind="'(' + result.time + ')'"></span>
-        <span ng-if="(result.min === undefined) && (result.max === undefined)" ng-bind="result.time"></span>
-        <span ng-if="result.penalty !== undefined" ng-bind="' ' + result.penalty"></span>
+        <span ng-if="(result.min !== undefined) || (result.max !== undefined)" ng-bind="'(' + result.detailedTime + ')'"></span>
+        <span ng-if="(result.min === undefined) && (result.max === undefined)" ng-bind="result.detailedTime"></span>
         <span ng-bind="' - ' + result.scramble"></span>
-        <span ng-if="result.comment !== undefined" ng-bind="' (' + result.comment + ')'"></span>
+        <span ng-if="result.comment !== ''" ng-bind="' (' + result.comment + ')'"></span>
       </li>
     </ol>
+  </div>
+  <div class="modal-footer">
+    <span ng-bind="ctrl.results[ctrl.results.length - 1].date"></span>
   </div>
 </div>
