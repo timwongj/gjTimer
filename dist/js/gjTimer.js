@@ -232,23 +232,23 @@
       var time = moment(timeMilliseconds);
 
       if (precision === 2) {
-        if (time < 10000) {
+        if (timeMilliseconds < 10000) {
           return time.format('s.SS');
-        } else if (time < 60000) {
+        } else if (timeMilliseconds < 60000) {
           return time.format('ss.SS');
-        } else if (time < 600000) {
+        } else if (timeMilliseconds < 600000) {
           return time.format('m:ss.SS');
-        } else if (time < 3600000) {
+        } else if (timeMilliseconds < 3600000) {
           return time.utc().format('h:mm:ss.SS');
         }
       } else {
-        if (time < 10000) {
+        if (timeMilliseconds < 10000) {
           return time.format('s.SSS');
-        } else if (time < 60000) {
+        } else if (timeMilliseconds < 60000) {
           return time.format('ss.SSS');
-        } else if (time < 600000) {
+        } else if (timeMilliseconds < 600000) {
           return time.format('m:ss.SSS');
-        } else if (time < 3600000) {
+        } else if (timeMilliseconds < 3600000) {
           return time.utc().format('h:mm:ss.SSS');
         }
       }
@@ -269,28 +269,34 @@
 
     var self = this;
 
+    self.events = {
+      '333': { index: 0, name: 'Rubik\'s Cube', style: { 'font-size' : '16pt' }, svg: { ratio: 0.75, width: 250 } },
+      '444': { index: 1, name: '4x4 Cube', style: { 'font-size' : '15pt' }, svg: { ratio: 0.75, width: 250 } },
+      '555': { index: 2, name: '5x5 Cube', style: { 'font-size' : '15pt' }, svg: { ratio: 0.75, width: 250 } },
+      '222': { index: 3, name: '2x2 Cube', style: { 'font-size' : '16pt' }, svg: { ratio: 0.75, width: 250 } },
+      '333bf': { index: 4, name: '3x3 blindfolded', style: { 'font-size' : '16pt' }, svg: { ratio: 0.75, width: 250 } },
+      '333oh': { index: 5, name: '3x3 one-handed', style: { 'font-size' : '16pt' }, svg: { ratio: 0.75, width: 250 } },
+      'minx': { index: 6, name: 'Megaminx', style: { 'font-size' : '13pt' }, svg: { ratio: 0.51, width: 175 } },
+      'pyram': { index: 7, name: 'Pyraminx', style: { 'font-size' : '16pt' }, svg: { ratio: 0.69, width: 250 } },
+      'sq1': { index: 8, name: 'Square-1', style: { 'font-size' : '15pt' }, svg: { ratio: 0.57, width: 175 } },
+      'clock': { index: 9, name: 'Rubik\'s Clock', style: { 'font-size' : '15pt' }, svg: { ratio: 0.50, width: 175 } },
+      '666': { index: 10, name: '6x6 Cube', style: { 'font-size' : '13pt' }, svg: { ratio: 0.75, width: 250 } },
+      '777': { index: 11, name: '7x7 Cube', style: { 'font-size' : '13pt' }, svg: { ratio: 0.75, width: 250 } },
+      '444bf': { index: 12, name: '4x4 blindfolded', style: { 'font-size' : '15pt' }, svg: { ratio: 0.75, width: 250 } },
+      '555bf': { index: 13, name: '5x5 blindfolded', style: { 'font-size' : '15pt' }, svg: { ratio: 0.75, width: 250 } }
+    };
+
     /**
      * Gets the list of events supported by gjTimer.
      * @returns {string[]}
      */
     self.getEvents = function() {
 
-      return [
-        'Rubik\'s Cube',
-        '4x4 Cube',
-        '5x5 Cube',
-        '2x2 Cube',
-        '3x3 blindfolded',
-        '3x3 one-handed',
-        'Megaminx',
-        'Pyraminx',
-        'Square-1',
-        'Rubik\'s Clock',
-        '6x6 Cube',
-        '7x7 Cube',
-        '4x4 blindfolded',
-        '5x5 blindfolded'
-      ];
+      var events = [];
+      angular.forEach(self.events, function(event) {
+        events[event.index] = event.name;
+      });
+      return events;
 
     };
 
@@ -301,55 +307,29 @@
      */
     self.getEvent = function(eventId) {
 
-      var events = {
-        '333': 'Rubik\'s Cube',
-        '444': '4x4 Cube',
-        '555': '5x5 Cube',
-        '222': '2x2 Cube',
-        '333bf': '3x3 blindfolded',
-        '333oh': '3x3 one-handed',
-        'minx': 'Megaminx',
-        'pyram': 'Pyraminx',
-        'sq1': 'Square-1',
-        'clock': 'Rubik\'s Clock',
-        '666': '6x6 Cube',
-        '777': '7x7 Cube',
-        '444bf': '4x4 blindfolded',
-        '555bf': '5x5 blindfolded'
-      };
-
-      if (events.hasOwnProperty(eventId)) {
-        return events[eventId];
+      if (self.events.hasOwnProperty(eventId)) {
+        return self.events[eventId].name;
       } else {
         return null;
       }
 
     };
 
-    self.getEventId = function(event) {
+    /**
+     * Gets the eventId given the event.
+     * @param eventName
+     * @returns {string}
+     */
+    self.getEventId = function(eventName) {
 
-      var eventIds = {
-        'Rubik\'s Cube': '333',
-        '4x4 Cube': '444',
-        '5x5 Cube': '555',
-        '2x2 Cube': '222',
-        '3x3 blindfolded': '333bf',
-        '3x3 one-handed': '333oh',
-        'Megaminx': 'minx',
-        'Pyraminx': 'pyram',
-        'Square-1': 'sq1',
-        'Rubik\'s Clock': 'clock',
-        '6x6 Cube': '666',
-        '7x7 Cube': '777',
-        '4x4 blindfolded': '444bf',
-        '5x5 blindfolded': '555bf'
-      };
-
-      if (eventIds.hasOwnProperty(event)) {
-        return eventIds[event];
-      } else {
-        return null;
+      for (var eventId in self.events) {
+        if (self.events.hasOwnProperty(eventId)) {
+          if (self.events[eventId].name === eventName) {
+            return eventId;
+          }
+        }
       }
+      return null;
 
     };
 
@@ -360,27 +340,10 @@
      */
     self.getEventStyle = function(eventId) {
 
-      var styles = {
-        '333': { 'font-size' : '16pt' },
-        '444': { 'font-size' : '15pt' },
-        '555': { 'font-size' : '15pt' },
-        '222': { 'font-size' : '16pt' },
-        '333bf': { 'font-size' : '16pt' },
-        '333oh': { 'font-size' : '16pt' },
-        'minx': { 'font-size' : '13pt' },
-        'pyram': { 'font-size' : '16pt' },
-        'sq1': { 'font-size' : '15pt' },
-        'clock': { 'font-size' : '15pt' },
-        '666': { 'font-size' : '13pt' },
-        '777': { 'font-size' : '13pt' },
-        '444bf': { 'font-size' : '15pt' },
-        '555bf': { 'font-size' : '15pt' }
-      };
-
-      if (styles.hasOwnProperty(eventId)) {
-        return styles[eventId];
+      if (self.events.hasOwnProperty(eventId)) {
+        return self.events[eventId].style;
       } else {
-        return styles['333'];
+        return self.events['333'].style;
       }
 
     };
@@ -392,27 +355,10 @@
      */
     self.getEventSvg = function(eventId) {
 
-      var svgs = {
-        '333': { ratio: 0.75, width: 250 },
-        '444': { ratio: 0.75, width: 250 },
-        '555': { ratio: 0.75, width: 250 },
-        '222': { ratio: 0.75, width: 250 },
-        '333bf': { ratio: 0.75, width: 250 },
-        '333oh': { ratio: 0.75, width: 250 },
-        'minx': { ratio: 0.51, width: 175 },
-        'pyram': { ratio: 0.69, width: 250 },
-        'sq1': { ratio: 0.57, width: 175 },
-        'clock': { ratio: 0.50, width: 175 },
-        '666': { ratio: 0.75, width: 250 },
-        '777': { ratio: 0.75, width: 250 },
-        '444bf': { ratio: 0.75, width: 250 },
-        '555bf': { ratio: 0.75, width: 250 }
-      };
-
-      if (svgs.hasOwnProperty(eventId)) {
-        return svgs[eventId];
+      if (self.events.hasOwnProperty(eventId)) {
+        return self.events[eventId].svg;
       } else {
-        return svgs['333'];
+        return self.events['333'].svg;
       }
 
     };
@@ -450,7 +396,6 @@
         localStorage.setItem(key, value);
         return true;
       } catch(e) {
-        console.error('Error saving to local storage');
         return false;
       }
     };
@@ -480,7 +425,19 @@
         localStorage.setItem(key, JSON.stringify(value));
         return true;
       } catch(e) {
-        console.error('Error saving to local storage');
+        return false;
+      }
+    };
+
+    /**
+     * Clears localStorage
+     * @returns {boolean}
+     */
+    self.clear = function() {
+      try {
+        localStorage.clear();
+        return true;
+      } catch(e) {
         return false;
       }
     };
@@ -1439,7 +1396,7 @@
     self.saveResult = function(time, scramble, sessionId) {
 
       var session = LocalStorage.getJSON(sessionId);
-      session.results.push(Calculator.convertTimeFromStringToMilliseconds(time) + '|' + scramble + '|' + (new Date()).getTime());
+      session.results.push(Calculator.convertTimeFromStringToMilliseconds(time) + '|' + scramble + '|' + Date.now());
       LocalStorage.setJSON(sessionId, session);
 
     };

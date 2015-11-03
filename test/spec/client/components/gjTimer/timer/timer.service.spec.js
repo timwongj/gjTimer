@@ -10,7 +10,8 @@
     timeString,
     scramble,
     sessionId,
-    session;
+    session,
+    now;
 
   describe('The timer service', function() {
 
@@ -26,11 +27,13 @@
       time = '6.25';
       scramble = 'scramble';
       sessionId = 'session1';
+      now = 'now';
 
       spyOn(Calculator, 'convertTimeFromMillisecondsToString').and.returnValue(time);
       spyOn(Calculator, 'convertTimeFromStringToMilliseconds').and.returnValue(Number(time) * 100);
       spyOn(LocalStorage, 'getJSON').and.returnValue({ results: [] });
       spyOn(LocalStorage, 'setJSON');
+      spyOn(Date, 'now').and.returnValue(now);
 
     }));
 
@@ -59,7 +62,7 @@
       it('should set self.startTime to be the current time', function() {
 
         TimerService.startTimer();
-        expect(TimerService.startTime).toEqual(Date.now());
+        expect(TimerService.startTime).toEqual(now);
 
       });
 
@@ -84,7 +87,7 @@
       it('should set the session using the LocalStorage service', function() {
 
         session = {
-          results: [ '625|scramble|' + Date.now() ]
+          results: [ '625|scramble|' + now ]
         };
 
         TimerService.saveResult(time, scramble, sessionId);

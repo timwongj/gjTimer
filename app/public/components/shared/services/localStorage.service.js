@@ -25,7 +25,6 @@
         localStorage.setItem(key, value);
         return true;
       } catch(e) {
-        console.error('Error saving to local storage');
         return false;
       }
     };
@@ -55,7 +54,19 @@
         localStorage.setItem(key, JSON.stringify(value));
         return true;
       } catch(e) {
-        console.error('Error saving to local storage');
+        return false;
+      }
+    };
+
+    /**
+     * Clears localStorage
+     * @returns {boolean}
+     */
+    self.clear = function() {
+      try {
+        localStorage.clear();
+        return true;
+      } catch(e) {
         return false;
       }
     };

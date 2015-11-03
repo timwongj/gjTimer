@@ -35,7 +35,7 @@
     self.saveResult = function(time, scramble, sessionId) {
 
       var session = LocalStorage.getJSON(sessionId);
-      session.results.push(Calculator.convertTimeFromStringToMilliseconds(time) + '|' + scramble + '|' + (new Date()).getTime());
+      session.results.push(Calculator.convertTimeFromStringToMilliseconds(time) + '|' + scramble + '|' + Date.now());
       LocalStorage.setJSON(sessionId, session);
 
     };

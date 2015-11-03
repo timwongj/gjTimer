@@ -126,23 +126,23 @@
       var time = moment(timeMilliseconds);
 
       if (precision === 2) {
-        if (time < 10000) {
+        if (timeMilliseconds < 10000) {
           return time.format('s.SS');
-        } else if (time < 60000) {
+        } else if (timeMilliseconds < 60000) {
           return time.format('ss.SS');
-        } else if (time < 600000) {
+        } else if (timeMilliseconds < 600000) {
           return time.format('m:ss.SS');
-        } else if (time < 3600000) {
+        } else if (timeMilliseconds < 3600000) {
           return time.utc().format('h:mm:ss.SS');
         }
       } else {
-        if (time < 10000) {
+        if (timeMilliseconds < 10000) {
           return time.format('s.SSS');
-        } else if (time < 60000) {
+        } else if (timeMilliseconds < 60000) {
           return time.format('ss.SSS');
-        } else if (time < 600000) {
+        } else if (timeMilliseconds < 600000) {
           return time.format('m:ss.SSS');
-        } else if (time < 3600000) {
+        } else if (timeMilliseconds < 3600000) {
           return time.utc().format('h:mm:ss.SSS');
         }
       }
