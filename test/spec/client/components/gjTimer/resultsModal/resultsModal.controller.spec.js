@@ -2,7 +2,7 @@
 
   'use strict';
 
-  describe('The timer controller', function() {
+  describe('The resultsModal controller', function() {
 
     it('should dose gj', function() {
 

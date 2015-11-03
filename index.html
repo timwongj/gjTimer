@@ -12,14 +12,14 @@
 <body ng-app="gjTimerApp" ng-controller="gjTimerController" ng-keydown="keydown($event)" ng-keyup="keyup($event)" ng-style="style.body">
   <div class="container-fluid">
     <div ng-style="style.section">
-      <menu-bar event="event" session-id="sessionId" settings="settings"></menu-bar>
+      <menu-bar event-id="eventId" session-id="sessionId" settings="settings"></menu-bar>
     </div>
     <div class="row">
       <div class="col-md-6 col-sm-12 col-md-push-3 section" ng-style="style.timer">
         <div class="jumbotron jumbotron-timer">
-          <scramble event="event" scramble="scramble"></scramble>
-          <timer event="event" scramble="scramble" session-id="sessionId" settings="settings"></timer>
-          <cub event="event"></cub>
+          <scramble event-id="eventId" scramble="scramble"></scramble>
+          <timer event-id="eventId" scramble="scramble" session-id="sessionId" settings="settings"></timer>
+          <cub event-id="eventId"></cub>
         </div>
       </div>
       <div class="col-md-3 col-sm-6 col-md-pull-6 section" ng-style="style.section">
@@ -29,7 +29,7 @@
       </div>
       <div class="col-md-3 col-sm-6 section" ng-style="style.section">
         <div class="jumbotron jumbotron-statistics">
-          <statistics event="event" results="results"></statistics>
+          <statistics event-id="eventId" results="results"></statistics>
         </div>
       </div>
     </div>

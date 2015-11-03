@@ -2,7 +2,7 @@
 
   'use strict';
 
-  function ResultsPopoverService() {
+  function ResultsPopoverService(LocalStorage) {
 
     var self = this;
 
@@ -13,23 +13,32 @@
      * @param penalty
      */
     self.penalty = function(sessionId, index, penalty) {
-      var session = JSON.parse(localStorage.getItem(sessionId));
+      var session = LocalStorage.getJSON(sessionId);
+      var result = session.results[index];
+      var pen = result.substring(result.indexOf('|') - 1, result.indexOf('|'));
       switch(penalty) {
         case '':
-          if (session.list[index].penalty !== undefined) {
-            delete session.list[index].penalty;
-            localStorage.setItem(sessionId, JSON.stringify(session));
+          if ((pen === '+') || (pen === '-')) {
+            result = result.substring(0, result.indexOf('|') - 1) + result.substring(result.indexOf('|'), result.length);
           }
           break;
         case '+2':
-          session.list[index].penalty = '+2';
-          localStorage.setItem(sessionId, JSON.stringify(session));
+          if ((pen === '+') || (pen === '-')) {
+            result = result.substring(0, result.indexOf('|') - 1) + '+' + result.substring(result.indexOf('|'), result.length);
+          } else {
+            result = result.substring(0, result.indexOf('|')) + '+' + result.substring(result.indexOf('|'), result.length);
+          }
           break;
         case 'DNF':
-          session.list[index].penalty = 'DNF';
-          localStorage.setItem(sessionId, JSON.stringify(session));
+          if ((pen === '+') || (pen === '-')) {
+            result = result.substring(0, result.indexOf('|') - 1) + '-' + result.substring(result.indexOf('|'), result.length);
+          } else {
+            result = result.substring(0, result.indexOf('|')) + '-' + result.substring(result.indexOf('|'), result.length);
+          }
           break;
       }
+      session.results[index] = result;
+      LocalStorage.setJSON(sessionId, session);
     };
 
     /**
@@ -39,7 +48,7 @@
      */
     self.remove = function(sessionId, index) {
       var session = JSON.parse(localStorage.getItem(sessionId));
-      session.list.splice(index, 1);
+      session.results.splice(index, 1);
       localStorage.setItem(sessionId, JSON.stringify(session));
     };
 
@@ -55,6 +64,6 @@
 
   }
 
-  angular.module('results').service('ResultsPopoverService', ResultsPopoverService);
+  angular.module('results').service('ResultsPopoverService', ['LocalStorage', ResultsPopoverService]);
 
 })();

@@ -2,7 +2,7 @@
 
   'use strict';
 
-  describe('The cub controller', function() {
+  describe('The statistics controller', function() {
 
     it('should dose gj', function() {
 

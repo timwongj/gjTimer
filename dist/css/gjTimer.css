@@ -1,27 +1,36 @@
 .section {
-  padding: .375em;
+  padding: .375em 0;
+}
+@media (min-width: 48em) {
+  .section {
+    padding: .375em;
+  }
 }
 .jumbotron-timer,
 .jumbotron-results,
 .jumbotron-statistics {
   margin-bottom: 0;
-  overflow-y: hidden;
   border-radius: 2px !important;
   background-color: #eeeeee;
 }
-@media screen and (min-width: 62em) {
+@media (min-width: 62em) {
   .jumbotron-timer,
   .jumbotron-results,
   .jumbotron-statistics {
     height: calc(100vh - 4em);
   }
 }
-.jumbotron-timer,
-.jumbotron-statistics {
+.jumbotron-timer {
   padding: .5em !important;
+  overflow-y: auto;
 }
 .jumbotron-results {
   padding: 0 !important;
+  overflow-y: hidden;
+}
+.jumbotron-statistics {
+  padding: .5em !important;
+  overflow-y: hidden;
 }
 .btn {
   border-radius: 2px;
@@ -63,7 +72,7 @@
 }
 @media screen and (max-width: 62em) {
   #results tbody {
-    height: 30em;
+    height: 21.5em;
   }
 }
 #results tr {
@@ -92,6 +101,9 @@
 }
 #resultsModal .modal-title {
   margin-left: .25em;
+}
+#resultsModal .modal-footer {
+  padding: .5em;
 }
 #resultsModal .btn-close {
   vertical-align: middle;
@@ -124,10 +136,9 @@
   text-align: center;
 }
 #scramble .scramble {
-  margin: .0625em;
-  padding: .0625em;
-  font-size: 150%;
-  font-family: "Courier New", Courier, monospace;
+  margin: 4px 2px;
+  padding: 2px;
+  font-family: Courier New, Courier New, monospace;
 }
 #settings .modal-header {
   padding: .5em;

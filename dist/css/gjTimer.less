@@ -1,27 +1,37 @@
 @color-jumbotron: #eee;
 @height-section: calc(~"100vh - 4em");
+@breakpoint-sm: 48em;
 @breakpoint-md: 62em;
 
 .section {
-  padding: .375em;
+  padding: .375em 0;
+  @media (min-width: @breakpoint-sm) {
+    padding: .375em;
+  }
 }
 
 .jumbotron-timer, .jumbotron-results, .jumbotron-statistics {
-  @media screen and (min-width: @breakpoint-md) {
+  @media (min-width: @breakpoint-md) {
     height: @height-section;
   }
   margin-bottom: 0;
-  overflow-y: hidden;
   border-radius: 2px !important;
   background-color: @color-jumbotron;
 }
 
-.jumbotron-timer, .jumbotron-statistics {
+.jumbotron-timer {
   padding: .5em !important;
+  overflow-y: auto;
 }
 
 .jumbotron-results {
   padding: 0 !important;
+  overflow-y: hidden;
+}
+
+.jumbotron-statistics {
+  padding: .5em !important;
+  overflow-y: hidden;
 }
 
 .btn {
@@ -66,7 +76,7 @@
 }
 
 @height-results: calc(~"100vh - 5.875em");
-@height-results-mobile: 30em;
+@height-results-mobile: 21.5em;
 
 #results {
 
@@ -121,6 +131,10 @@
     margin-left: .25em;
   }
 
+  .modal-footer {
+    padding: .5em;
+  }
+
   .btn-close {
     vertical-align: middle;
   }
@@ -164,10 +178,9 @@
   text-align: center;
 
   .scramble {
-    margin: .0625em;
-    padding: .0625em;
-    font-size: 150%;
-    font-family: "Courier New", Courier, monospace;
+    margin: 4px 2px;
+    padding: 2px;
+    font-family: Courier New, Courier New, monospace;
   }
 
 }

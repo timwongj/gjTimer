@@ -8,26 +8,22 @@
     var COLOR_BACKGROUND_FOCUS = '#EEEEEE'; // gray
     var SPACEBAR_KEY_CODE = 32, ENTER_KEY_CODE = 13;
 
-    $scope.style = {
-      body: {},
-      section: {},
-      timer: {}
-    };
+    $scope.style = { body: {}, section: {}, timer: {} };
 
-    $scope.keydown = function(event) {
+    $scope.keydown = function($event) {
 
       if (event.keyCode === ENTER_KEY_CODE) {
-        $rootScope.$broadcast('new scramble', $scope.event);
+        $rootScope.$broadcast('new scramble', $scope.eventId);
       } else if (event.keyCode === SPACEBAR_KEY_CODE) {
         event.preventDefault();
       }
-      $rootScope.$broadcast('keydown', event);
+      $rootScope.$broadcast('keydown', $event);
 
     };
 
-    $scope.keyup = function(event) {
+    $scope.keyup = function($event) {
 
-      $rootScope.$broadcast('keyup', event);
+      $rootScope.$broadcast('keyup', $event);
 
     };
 

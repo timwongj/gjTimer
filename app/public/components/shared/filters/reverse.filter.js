@@ -6,12 +6,16 @@
 
     return function(items) {
 
-      return items.slice().reverse();
+      if (items !== undefined) {
+        return items.slice().reverse();
+      } else {
+        return [];
+      }
 
     };
 
   }
 
-  angular.module('gjTimer').filter('reverse', ReverseFilter);
+  angular.module('gjTimer.filters').filter('reverse', ReverseFilter);
 
 })();

@@ -2,83 +2,84 @@
 
   'use strict';
 
-  function MenuBarService() {
+  function MenuBarService(LocalStorage) {
 
     var self = this;
 
-    var NUMBER_OF_SESSIONS = 20;
+    var NUMBER_OF_SESSIONS = 15;
 
     /**
-     * Initialize or get session number from local storage.
-     * Initialize sessions if they do not exist in local storage
-     * @returns {*}
+     * Initializes sessions in local storage if they do not exist.
+     * @returns [String] - sessionId
      */
-    self.init = function() {
+    self.initSessions = function() {
 
-      var currentSessionId;
-
-      if (localStorage.getItem('currentSessionId') !== null) {
-        currentSessionId = localStorage.getItem('currentSessionId');
-      } else {
-        currentSessionId = (localStorage.getItem('sessionNumber') !== null) ? 'session' + localStorage.getItem('sessionNumber') : 'session1';
-        localStorage.setItem('currentSessionId', currentSessionId);
-      }
-
-      var newSession = {
-        event: 'Rubik\'s Cube',
-        list: []
-      };
+      var sessions = [];
 
       for (var i = 1; i <= NUMBER_OF_SESSIONS; i++) {
-
-        var session = JSON.parse(localStorage.getItem('session' + i));
-
+        sessions.push('Session ' + i);
+        var session = LocalStorage.getJSON('Session ' + i);
         if (session === null) {
-          newSession.name = 'Session ' + i;
-          localStorage.setItem('session' + i, JSON.stringify(newSession));
-        } else if (session.event === null) {
-          session.event = 'Rubik\'s Cube';
-          localStorage.setItem('session' + i, JSON.stringify(session));
+          LocalStorage.setJSON('Session ' + i, { sessionId: 'Session ' + i , eventId: '333', results: [] });
         }
-
       }
 
-      return self.getSession(currentSessionId);
+      return sessions;
+
+    };
+
+    /**
+     * Initializes or gets session number from local storage.
+     * @returns {object} - session
+     */
+    self.initSession = function() {
+
+      var sessionId;
+
+      if (LocalStorage.get('sessionId') !== null) {
+        sessionId = LocalStorage.get('sessionId');
+      } else {
+        sessionId = 'Session 1';
+        LocalStorage.set('sessionId', 'Session 1');
+      }
+
+      return LocalStorage.getJSON(sessionId);
 
     };
 
     /**
      * Gets session data from local storage.
      * @param sessionId
-     * @returns {*}
+     * @returns {object} session
      */
     self.getSession = function(sessionId) {
 
-      return JSON.parse(localStorage.getItem(sessionId));
+      return LocalStorage.getJSON(sessionId);
 
     };
 
     /**
      * Saves the new session in local storage and returns the new session.
      * @param sessionId
-     * @returns {*}
+     * @returns {object} session
      */
     self.changeSession = function(sessionId) {
 
-      localStorage.setItem('currentSessionId', sessionId);
-      return self.getSession(sessionId);
+      LocalStorage.set('sessionId', sessionId);
+      return LocalStorage.getJSON(sessionId);
 
     };
 
     /**
-     * Resets the session in local storage.
+     * Resets the session in local storage by clearing the results list.
      * @param sessionId
+     * @returns {object} session
      */
     self.resetSession = function(sessionId) {
 
-      var session = JSON.parse(localStorage.getItem(sessionId));
-      session.list = [];
-      localStorage.setItem(sessionId, JSON.stringify(session));
+      var session = LocalStorage.getJSON(sessionId);
+      session.results = [];
+      LocalStorage.setJSON(sessionId, session);
       return session;
 
     };
@@ -86,20 +87,20 @@
     /**
      * Saves the new event in the session.
      * @param sessionId
-     * @param event
-     * @returns {*}
+     * @param eventId
+     * @returns {*} eventId
      */
-    self.changeEvent = function(sessionId, event) {
+    self.changeEvent = function(sessionId, eventId) {
 
-      var session = JSON.parse(localStorage.getItem(sessionId));
-      session.event = event;
-      localStorage.setItem(sessionId, JSON.stringify(session));
-      return session.event;
+      var session = LocalStorage.getJSON(sessionId);
+      session.eventId = eventId;
+      LocalStorage.setJSON(sessionId, session);
+      return session.eventId;
 
     };
 
   }
 
-  angular.module('menuBar').service('MenuBarService', MenuBarService);
+  angular.module('menuBar').service('MenuBarService', ['LocalStorage', MenuBarService]);
 
 })();

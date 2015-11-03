@@ -2,7 +2,7 @@
 
   'use strict';
 
-  function ResultsService() {
+  function ResultsService(LocalStorage, Calculator) {
 
     var self = this;
 
@@ -13,23 +13,50 @@
      */
     self.getResults = function(sessionId, precision) {
 
-      var results = JSON.parse(localStorage.getItem(sessionId)).list;
+      var results = [], rawResults = LocalStorage.getJSON(sessionId).results;
 
-      angular.forEach(results, function(result, index) {
+      angular.forEach(rawResults, function(rawResult, index) {
 
-        result.time = Number(result.time).toFixed(3);
+        var res = rawResult.split('|');
+
+        var result = {
+          index: index,
+          scramble: res[1],
+          date: new Date(Number(res[2])),
+          comment: res[3] ? res[3] : ''
+        };
+
+        // deal with penalty if it exists
+        if (res[0].substring(res[0].length - 1, res[0].length) === '+') {
+          result.time = Number(res[0].substring(0, res[0].length - 1));
+          result.penalty = '+2';
+          result.displayedTime = Calculator.convertTimeFromMillisecondsToString(Number(res[0].substring(0, res[0].length - 1)) + 2000, precision) + '+';
+          result.detailedTime = Calculator.convertTimeFromMillisecondsToString(Number(res[0].substring(0, res[0].length - 1)) + 2000, precision) + '+';
+        } else if (res[0].substring(res[0].length - 1, res[0].length) === '-') {
+          result.time = Number(res[0].substring(0, res[0].length - 1));
+          result.penalty = 'DNF';
+          result.displayedTime = 'DNF';
+          result.detailedTime = 'DNF(' + Calculator.convertTimeFromMillisecondsToString(Number(res[0].substring(0, res[0].length - 1)), precision) + ')';
+        } else {
+          result.time = Number(res[0]);
+          result.penalty = '';
+          result.displayedTime = Calculator.convertTimeFromMillisecondsToString(Number(res[0]), precision);
+          result.detailedTime = Calculator.convertTimeFromMillisecondsToString(Number(res[0]), precision);
+        }
 
         if (index >= 4) {
-          result.avg5 = self.calculateAverage(results.slice(index - 4, index + 1), precision);
+          result.avg5 = Calculator.convertTimeFromMillisecondsToString(Calculator.calculateAverage(results.slice(index - 4, index + 1)), precision);
         } else {
           result.avg5 = 'DNF';
         }
 
         if (index >= 11) {
-          result.avg12 = self.calculateAverage(results.slice(index - 11, index + 1), precision);
+          result.avg12 = Calculator.convertTimeFromMillisecondsToString(Calculator.calculateAverage(results.slice(index - 11, index + 1)), precision);
         } else {
           result.avg12 = 'DNF';
         }
+
+        results.push(result);
 
       });
 
@@ -37,184 +64,8 @@
 
     };
 
-    /**
-     * Get results for the avg5/avg12 modal.
-     * @param sessionId
-     * @param index
-     * @param numberOfResults
-     */
-    self.getModalResults = function(sessionId, index, numberOfResults) {
-
-      if (localStorage.getItem(sessionId) === null) {
-        return [];
-      } else {
-
-        var results = JSON.parse(localStorage.getItem(sessionId)).list.slice(index - numberOfResults, index);
-        var min, max, rawTimes = [], DNF = 2147485547;
-
-        angular.forEach(results, function(result) {
-
-          if ((result.penalty !== undefined) && (result.penalty === '(DNF)')) {
-            rawTimes.push(DNF);
-          } else if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
-            rawTimes.push(self.timeToSeconds(result.time, 3) + 2);
-          } else {
-            rawTimes.push(self.timeToSeconds(result.time, 3));
-          }
-
-        });
-
-        min = rawTimes.indexOf(Math.min.apply(null, rawTimes));
-        max = rawTimes.indexOf(Math.max.apply(null, rawTimes));
-
-        results[min].min = true;
-        results[max].max = true;
-
-        return results;
-      }
-
-    };
-
-    /**
-     * Calculates the average of the results.
-     * @param results
-     * @param precision
-     * @returns {*}
-     */
-    self.calculateAverage = function(results, precision) {
-
-      if (results.length < 3) {
-        return 'DNF';
-      }
-
-      var rawTimes = [], DNF = 2147485547;
-
-      angular.forEach(results, function(result) {
-
-        if ((result.penalty !== undefined) && (result.penalty === '(DNF)')) {
-          rawTimes.push(DNF);
-        } else if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
-          rawTimes.push(self.timeToSeconds(result.time, precision) + 2);
-        } else {
-          rawTimes.push(self.timeToSeconds(result.time, precision));
-        }
-
-      });
-
-      rawTimes.splice(rawTimes.indexOf(Math.min.apply(null, rawTimes)), 1);
-      rawTimes.splice(rawTimes.indexOf(Math.max.apply(null, rawTimes)), 1);
-
-      if (rawTimes.indexOf(DNF) >= 0) {
-        return 'DNF';
-      } else {
-        return (rawTimes.reduce(function(pv, cv) { return pv + cv; }, 0) / rawTimes.length).toFixed(precision);
-      }
-
-    };
-
-    /**
-     * Calculates the mean of the results.
-     * @param results
-     * @param precision
-     */
-    self.calculateMean = function(results, precision) {
-
-      var rawTimes = [];
-
-      angular.forEach(results, function(result) {
-
-        if ((result.penalty !== undefined) && (result.penalty === '(DNF)')) {
-          return 'DNF';
-        } else if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
-          rawTimes.push(self.timeToSeconds(result.time, precision) + 2);
-        } else {
-          rawTimes.push(self.timeToSeconds(result.time, precision));
-        }
-
-      });
-
-      return (rawTimes.reduce(function(pv, cv) { return pv + cv; }, 0) / rawTimes.length).toFixed(precision);
-
-    };
-
-    /**
-     * Calculates the mean of the results.
-     * @param results
-     * @param precision
-     */
-    self.calculateLargeMean = function(results, precision) {
-
-      var rawTimes = [];
-
-      angular.forEach(results, function(result) {
-
-        if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
-          rawTimes.push(self.timeToSeconds(result.time, precision) + 2);
-        } else if ((result.penalty === undefined) || (result.penalty === '')) {
-          rawTimes.push(self.timeToSeconds(result.time, precision));
-        }
-
-      });
-
-      return (rawTimes.reduce(function(pv, cv) { return pv + cv; }, 0) / rawTimes.length).toFixed(precision);
-
-    };
-
-    /**
-     * Adds 2 seconds to the displayed time.
-     * @param time
-     * @returns {*}
-     */
-    self.plus2 = function(time) {
-
-      return self.millisecondsToString((self.timeToSeconds(time) + 2) * 1000);
-
-    };
-
-    /**
-     * Converts time from string to seconds.
-     * @param time
-     * @returns {*}
-     */
-    self.timeToSeconds = function(time) {
-
-      var res = time.split(':');
-
-      if (res.length === 1) {
-        return parseFloat(res[0]);
-      } else if (res.length === 2) {
-        return (parseFloat(res[0]) * 60) + parseFloat(res[1]);
-      } else if (res.length === 3) {
-        return (parseFloat(res[0]) * 3600) + (parseFloat(res[1]) * 60) + parseFloat(res[2]);
-      } else {
-        return -1;
-      }
-
-    };
-
-    /**
-     * Converts time from milliseconds to string
-     * @param milliseconds
-     * @returns {*}
-     */
-    self.millisecondsToString = function(milliseconds) {
-
-      var time = moment(milliseconds);
-
-      if (time < 10000) {
-        return time.format('s.SSS');
-      } else if (time < 60000) {
-        return time.format('ss.SSS');
-      } else if (time < 600000) {
-        return time.format('m:ss.SSS');
-      } else if (time < 3600000) {
-        return time.utc().format('h:mm:ss.SSS');
-      }
-
-    };
-
   }
 
-  angular.module('results').service('ResultsService', [ResultsService]);
+  angular.module('results').service('ResultsService', ['LocalStorage', 'Calculator', ResultsService]);
 
 })();

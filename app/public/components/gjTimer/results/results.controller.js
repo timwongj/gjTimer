@@ -28,19 +28,15 @@
           resolve: {
             data: function () {
               return {
-                sessionId: $scope.sessionId,
                 index: index,
-                avg: avg,
-                numberOfResults: numberOfResults
+                numberOfResults: numberOfResults,
+                results: $scope.results,
+                avg: avg
               };
             }
           }
         });
       }
-    };
-
-    self.plus2 = function(time) {
-      return ResultsService.plus2(time);
     };
 
   }

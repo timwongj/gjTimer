@@ -7,9 +7,10 @@
     var jsIncludes = require('../../app/lib/jsIncludes');
     var files = [];
     files = files.concat(jsIncludes.thirdPartyMinifiedJs);
-    files = files.concat(['bower_components/angular-mocks/angular-mocks.js']);
+    files = files.concat('bower_components/angular-mocks/angular-mocks.js');
     files = files.concat(jsIncludes.gjTimerUnminifiedJs);
-    files = files.concat(['test/spec/**/*.spec.js']);
+    files = files.concat('test/spec/**/*.spec.js');
+    files = files.concat('dist/**/*.html');
 
     grunt.config('karma', {
       unit: {

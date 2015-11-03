@@ -28,10 +28,23 @@
   'use strict';
 
   /**
-   * This is the main gjTimer module. All gjTimer components should be pulled in here as dependencies.
+   * This is the gjTimer.services module.
+   * It contains all the shared services in the gjTimer module.
+   */
+  angular.module('gjTimer.services', []);
+
+  /**
+   * This is the gjTimer.filters module.
+   * It contains all the shared filters in the gjTimer module.
+   */
+  angular.module('gjTimer.filters', []);
+
+  /**
+   * This is the main gjTimer module.
+   * All gjTimer components should be pulled in here as dependencies.
    * This module is pulled into the main app.js 'gjTimerApp' module.
    */
-  angular.module('gjTimer', ['cub', 'menuBar', 'results', 'scramble', 'statistics', 'timer']);
+  angular.module('gjTimer', ['gjTimer.services', 'gjTimer.filters', 'cub', 'menuBar', 'results', 'scramble', 'statistics', 'timer']);
 
 })();
 
@@ -45,26 +58,22 @@
     var COLOR_BACKGROUND_FOCUS = '#EEEEEE'; // gray
     var SPACEBAR_KEY_CODE = 32, ENTER_KEY_CODE = 13;
 
-    $scope.style = {
-      body: {},
-      section: {},
-      timer: {}
-    };
+    $scope.style = { body: {}, section: {}, timer: {} };
 
-    $scope.keydown = function(event) {
+    $scope.keydown = function($event) {
 
       if (event.keyCode === ENTER_KEY_CODE) {
-        $rootScope.$broadcast('new scramble', $scope.event);
+        $rootScope.$broadcast('new scramble', $scope.eventId);
       } else if (event.keyCode === SPACEBAR_KEY_CODE) {
         event.preventDefault();
       }
-      $rootScope.$broadcast('keydown', event);
+      $rootScope.$broadcast('keydown', $event);
 
     };
 
-    $scope.keyup = function(event) {
+    $scope.keyup = function($event) {
 
-      $rootScope.$broadcast('keyup', event);
+      $rootScope.$broadcast('keyup', $event);
 
     };
 
@@ -98,13 +107,174 @@
 
     return function(items) {
 
-      return items.slice().reverse();
+      if (items !== undefined) {
+        return items.slice().reverse();
+      } else {
+        return [];
+      }
 
     };
 
   }
 
-  angular.module('gjTimer').filter('reverse', ReverseFilter);
+  angular.module('gjTimer.filters').filter('reverse', ReverseFilter);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function Calculator() {
+
+    var self = this;
+
+    /**
+     * Calculates the average of the results.
+     * @param results
+     * @returns {number}
+     */
+    self.calculateAverage = function(results) {
+
+      var rawTimes = [], PLUS_TWO = 2000, DNF = 2147485547;
+
+      // add penalties
+      angular.forEach(results, function(result) {
+
+        if (result.penalty === 'DNF') {
+          rawTimes.push(DNF);
+        } else if (result.penalty === '+2') {
+          rawTimes.push(result.time + PLUS_TWO);
+        } else {
+          rawTimes.push(result.time);
+        }
+
+      });
+
+      // remove best and worst time
+      rawTimes.splice(rawTimes.indexOf(Math.min.apply(null, rawTimes)), 1);
+      rawTimes.splice(rawTimes.indexOf(Math.max.apply(null, rawTimes)), 1);
+
+      if (rawTimes.indexOf(DNF) >= 0) {
+        return DNF;
+      } else {
+        return Number((rawTimes.reduce(function(pv, cv) { return pv + cv; }, 0) / rawTimes.length).toFixed(0));
+      }
+
+    };
+
+    /**
+     * Calculates the mean of the results.
+     * @param results
+     * @returns {number}
+     */
+    self.calculateMean = function(results) {
+
+      var rawTimes = [], PLUS_TWO = 2000, DNF = 2147485547;
+
+      // add penalties
+      angular.forEach(results, function(result) {
+
+        if (result.penalty === 'DNF') {
+          rawTimes.push(DNF);
+        } else if (result.penalty === '+2') {
+          rawTimes.push(result.time + PLUS_TWO);
+        } else {
+          rawTimes.push(result.time);
+        }
+
+      });
+
+      if (rawTimes.indexOf(DNF) >= 0) {
+        return DNF;
+      } else {
+        return Number((rawTimes.reduce(function(pv, cv) { return pv + cv; }, 0) / rawTimes.length).toFixed(0));
+      }
+
+    };
+
+    /**
+     * Calculates the mean of the results ignoring the DNFs.
+     * @param results
+     * @returns {number}
+     */
+    self.calculateLargeMean = function(results) {
+
+      var rawTimes = [], PLUS_TWO = 2000, DNF = 2147485547;
+
+      // add penalties
+      angular.forEach(results, function(result) {
+
+        if (result.penalty === '+2') {
+          rawTimes.push(result.time + PLUS_TWO);
+        } else {
+          rawTimes.push(result.time);
+        }
+
+      });
+
+      return Number((rawTimes.reduce(function(pv, cv) { return pv + cv; }, 0) / rawTimes.length).toFixed(0));
+
+    };
+
+    /**
+     * Converts time from string to milliseconds.
+     * @param timeString
+     * @returns {number} - timeMilliseconds
+     */
+    self.convertTimeFromStringToMilliseconds = function(timeString) {
+
+      var res = timeString.split(':');
+
+      if (res.length === 1) {
+        return (parseFloat(res[0]) * 1000);
+      } else if (res.length === 2) {
+        return (parseFloat(res[0]) * 60 * 1000) + (parseFloat(res[1]) * 1000);
+      } else if (res.length === 3) {
+        return (parseFloat(res[0]) * 60 * 60 * 1000) + (parseFloat(res[1]) * 60 * 1000) + (parseFloat(res[2]) * 1000);
+      } else {
+        return -1;
+      }
+
+    };
+
+    /**
+     * Converts time from milliseconds to string.
+     * @param timeMilliseconds
+     * @param precision
+     * @returns {string} - timeString
+     */
+    self.convertTimeFromMillisecondsToString = function(timeMilliseconds, precision) {
+
+      var time = moment(timeMilliseconds);
+
+      if (precision === 2) {
+        if (timeMilliseconds < 10000) {
+          return time.format('s.SS');
+        } else if (timeMilliseconds < 60000) {
+          return time.format('ss.SS');
+        } else if (timeMilliseconds < 600000) {
+          return time.format('m:ss.SS');
+        } else if (timeMilliseconds < 3600000) {
+          return time.utc().format('h:mm:ss.SS');
+        }
+      } else {
+        if (timeMilliseconds < 10000) {
+          return time.format('s.SSS');
+        } else if (timeMilliseconds < 60000) {
+          return time.format('ss.SSS');
+        } else if (timeMilliseconds < 600000) {
+          return time.format('m:ss.SSS');
+        } else if (timeMilliseconds < 3600000) {
+          return time.utc().format('h:mm:ss.SSS');
+        }
+      }
+
+    };
+
+  }
+
+  angular.module('gjTimer.services').service('Calculator', Calculator);
 
 })();
 
@@ -116,55 +286,182 @@
 
     var self = this;
 
-    var eventIds = {
-      'Rubik\'s Cube': '333',
-      '4x4 Cube': '444',
-      '5x5 Cube': '555',
-      '2x2 Cube': '222',
-      '3x3 blindfolded': '333bf',
-      '3x3 one-handed': '333oh',
-      'Megaminx': 'minx',
-      'Pyraminx': 'pyram',
-      'Square-1': 'sq1',
-      'Rubik\'s Clock': 'clock',
-      '6x6 Cube': '666',
-      '7x7 Cube': '777',
-      '4x4 blindfolded': '444bf',
-      '5x5 blindfolded': '555bf'
+    self.events = {
+      '333': { index: 0, name: 'Rubik\'s Cube', style: { 'font-size' : '16pt' }, svg: { ratio: 0.75, width: 250 } },
+      '444': { index: 1, name: '4x4 Cube', style: { 'font-size' : '15pt' }, svg: { ratio: 0.75, width: 250 } },
+      '555': { index: 2, name: '5x5 Cube', style: { 'font-size' : '15pt' }, svg: { ratio: 0.75, width: 250 } },
+      '222': { index: 3, name: '2x2 Cube', style: { 'font-size' : '16pt' }, svg: { ratio: 0.75, width: 250 } },
+      '333bf': { index: 4, name: '3x3 blindfolded', style: { 'font-size' : '16pt' }, svg: { ratio: 0.75, width: 250 } },
+      '333oh': { index: 5, name: '3x3 one-handed', style: { 'font-size' : '16pt' }, svg: { ratio: 0.75, width: 250 } },
+      'minx': { index: 6, name: 'Megaminx', style: { 'font-size' : '13pt' }, svg: { ratio: 0.51, width: 175 } },
+      'pyram': { index: 7, name: 'Pyraminx', style: { 'font-size' : '16pt' }, svg: { ratio: 0.69, width: 250 } },
+      'sq1': { index: 8, name: 'Square-1', style: { 'font-size' : '15pt' }, svg: { ratio: 0.57, width: 175 } },
+      'clock': { index: 9, name: 'Rubik\'s Clock', style: { 'font-size' : '15pt' }, svg: { ratio: 0.50, width: 175 } },
+      '666': { index: 10, name: '6x6 Cube', style: { 'font-size' : '13pt' }, svg: { ratio: 0.75, width: 250 } },
+      '777': { index: 11, name: '7x7 Cube', style: { 'font-size' : '13pt' }, svg: { ratio: 0.75, width: 250 } },
+      '444bf': { index: 12, name: '4x4 blindfolded', style: { 'font-size' : '15pt' }, svg: { ratio: 0.75, width: 250 } },
+      '555bf': { index: 13, name: '5x5 blindfolded', style: { 'font-size' : '15pt' }, svg: { ratio: 0.75, width: 250 } }
     };
 
-    var eventSvg = {
-      'Rubik\'s Cube': { ratio: 0.75, width: 200 },
-      '4x4 Cube': { ratio: 0.75, width: 200 },
-      '5x5 Cube': { ratio: 0.75, width: 200 },
-      '2x2 Cube': { ratio: 0.75, width: 200 },
-      '3x3 blindfolded': { ratio: 0.75, width: 200 },
-      '3x3 one-handed': { ratio: 0.75, width: 200 },
-      'Megaminx': { ratio: 0.51, width: 150 },
-      'Pyraminx': { ratio: 0.69, width: 200 },
-      'Square-1': { ratio: 0.57, width: 150 },
-      'Rubik\'s Clock': { ratio: 0.50, width: 150 },
-      '6x6 Cube': { ratio: 0.75, width: 200 },
-      '7x7 Cube': { ratio: 0.75, width: 200 },
-      '4x4 blindfolded': { ratio: 0.75, width: 200 },
-      '5x5 blindfolded': { ratio: 0.75, width: 200 }
-    };
-
+    /**
+     * Gets the list of events supported by gjTimer.
+     * @returns {string[]}
+     */
     self.getEvents = function() {
-      return eventIds;
+
+      var events = [];
+      angular.forEach(self.events, function(event) {
+        events[event.index] = event.name;
+      });
+      return events;
+
     };
 
-    self.getEventId = function(event) {
-      return eventIds[event];
+    /**
+     * Gets the event given the eventId.
+     * @param eventId
+     * @returns {string} event
+     */
+    self.getEvent = function(eventId) {
+
+      if (self.events.hasOwnProperty(eventId)) {
+        return self.events[eventId].name;
+      } else {
+        return null;
+      }
+
     };
 
-    self.getEventSvg = function(event) {
-      return eventSvg[event];
+    /**
+     * Gets the eventId given the event.
+     * @param eventName
+     * @returns {string}
+     */
+    self.getEventId = function(eventName) {
+
+      for (var eventId in self.events) {
+        if (self.events.hasOwnProperty(eventId)) {
+          if (self.events[eventId].name === eventName) {
+            return eventId;
+          }
+        }
+      }
+      return null;
+
+    };
+
+    /**
+     * Gets the css style for the scramble of the event.
+     * @param eventId
+     * @returns {object} style
+     */
+    self.getEventStyle = function(eventId) {
+
+      if (self.events.hasOwnProperty(eventId)) {
+        return self.events[eventId].style;
+      } else {
+        return self.events['333'].style;
+      }
+
+    };
+
+    /**
+     * Gets the svg properties of the event.
+     * @param eventId
+     * @returns {object}
+     */
+    self.getEventSvg = function(eventId) {
+
+      if (self.events.hasOwnProperty(eventId)) {
+        return self.events[eventId].svg;
+      } else {
+        return self.events['333'].svg;
+      }
+
     };
 
   }
 
-  angular.module('gjTimer').service('Events', Events);
+  angular.module('gjTimer.services').service('Events', Events);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function LocalStorage() {
+
+    var self = this;
+
+    /**
+     * Get a localStorage value given a key.
+     * @param key
+     */
+    self.get = function(key) {
+      return localStorage.getItem(key);
+    };
+
+    /**
+     * Set a localStorage (key, value) pair in local storage with error handling.
+     * @param key
+     * @param value
+     * @returns {boolean}
+     */
+    self.set = function(key, value) {
+      try {
+        localStorage.setItem(key, value);
+        return true;
+      } catch(e) {
+        return false;
+      }
+    };
+
+    /**
+     * Get a localStorage value as JSON given a key.
+     * @param key
+     * @returns {null}
+     */
+    self.getJSON = function(key) {
+      var value = localStorage.getItem(key);
+      if (value !== null) {
+        return JSON.parse(value);
+      } else {
+        return null;
+      }
+    };
+
+    /**
+     * Set a localStorage (key, value) pair as a JSON string in local storage with error handling.
+     * @param key
+     * @param value
+     * @returns {boolean}
+     */
+    self.setJSON = function(key, value) {
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+        return true;
+      } catch(e) {
+        return false;
+      }
+    };
+
+    /**
+     * Clears localStorage
+     * @returns {boolean}
+     */
+    self.clear = function() {
+      try {
+        localStorage.clear();
+        return true;
+      } catch(e) {
+        return false;
+      }
+    };
+
+  }
+
+  angular.module('gjTimer.services').service('LocalStorage', LocalStorage);
 
 })();
 
@@ -175,11 +472,11 @@
   function cubDirective() {
     return {
       restrict: 'E',
-      templateUrl: '/dist/components/gjTimer/cub/cub.html',
+      templateUrl: 'dist/components/gjTimer/cub/cub.html',
       controller: 'CubController',
       controllerAs: 'ctrl',
       scope: {
-        event: '='
+        eventId: '='
       }
     };
   }
@@ -196,8 +493,10 @@
 
     var self = this;
 
-    $scope.$on('draw scramble', function($event, event, state) {
-      self.cub = CubService.drawScramble(event, state);
+    $scope.$on('draw scramble', function($event, eventId, state) {
+
+      self.cub = CubService.drawScramble(eventId, state);
+
     });
 
   }
@@ -216,19 +515,19 @@
 
     /**
      * Uses the jsss library to create an svg element of the scramble.
-     * @param event
+     * @param eventId
      * @param state
      * @returns {*}
      */
-    self.drawScramble = function(event, state) {
+    self.drawScramble = function(eventId, state) {
 
-      var width = Events.getEventSvg(event).width;
-      var height = width / Events.getEventSvg(event).ratio;
+      var width = Events.getEventSvg(eventId).width;
+      var height = width / Events.getEventSvg(eventId).ratio;
 
-      var el = document.createElement("div");
-      scramblers[Events.getEventId(event)].drawScramble(el, state, height, width);
+      var el = document.createElement('div');
+      scramblers[eventId].drawScramble(el, state, height, width);
 
-      var tmp = document.createElement("div");
+      var tmp = document.createElement('div');
       tmp.appendChild(el);
 
       return $sce.trustAsHtml(tmp.innerHTML);
@@ -248,11 +547,11 @@
   function menuBarDirective() {
     return {
       restrict: 'E',
-      templateUrl: '/dist/components/gjTimer/menuBar/menuBar.html',
+      templateUrl: 'dist/components/gjTimer/menuBar/menuBar.html',
       controller: 'MenuBarController',
       controllerAs: 'ctrl',
       scope: {
-        event: '=',
+        eventId: '=',
         sessionId: '=',
         settings: '='
       }
@@ -271,15 +570,15 @@
 
     var self = this;
 
-    var NUMBER_OF_SESSIONS = 20;
-
+    self.sessions = MenuBarService.initSessions();
+    self.session = MenuBarService.initSession();
     self.events = Events.getEvents();
-    self.session = MenuBarService.init();
-    self.event = self.session.event;
-    $scope.sessionId = 'session' + self.session.name.substr(8, self.session.name.length);
-    $scope.event = self.event;
+    self.event = { eventId: self.session.eventId, event: Events.getEvent(self.session.eventId) };
+    $scope.sessionId = self.session.sessionId;
+    $scope.eventId = self.session.eventId;
     $scope.settings = {
       precision: 2, // 2 digits after decimal
+      timerPrecision: 3, // 3 digits after decimal
       timerStartDelay: 100, // milliseconds
       timerStopDelay: 100, // milliseconds
       timerRefreshInterval: 50 // milliseconds
@@ -288,33 +587,25 @@
     // TODO - find a better solution to waiting for controllers to initialize before broadcasting
     // The cutoff for successful broadcast is ~15-20ms, so 50 should be sufficient for now.
     $timeout(function() {
-      $rootScope.$broadcast('new scramble', $scope.event);
+      $rootScope.$broadcast('new scramble', $scope.eventId);
     }, 50);
 
-    self.sessions = [];
-    for (var i = 0; i < NUMBER_OF_SESSIONS; i++) {
-      self.sessions[i] = {};
-    }
-
-    angular.forEach(self.sessions, function(session, $index) {
-      session.name = 'Session ' + ($index + 1);
-    });
-
-    self.selectEvent = function(event) {
-      self.event = MenuBarService.changeEvent('session' + self.session.name.substr(8, self.session.name.length), event);
-      $scope.event = self.event;
-      $rootScope.$broadcast('new scramble', $scope.event);
+    self.changeSession = function(sessionId) {
+      self.session = MenuBarService.changeSession(sessionId);
+      $scope.sessionId = sessionId;
+      $scope.eventId = self.session.eventId;
+      $rootScope.$broadcast('refresh data', sessionId);
+      if (self.event.eventId !== self.session.eventId) {
+        $rootScope.$broadcast('new scramble', $scope.eventId);
+      }
+      self.event = { eventId: $scope.eventId, event: Events.getEvent($scope.eventId) };
     };
 
-    self.changeSession = function(sessionName) {
-      self.session = MenuBarService.changeSession('session' + sessionName.substr(8, sessionName.length));
-      $scope.sessionId = 'session' + sessionName.substr(8, sessionName.length);
-      $scope.event = self.session.event;
-      $rootScope.$broadcast('refresh data', $scope.sessionId);
-      if (self.event !== self.session.event) {
-        $rootScope.$broadcast('new scramble', $scope.event);
-      }
-      self.event = $scope.event;
+    self.changeEvent = function(event) {
+      $scope.eventId = MenuBarService.changeEvent($scope.sessionId, Events.getEventId(event));
+      self.session.eventId = $scope.eventId;
+      self.event = { eventId: $scope.eventId, event: Events.getEvent($scope.eventId) };
+      $rootScope.$broadcast('new scramble', $scope.eventId);
     };
 
     self.settings = function() {
@@ -333,9 +624,9 @@
     };
 
     self.resetSession = function() {
-      if (confirm('Are you sure you want to reset ' + self.session.name + '?')) {
-        self.session = MenuBarService.resetSession('session' + self.session.name.substr(8, self.session.name.length));
-        $rootScope.$broadcast('refresh data');
+      if (confirm('Are you sure you want to reset ' + $scope.sessionId + '?')) {
+        self.session = MenuBarService.resetSession($scope.sessionId);
+        $rootScope.$broadcast('refresh data', $scope.sessionId);
       }
     };
 
@@ -349,83 +640,84 @@
 
   'use strict';
 
-  function MenuBarService() {
+  function MenuBarService(LocalStorage) {
 
     var self = this;
 
-    var NUMBER_OF_SESSIONS = 20;
+    var NUMBER_OF_SESSIONS = 15;
 
     /**
-     * Initialize or get session number from local storage.
-     * Initialize sessions if they do not exist in local storage
-     * @returns {*}
+     * Initializes sessions in local storage if they do not exist.
+     * @returns [String] - sessionId
      */
-    self.init = function() {
+    self.initSessions = function() {
 
-      var currentSessionId;
-
-      if (localStorage.getItem('currentSessionId') !== null) {
-        currentSessionId = localStorage.getItem('currentSessionId');
-      } else {
-        currentSessionId = (localStorage.getItem('sessionNumber') !== null) ? 'session' + localStorage.getItem('sessionNumber') : 'session1';
-        localStorage.setItem('currentSessionId', currentSessionId);
-      }
-
-      var newSession = {
-        event: 'Rubik\'s Cube',
-        list: []
-      };
+      var sessions = [];
 
       for (var i = 1; i <= NUMBER_OF_SESSIONS; i++) {
-
-        var session = JSON.parse(localStorage.getItem('session' + i));
-
+        sessions.push('Session ' + i);
+        var session = LocalStorage.getJSON('Session ' + i);
         if (session === null) {
-          newSession.name = 'Session ' + i;
-          localStorage.setItem('session' + i, JSON.stringify(newSession));
-        } else if (session.event === null) {
-          session.event = 'Rubik\'s Cube';
-          localStorage.setItem('session' + i, JSON.stringify(session));
+          LocalStorage.setJSON('Session ' + i, { sessionId: 'Session ' + i , eventId: '333', results: [] });
         }
-
       }
 
-      return self.getSession(currentSessionId);
+      return sessions;
+
+    };
+
+    /**
+     * Initializes or gets session number from local storage.
+     * @returns {object} - session
+     */
+    self.initSession = function() {
+
+      var sessionId;
+
+      if (LocalStorage.get('sessionId') !== null) {
+        sessionId = LocalStorage.get('sessionId');
+      } else {
+        sessionId = 'Session 1';
+        LocalStorage.set('sessionId', 'Session 1');
+      }
+
+      return LocalStorage.getJSON(sessionId);
 
     };
 
     /**
      * Gets session data from local storage.
      * @param sessionId
-     * @returns {*}
+     * @returns {object} session
      */
     self.getSession = function(sessionId) {
 
-      return JSON.parse(localStorage.getItem(sessionId));
+      return LocalStorage.getJSON(sessionId);
 
     };
 
     /**
      * Saves the new session in local storage and returns the new session.
      * @param sessionId
-     * @returns {*}
+     * @returns {object} session
      */
     self.changeSession = function(sessionId) {
 
-      localStorage.setItem('currentSessionId', sessionId);
-      return self.getSession(sessionId);
+      LocalStorage.set('sessionId', sessionId);
+      return LocalStorage.getJSON(sessionId);
 
     };
 
     /**
-     * Resets the session in local storage.
+     * Resets the session in local storage by clearing the results list.
      * @param sessionId
+     * @returns {object} session
      */
     self.resetSession = function(sessionId) {
 
-      var session = JSON.parse(localStorage.getItem(sessionId));
-      session.list = [];
-      localStorage.setItem(sessionId, JSON.stringify(session));
+      var session = LocalStorage.getJSON(sessionId);
+      session.results = [];
+      LocalStorage.setJSON(sessionId, session);
       return session;
 
     };
@@ -433,21 +725,21 @@
     /**
      * Saves the new event in the session.
      * @param sessionId
-     * @param event
-     * @returns {*}
+     * @param eventId
+     * @returns {*} eventId
      */
-    self.changeEvent = function(sessionId, event) {
+    self.changeEvent = function(sessionId, eventId) {
 
-      var session = JSON.parse(localStorage.getItem(sessionId));
-      session.event = event;
-      localStorage.setItem(sessionId, JSON.stringify(session));
-      return session.event;
+      var session = LocalStorage.getJSON(sessionId);
+      session.eventId = eventId;
+      LocalStorage.setJSON(sessionId, session);
+      return session.eventId;
 
     };
 
   }
 
-  angular.module('menuBar').service('MenuBarService', MenuBarService);
+  angular.module('menuBar').service('MenuBarService', ['LocalStorage', MenuBarService]);
 
 })();
 
@@ -458,7 +750,7 @@
   function resultsDirective() {
     return {
       restrict: 'E',
-      templateUrl: '/dist/components/gjTimer/results/results.html',
+      templateUrl: 'dist/components/gjTimer/results/results.html',
       controller: 'ResultsController',
       controllerAs: 'ctrl',
       scope: {
@@ -503,19 +795,15 @@
           resolve: {
             data: function () {
               return {
-                sessionId: $scope.sessionId,
                 index: index,
-                avg: avg,
-                numberOfResults: numberOfResults
+                numberOfResults: numberOfResults,
+                results: $scope.results,
+                avg: avg
               };
             }
           }
         });
       }
-    };
-
-    self.plus2 = function(time) {
-      return ResultsService.plus2(time);
     };
 
   }
@@ -528,7 +816,7 @@
 
   'use strict';
 
-  function ResultsService() {
+  function ResultsService(LocalStorage, Calculator) {
 
     var self = this;
 
@@ -539,23 +827,50 @@
      */
     self.getResults = function(sessionId, precision) {
 
-      var results = JSON.parse(localStorage.getItem(sessionId)).list;
+      var results = [], rawResults = LocalStorage.getJSON(sessionId).results;
 
-      angular.forEach(results, function(result, index) {
+      angular.forEach(rawResults, function(rawResult, index) {
 
-        result.time = Number(result.time).toFixed(3);
+        var res = rawResult.split('|');
+
+        var result = {
+          index: index,
+          scramble: res[1],
+          date: new Date(Number(res[2])),
+          comment: res[3] ? res[3] : ''
+        };
+
+        // deal with penalty if it exists
+        if (res[0].substring(res[0].length - 1, res[0].length) === '+') {
+          result.time = Number(res[0].substring(0, res[0].length - 1));
+          result.penalty = '+2';
+          result.displayedTime = Calculator.convertTimeFromMillisecondsToString(Number(res[0].substring(0, res[0].length - 1)) + 2000, precision) + '+';
+          result.detailedTime = Calculator.convertTimeFromMillisecondsToString(Number(res[0].substring(0, res[0].length - 1)) + 2000, precision) + '+';
+        } else if (res[0].substring(res[0].length - 1, res[0].length) === '-') {
+          result.time = Number(res[0].substring(0, res[0].length - 1));
+          result.penalty = 'DNF';
+          result.displayedTime = 'DNF';
+          result.detailedTime = 'DNF(' + Calculator.convertTimeFromMillisecondsToString(Number(res[0].substring(0, res[0].length - 1)), precision) + ')';
+        } else {
+          result.time = Number(res[0]);
+          result.penalty = '';
+          result.displayedTime = Calculator.convertTimeFromMillisecondsToString(Number(res[0]), precision);
+          result.detailedTime = Calculator.convertTimeFromMillisecondsToString(Number(res[0]), precision);
+        }
 
         if (index >= 4) {
-          result.avg5 = self.calculateAverage(results.slice(index - 4, index + 1), precision);
+          result.avg5 = Calculator.convertTimeFromMillisecondsToString(Calculator.calculateAverage(results.slice(index - 4, index + 1)), precision);
         } else {
           result.avg5 = 'DNF';
         }
 
         if (index >= 11) {
-          result.avg12 = self.calculateAverage(results.slice(index - 11, index + 1), precision);
+          result.avg12 = Calculator.convertTimeFromMillisecondsToString(Calculator.calculateAverage(results.slice(index - 11, index + 1)), precision);
         } else {
           result.avg12 = 'DNF';
         }
+
+        results.push(result);
 
       });
 
@@ -563,185 +878,9 @@
 
     };
 
-    /**
-     * Get results for the avg5/avg12 modal.
-     * @param sessionId
-     * @param index
-     * @param numberOfResults
-     */
-    self.getModalResults = function(sessionId, index, numberOfResults) {
-
-      if (localStorage.getItem(sessionId) === null) {
-        return [];
-      } else {
-
-        var results = JSON.parse(localStorage.getItem(sessionId)).list.slice(index - numberOfResults, index);
-        var min, max, rawTimes = [], DNF = 2147485547;
-
-        angular.forEach(results, function(result) {
-
-          if ((result.penalty !== undefined) && (result.penalty === '(DNF)')) {
-            rawTimes.push(DNF);
-          } else if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
-            rawTimes.push(self.timeToSeconds(result.time, 3) + 2);
-          } else {
-            rawTimes.push(self.timeToSeconds(result.time, 3));
-          }
-
-        });
-
-        min = rawTimes.indexOf(Math.min.apply(null, rawTimes));
-        max = rawTimes.indexOf(Math.max.apply(null, rawTimes));
-
-        results[min].min = true;
-        results[max].max = true;
-
-        return results;
-      }
-
-    };
-
-    /**
-     * Calculates the average of the results.
-     * @param results
-     * @param precision
-     * @returns {*}
-     */
-    self.calculateAverage = function(results, precision) {
-
-      if (results.length < 3) {
-        return 'DNF';
-      }
-
-      var rawTimes = [], DNF = 2147485547;
-
-      angular.forEach(results, function(result) {
-
-        if ((result.penalty !== undefined) && (result.penalty === '(DNF)')) {
-          rawTimes.push(DNF);
-        } else if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
-          rawTimes.push(self.timeToSeconds(result.time, precision) + 2);
-        } else {
-          rawTimes.push(self.timeToSeconds(result.time, precision));
-        }
-
-      });
-
-      rawTimes.splice(rawTimes.indexOf(Math.min.apply(null, rawTimes)), 1);
-      rawTimes.splice(rawTimes.indexOf(Math.max.apply(null, rawTimes)), 1);
-
-      if (rawTimes.indexOf(DNF) >= 0) {
-        return 'DNF';
-      } else {
-        return (rawTimes.reduce(function(pv, cv) { return pv + cv; }, 0) / rawTimes.length).toFixed(precision);
-      }
-
-    };
-
-    /**
-     * Calculates the mean of the results.
-     * @param results
-     * @param precision
-     */
-    self.calculateMean = function(results, precision) {
-
-      var rawTimes = [];
-
-      angular.forEach(results, function(result) {
-
-        if ((result.penalty !== undefined) && (result.penalty === '(DNF)')) {
-          return 'DNF';
-        } else if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
-          rawTimes.push(self.timeToSeconds(result.time, precision) + 2);
-        } else {
-          rawTimes.push(self.timeToSeconds(result.time, precision));
-        }
-
-      });
-
-      return (rawTimes.reduce(function(pv, cv) { return pv + cv; }, 0) / rawTimes.length).toFixed(precision);
-
-    };
-
-    /**
-     * Calculates the mean of the results.
-     * @param results
-     * @param precision
-     */
-    self.calculateLargeMean = function(results, precision) {
-
-      var rawTimes = [];
-
-      angular.forEach(results, function(result) {
-
-        if ((result.penalty !== undefined) && (result.penalty === '(+2)')) {
-          rawTimes.push(self.timeToSeconds(result.time, precision) + 2);
-        } else if ((result.penalty === undefined) || (result.penalty === '')) {
-          rawTimes.push(self.timeToSeconds(result.time, precision));
-        }
-
-      });
-
-      return (rawTimes.reduce(function(pv, cv) { return pv + cv; }, 0) / rawTimes.length).toFixed(precision);
-
-    };
-
-    /**
-     * Adds 2 seconds to the displayed time.
-     * @param time
-     * @returns {*}
-     */
-    self.plus2 = function(time) {
-
-      return self.millisecondsToString((self.timeToSeconds(time) + 2) * 1000);
-
-    };
-
-    /**
-     * Converts time from string to seconds.
-     * @param time
-     * @returns {*}
-     */
-    self.timeToSeconds = function(time) {
-
-      var res = time.split(':');
-
-      if (res.length === 1) {
-        return parseFloat(res[0]);
-      } else if (res.length === 2) {
-        return (parseFloat(res[0]) * 60) + parseFloat(res[1]);
-      } else if (res.length === 3) {
-        return (parseFloat(res[0]) * 3600) + (parseFloat(res[1]) * 60) + parseFloat(res[2]);
-      } else {
-        return -1;
-      }
-
-    };
-
-    /**
-     * Converts time from milliseconds to string
-     * @param milliseconds
-     * @returns {*}
-     */
-    self.millisecondsToString = function(milliseconds) {
-
-      var time = moment(milliseconds);
-
-      if (time < 10000) {
-        return time.format('s.SSS');
-      } else if (time < 60000) {
-        return time.format('ss.SSS');
-      } else if (time < 600000) {
-        return time.format('m:ss.SSS');
-      } else if (time < 3600000) {
-        return time.utc().format('h:mm:ss.SSS');
-      }
-
-    };
-
   }
 
-  angular.module('results').service('ResultsService', [ResultsService]);
+  angular.module('results').service('ResultsService', ['LocalStorage', 'Calculator', ResultsService]);
 
 })();
 
@@ -749,12 +888,12 @@
 
   'use strict';
 
-  function ResultsModalController($modalInstance, data, ResultsService) {
+  function ResultsModalController($modalInstance, data, ResultsModalService) {
 
     var self = this;
 
     self.title = data.avg + ' average of ' + data.numberOfResults;
-    self.results = ResultsService.getModalResults(data.sessionId, data.index, data.numberOfResults);
+    self.results = ResultsModalService.getModalResults(data.results, data.index, data.numberOfResults);
 
     self.close = function() {
       $modalInstance.dismiss();
@@ -762,7 +901,52 @@
 
   }
 
-  angular.module('results').controller('ResultsModalController', ['$modalInstance', 'data', 'ResultsService', ResultsModalController]);
+  angular.module('results').controller('ResultsModalController', ['$modalInstance', 'data', 'ResultsModalService', ResultsModalController]);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function ResultsModalService() {
+
+    var self = this;
+
+    /**
+     * Get results for the results modal.
+     * @param results
+     * @param index
+     * @param numberOfResults
+     * @returns [Object] - modalResults
+     */
+    self.getModalResults = function(results, index, numberOfResults) {
+
+      var rawTimes = [], PLUS_TWO = 2000, DNF = 2147485547, modalResults = results.slice(index - numberOfResults, index);
+
+      // add penalties
+      angular.forEach(modalResults, function(result) {
+
+        if (result.penalty === 'DNF') {
+          rawTimes.push(DNF);
+        } else if (result.penalty === '+2') {
+          rawTimes.push(result.time + PLUS_TWO);
+        } else {
+          rawTimes.push(result.time);
+        }
+
+      });
+
+      modalResults[rawTimes.indexOf(Math.min.apply(null, rawTimes))].min = true;
+      modalResults[rawTimes.indexOf(Math.max.apply(null, rawTimes))].max = true;
+
+      return modalResults;
+
+    };
+
+  }
+
+  angular.module('results').service('ResultsModalService', ResultsModalService);
 
 })();
 
@@ -799,18 +983,12 @@
         getTemplate().then(function(content) {
           scope.popoverDelay = 1; // just needs to be at least 1
           $rootScope.insidePopover = -1;
-          var title = scope.result.time;
-          if (scope.result.penalty === '+2') {
-            title = ResultsService.plus2(scope.result.time) + '+';
-          } else if (scope.result.penalty === 'DNF') {
-            title = 'DNF(' + scope.result.time + ')';
-          }
           $(element).popover({
             animation: false,
             content: content,
             html: true,
             placement: 'right',
-            title: title
+            title: scope.result.detailedTime
           });
           $(element).bind('mouseenter', function () {
             scope.insideDiv = scope.index;
@@ -894,7 +1072,7 @@
 
   'use strict';
 
-  function ResultsPopoverService() {
+  function ResultsPopoverService(LocalStorage) {
 
     var self = this;
 
@@ -905,23 +1083,32 @@
      * @param penalty
      */
     self.penalty = function(sessionId, index, penalty) {
-      var session = JSON.parse(localStorage.getItem(sessionId));
+      var session = LocalStorage.getJSON(sessionId);
+      var result = session.results[index];
+      var pen = result.substring(result.indexOf('|') - 1, result.indexOf('|'));
       switch(penalty) {
         case '':
-          if (session.list[index].penalty !== undefined) {
-            delete session.list[index].penalty;
-            localStorage.setItem(sessionId, JSON.stringify(session));
+          if ((pen === '+') || (pen === '-')) {
+            result = result.substring(0, result.indexOf('|') - 1) + result.substring(result.indexOf('|'), result.length);
           }
           break;
         case '+2':
-          session.list[index].penalty = '+2';
-          localStorage.setItem(sessionId, JSON.stringify(session));
+          if ((pen === '+') || (pen === '-')) {
+            result = result.substring(0, result.indexOf('|') - 1) + '+' + result.substring(result.indexOf('|'), result.length);
+          } else {
+            result = result.substring(0, result.indexOf('|')) + '+' + result.substring(result.indexOf('|'), result.length);
+          }
           break;
         case 'DNF':
-          session.list[index].penalty = 'DNF';
-          localStorage.setItem(sessionId, JSON.stringify(session));
+          if ((pen === '+') || (pen === '-')) {
+            result = result.substring(0, result.indexOf('|') - 1) + '-' + result.substring(result.indexOf('|'), result.length);
+          } else {
+            result = result.substring(0, result.indexOf('|')) + '-' + result.substring(result.indexOf('|'), result.length);
+          }
           break;
       }
+      session.results[index] = result;
+      LocalStorage.setJSON(sessionId, session);
     };
 
     /**
@@ -931,7 +1118,7 @@
      */
     self.remove = function(sessionId, index) {
       var session = JSON.parse(localStorage.getItem(sessionId));
-      session.list.splice(index, 1);
+      session.results.splice(index, 1);
       localStorage.setItem(sessionId, JSON.stringify(session));
     };
 
@@ -947,7 +1134,7 @@
 
   }
 
-  angular.module('results').service('ResultsPopoverService', ResultsPopoverService);
+  angular.module('results').service('ResultsPopoverService', ['LocalStorage', ResultsPopoverService]);
 
 })();
 
@@ -958,11 +1145,11 @@
   function scrambleDirective() {
     return {
       restrict: 'E',
-      templateUrl: '/dist/components/gjTimer/scramble/scramble.html',
+      templateUrl: 'dist/components/gjTimer/scramble/scramble.html',
       controller: 'ScrambleController',
       controllerAs: 'ctrl',
       scope: {
-        event: '=',
+        eventId: '=',
         scramble: '='
       }
     };
@@ -976,19 +1163,22 @@
 
   'use strict';
 
-  function ScrambleController($scope, $rootScope, $sce, ScrambleService) {
+  function ScrambleController($scope, $rootScope, $sce, ScrambleService, Events) {
 
     var self = this;
 
-    $scope.$on('new scramble', function($event, event) {
-      $scope.scramble = ScrambleService.newScramble(event);
+    $scope.$on('new scramble', function($event, eventId) {
+
+      $scope.scramble = ScrambleService.getNewScramble(eventId);
       self.scramble = $sce.trustAsHtml($scope.scramble);
-      $rootScope.$broadcast('draw scramble', event, ScrambleService.getScrambleState());
+      self.scrambleStyle = Events.getEventStyle(eventId);
+      $rootScope.$broadcast('draw scramble', eventId, ScrambleService.getScrambleState());
+
     });
 
   }
 
-  angular.module('scramble').controller('ScrambleController', ['$scope', '$rootScope', '$sce', 'ScrambleService', ScrambleController]);
+  angular.module('scramble').controller('ScrambleController', ['$scope', '$rootScope', '$sce', 'ScrambleService', 'Events', ScrambleController]);
 
 })();
 
@@ -996,24 +1186,14 @@
 
   'use strict';
 
-  function ScrambleService(Events) {
+  function ScrambleService() {
 
     var self = this;
 
     /**
-     * Gets the current scramble string.
-     * @returns {*}
-     */
-    self.getScramble = function() {
-
-      return self.scramble.scramble_string;
-
-    };
-
-    /**
      * Gets the scramble state of the current scramble.
      * This is used by the cub component to draw the scramble.
-     * @returns {*}
+     * @returns {string}
      */
     self.getScrambleState = function() {
 
@@ -1023,20 +1203,24 @@
 
     /**
      * Uses the jsss library to generate a new scramble for the event.
-     * @param event
-     * @returns {*}
+     * @param eventId
+     * @returns {string}
      */
-    self.newScramble = function(event) {
+    self.getNewScramble = function(eventId) {
 
-      self.scramble = scramblers[Events.getEventId(event)].getRandomScramble();
+      self.scramble = scramblers[eventId].getRandomScramble();
 
-      return self.scramble.scramble_string;
+      if (self.scramble.scramble_string.substring(self.scramble.scramble_string.length - 1, self.scramble.scramble_string.length) === ' ') {
+        return self.scramble.scramble_string.substring(0, self.scramble.scramble_string.length - 1);
+      } else {
+        return self.scramble.scramble_string;
+      }
 
     };
 
   }
 
-  angular.module('scramble').service('ScrambleService', ['Events', ScrambleService]);
+  angular.module('scramble').service('ScrambleService', ScrambleService);
 
 })();
 
@@ -1066,10 +1250,10 @@
   function statisticsDirective() {
     return {
       restrict: 'E',
-      templateUrl: '/dist/components/gjTimer/statistics/statistics.html',
+      templateUrl: 'dist/components/gjTimer/statistics/statistics.html',
       controller: 'StatisticsController',
       controllerAs: 'ctrl',
-      scope: {
+      scopeId: {
         event: '=',
         results: '='
       }
@@ -1115,11 +1299,11 @@
   function timerDirective() {
     return {
       restrict: 'E',
-      templateUrl: '/dist/components/gjTimer/timer/timer.html',
+      templateUrl: 'dist/components/gjTimer/timer/timer.html',
       controller: 'TimerController',
       controllerAs: 'ctrl',
       scope: {
-        event: '=',
+        eventId: '=',
         scramble: '=',
         sessionId: '=',
         settings: '='
@@ -1139,7 +1323,7 @@
 
     var self = this, timer, state = 'reset', SPACE_BAR_KEY_CODE = 32;
 
-    self.time = moment(0).format('s.SSS');
+    self.time = $scope.settings.timerPrecision === 2 ? moment(0).format('s.SS') : moment(0).format('s.SSS');
 
     var STYLES = {
       BLACK: { 'color': '#000000' },
@@ -1150,7 +1334,7 @@
     $scope.$on('keydown', function($event, event) {
       if ((state === 'reset') && (event.keyCode === SPACE_BAR_KEY_CODE)) {
         state = 'keydown';
-        self.time = moment(0).format('s.SSS');
+        self.time = $scope.settings.timerPrecision === 2 ? moment(0).format('s.SS') : moment(0).format('s.SSS');
         self.timerStyle = STYLES.RED;
         $timeout(function() {
           if (state === 'keydown') {
@@ -1165,7 +1349,7 @@
         $rootScope.$broadcast('timer unfocus');
         TimerService.saveResult(self.time, $scope.scramble, $scope.sessionId);
         $rootScope.$broadcast('refresh data', $scope.sessionId);
-        $rootScope.$broadcast('new scramble', $scope.event);
+        $rootScope.$broadcast('new scramble', $scope.eventId);
       }
     });
 
@@ -1175,7 +1359,7 @@
         state = 'timing';
         TimerService.startTimer();
         timer = $interval(function() {
-          self.time = TimerService.getTime();
+          self.time = TimerService.getTime($scope.settings.timerPrecision);
         }, $scope.settings.timerRefreshInterval);
       } else if (state === 'keydown') {
         state = 'reset';
@@ -1196,29 +1380,18 @@
 
   'use strict';
 
-  function TimerService() {
+  function TimerService(LocalStorage, Calculator) {
 
     var self = this;
 
-    var startTime;
-
     /**
      * Gets the current time.
+     * @param precision
      * @returns {string}
      */
-    self.getTime = function() {
+    self.getTime = function(precision) {
 
-      var time = moment(Date.now() - startTime);
-
-      if (time < 10000) {
-        return time.format('s.SSS');
-      } else if (time < 60000) {
-        return time.format('ss.SSS');
-      } else if (time < 600000) {
-        return time.format('m:ss.SSS');
-      } else if (time < 3600000) {
-        return time.utc().format('h:mm:ss.SSS');
-      }
+      return Calculator.convertTimeFromMillisecondsToString(moment(Date.now() - self.startTime), precision);
 
     };
 
@@ -1227,32 +1400,26 @@
      */
     self.startTimer = function() {
 
-      startTime = Date.now();
+      self.startTime = Date.now();
 
     };
 
     /**
-     * Saves the result.
+     * Saves the result in the format of 'Time in milliseconds'|'Scramble'|'Date in milliseconds'.
      * @param time
      * @param scramble
      * @param sessionId
      */
     self.saveResult = function(time, scramble, sessionId) {
 
-      var result = {
-        time: time,
-        scramble: scramble,
-        date: new Date()
-      };
-
-      var session = JSON.parse(localStorage.getItem(sessionId));
-      session.list.push(result);
-      localStorage.setItem(sessionId, JSON.stringify(session));
+      var session = LocalStorage.getJSON(sessionId);
+      session.results.push(Calculator.convertTimeFromStringToMilliseconds(time) + '|' + scramble + '|' + Date.now());
+      LocalStorage.setJSON(sessionId, session);
 
     };
 
   }
 
-  angular.module('timer').service('TimerService', TimerService);
+  angular.module('timer').service('TimerService', ['LocalStorage', 'Calculator', TimerService]);
 
 })();

@@ -8,19 +8,19 @@
 
     /**
      * Uses the jsss library to create an svg element of the scramble.
-     * @param event
+     * @param eventId
      * @param state
      * @returns {*}
      */
-    self.drawScramble = function(event, state) {
+    self.drawScramble = function(eventId, state) {
 
-      var width = Events.getEventSvg(event).width;
-      var height = width / Events.getEventSvg(event).ratio;
+      var width = Events.getEventSvg(eventId).width;
+      var height = width / Events.getEventSvg(eventId).ratio;
 
-      var el = document.createElement("div");
-      scramblers[Events.getEventId(event)].drawScramble(el, state, height, width);
+      var el = document.createElement('div');
+      scramblers[eventId].drawScramble(el, state, height, width);
 
-      var tmp = document.createElement("div");
+      var tmp = document.createElement('div');
       tmp.appendChild(el);
 
       return $sce.trustAsHtml(tmp.innerHTML);

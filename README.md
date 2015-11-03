@@ -1,19 +1,41 @@
 # gjTimer
 
 This is an angular app for a client side Rubik's Cube timer that uses local storage to save results.
-It uses jsss for scrambling and displaying the state of the puzzles.
-https://github.com/cubing/jsss
 
-### To run the app:
+## Usage:
 
-$ npm install
+#### To simply run the app:
 
-$ bower install
+    $ curl -O -L https://npmjs.org/install.sh
+  
+    $ sudo sh install.sh
 
-$ sudo npm install -g http-server
-
-$ grunt
-
-$ http-server
-
+    $ sudo npm install -g http-server
+  
+    $ http-server
+  
 Navigate to localhost:8080 on your browser
+  
+#### To build and run the app:
+
+    $ npm install
+  
+    $ bower install
+
+    $ grunt:prod
+
+    $ http-server
+  
+#### To run the tests:
+
+    $ grunt karma
+  
+#### To run in development mode:
+  
+    $ grunt
+    
+## Resources
+
+gjTimer uses jsss for scrambling and displaying the state of the puzzles.
+This library is publicly available on GitHub and can be found here:
+https://github.com/cubing/jsss
