@@ -151,6 +151,6 @@
 
   }
 
-  angular.module('gjTimer').service('Calculator', Calculator);
+  angular.module('gjTimer.services').service('Calculator', Calculator);
 
 })();

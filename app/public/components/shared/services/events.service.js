@@ -102,6 +102,6 @@
 
   }
 
-  angular.module('gjTimer').service('Events', Events);
+  angular.module('gjTimer.services').service('Events', Events);
 
 })();

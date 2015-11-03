@@ -16,6 +16,6 @@
 
   }
 
-  angular.module('gjTimer').filter('reverse', ReverseFilter);
+  angular.module('gjTimer.filters').filter('reverse', ReverseFilter);
 
 })();

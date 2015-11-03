@@ -73,6 +73,6 @@
 
   }
 
-  angular.module('gjTimer').service('LocalStorage', LocalStorage);
+  angular.module('gjTimer.services').service('LocalStorage', LocalStorage);
 
 })();
