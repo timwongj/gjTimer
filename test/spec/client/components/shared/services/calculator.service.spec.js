@@ -3,10 +3,10 @@
   'use strict';
 
   var Calculator,
-    results,
+    rawTimes,
     average,
     mean,
-    largeMean,
+    sessionMean,
     timeMilliseconds,
     timeString;
 
@@ -24,15 +24,9 @@
 
       it('should calculate the average of the results without penalties', function() {
 
-        results = [
-          { time: 644, penalty: ''},
-          { time: 848, penalty: ''},
-          { time: 708, penalty: ''},
-          { time: 420, penalty: ''},
-          { time: 625, penalty: ''}
-        ];
+        rawTimes = [644, 848, 708, 420, 625];
 
-        average = Calculator.calculateAverage(results);
+        average = Calculator.calculateAverage(rawTimes);
 
         expect(average).toEqual(659);
 
@@ -44,13 +38,9 @@
 
       it('should calculate the mean of the results without penalties', function() {
 
-        results = [
-          { time: 644, penalty: ''},
-          { time: 708, penalty: ''},
-          { time: 625, penalty: ''}
-        ];
+        rawTimes = [644, 708, 625];
 
-        mean = Calculator.calculateMean(results);
+        mean = Calculator.calculateMean(rawTimes);
 
         expect(mean).toEqual(659);
 
@@ -58,21 +48,15 @@
 
     });
 
-    describe('calculateLargeMean function', function() {
+    describe('calculateSessionMean function', function() {
 
       it('should calculate the large mean of the results without penalties', function() {
 
-        results = [
-          { time: 644, penalty: ''},
-          { time: 848, penalty: ''},
-          { time: 708, penalty: ''},
-          { time: 420, penalty: ''},
-          { time: 625, penalty: ''}
-        ];
+        rawTimes = [644, 848, 708, 420, 625];
 
-        largeMean = Calculator.calculateLargeMean(results);
+        sessionMean = Calculator.calculateSessionMean(rawTimes);
 
-        expect(largeMean).toEqual(649);
+        expect(sessionMean).toEqual(649);
 
       });
 

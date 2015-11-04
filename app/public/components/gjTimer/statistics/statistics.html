@@ -1,3 +1,44 @@
 <div id="statistics">
   <h4>Statistics</h4>
+  <span class="stat" ng-bind="'Solves: ' + ctrl.statistics.solves.solved + '/' + ctrl.statistics.solves.attempted"></span>
+  <span class="stat" ng-bind="'Best: ' + ctrl.statistics.solves.best"></span>
+  <span class="stat" ng-bind="'Worst: ' + ctrl.statistics.solves.worst"></span>
+  <span class="stat" ng-bind="'Mean: ' + ctrl.statistics.sessionMean"></span>
+  <span class="stat" ng-bind="'Avg: ' + ctrl.statistics.sessionAvg"></span>
+  <table class="table table-bordered table-condensed">
+    <thead>
+    <tr>
+      <th></th>
+      <th>Current</th>
+      <th>Best</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-if="ctrl.statistics.mo3">
+      <td>mo3</td>
+      <td ng-bind="ctrl.statistics.mo3.current"></td>
+      <td ng-bind="ctrl.statistics.mo3.best"></td>
+    </tr>
+    <tr ng-if="ctrl.statistics.avg5">
+      <td>avg5</td>
+      <td ng-bind="ctrl.statistics.avg5.current"></td>
+      <td ng-bind="ctrl.statistics.avg5.best"></td>
+    </tr>
+    <tr ng-if="ctrl.statistics.avg12">
+      <td>avg12</td>
+      <td ng-bind="ctrl.statistics.avg12.current"></td>
+      <td ng-bind="ctrl.statistics.avg12.best"></td>
+    </tr>
+    <tr ng-if="ctrl.statistics.avg50">
+      <td>avg50</td>
+      <td ng-bind="ctrl.statistics.avg50.current"></td>
+      <td ng-bind="ctrl.statistics.avg50.best"></td>
+    </tr>
+    <tr ng-if="ctrl.statistics.avg100">
+      <td>avg100</td>
+      <td ng-bind="ctrl.statistics.avg100.current"></td>
+      <td ng-bind="ctrl.statistics.avg100.best"></td>
+    </tr>
+    </tbody>
+  </table>
 </div>

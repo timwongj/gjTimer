@@ -5,6 +5,10 @@
   function StatisticsController($scope, StatisticsService) {
 
     var self = this;
+    
+    $scope.$watch('results', function() {
+      self.statistics = StatisticsService.getStatistics($scope.results);
+    });
 
   }
 
