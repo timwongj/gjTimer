@@ -94,26 +94,28 @@
   width: 40em;
 }
 .modal {
-  top: 20%;
+  top: 5%;
 }
 #resultsModal .modal-header {
+  padding: .5em;
+}
+#resultsModal .modal-body {
+  padding: .5em;
+  max-height: calc(100vh - 15em);
+  overflow-y: auto;
+}
+#resultsModal .modal-footer {
   padding: .5em;
 }
 #resultsModal .modal-title {
   margin-left: .25em;
 }
-#resultsModal .modal-footer {
-  padding: .5em;
-}
 #resultsModal .btn-close {
   vertical-align: middle;
 }
-#resultsModal .modal-body {
-  padding: .5em;
-}
 #resultsModal .ol-results {
   margin: 0;
-  padding-left: 2em;
+  padding-left: 2.5em;
 }
 #resultsModal .li-results {
   margin-bottom: .125em;
@@ -159,6 +161,10 @@
   margin: .125em;
   padding: .125em;
 }
+#statistics .stat {
+  white-space: nowrap;
+  font-weight: 500;
+}
 #statistics table {
   margin: .5em 0;
 }
@@ -166,8 +172,11 @@
 #statistics table th {
   padding: .25em;
 }
-#statistics .stat {
-  font-weight: 500;
+#statistics table .type {
+  text-align: right;
+}
+#statistics table .data {
+  text-align: center;
 }
 #timer {
   text-align: center;

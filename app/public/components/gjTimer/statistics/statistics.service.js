@@ -31,7 +31,8 @@
       if (rawTimes.length >= 3) {
         best = Calculator.calculateBestMean(rawTimes, 3);
         statistics.averages.push({
-          type: 'mo3',
+          type: 'm',
+          length: 3,
           current: {
             avg: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateMean(rawTimes.slice(rawTimes.length - 3, rawTimes.length))),
             stDev: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateStandardDeviation(rawTimes.slice(rawTimes.length - 3, rawTimes.length), false))
@@ -49,7 +50,8 @@
         if (rawTimes.length >= typesOfAverages[i]) {
           best = Calculator.calculateBestAverage(rawTimes, typesOfAverages[i]);
           statistics.averages.push({
-            type: 'avg' + typesOfAverages[i],
+            type: 'a',
+            length: typesOfAverages[i],
             current: {
               avg: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateAverage(rawTimes.slice(rawTimes.length - typesOfAverages[i], rawTimes.length))),
               stDev: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateStandardDeviation(rawTimes.slice(rawTimes.length - typesOfAverages[i], rawTimes.length), true))

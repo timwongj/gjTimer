@@ -4,7 +4,7 @@
       <span aria-hidden="true" class="btn-close">&times;</span>
     </button>
     <h4 class="modal-title">
-      <span ng-bind="ctrl.results.avg + ' average of ' + ctrl.results.results.length"></span>
+      <span ng-bind="ctrl.results.avg + ' ' + ctrl.type + ' of ' + ctrl.results.results.length"></span>
       <span ng-if="ctrl.results.stDev !== 'N/A'">&nbsp;(&rho;={{ctrl.results.stDev}})</span>
     </h4>
   </div>

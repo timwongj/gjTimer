@@ -1,5 +1,7 @@
+@max-height-modal-body: calc(~"100vh - 15em");
+
 .modal {
-  top: 20%;
+  top: 5%;
 }
 
 #resultsModal {
@@ -8,25 +10,27 @@
     padding: .5em;
   }
 
-  .modal-title {
-    margin-left: .25em;
+  .modal-body {
+    padding: .5em;
+    max-height: @max-height-modal-body;
+    overflow-y: auto;
   }
 
   .modal-footer {
     padding: .5em;
   }
 
+  .modal-title {
+    margin-left: .25em;
+  }
+
   .btn-close {
     vertical-align: middle;
   }
 
-  .modal-body {
-    padding: .5em;
-  }
-
   .ol-results {
     margin: 0;
-    padding-left: 2em;
+    padding-left: 2.5em;
   }
 
   .li-results {
