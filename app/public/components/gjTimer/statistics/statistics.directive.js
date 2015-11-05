@@ -9,7 +9,6 @@
       controller: 'StatisticsController',
       controllerAs: 'ctrl',
       scopeId: {
-        event: '=',
         results: '='
       }
     };

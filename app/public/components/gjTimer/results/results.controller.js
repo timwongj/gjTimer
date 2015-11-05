@@ -24,7 +24,7 @@
           templateUrl: 'dist/components/gjTimer/resultsModal/resultsModal.html',
           controller: 'ResultsModalController',
           controllerAs: 'ctrl',
-          size: 'md',
+          size: 'lg',
           resolve: {
             results: function () {
               return $scope.results.slice(index - numberOfResults, index);

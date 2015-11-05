@@ -8,6 +8,8 @@
 
     self.results = ResultsModalService.getModalResults(results);
 
+    self.type = results.length === 3 ? 'mean' : 'average';
+
     self.close = function() {
       $modalInstance.dismiss();
     };
