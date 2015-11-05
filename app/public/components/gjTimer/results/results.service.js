@@ -6,7 +6,7 @@
 
     var self = this;
 
-    var DNF = Calculator.getDNF();
+    var DNF = Calculator.DNF;
 
     /**
      * Gets results for the session.

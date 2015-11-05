@@ -138,6 +138,10 @@
      */
     self.calculateAverage = function(rawTimes) {
 
+      if (rawTimes.length < 3) {
+        return self.DNF;
+      }
+
       var times = rawTimes.slice(0);
 
       // remove best and worst time
@@ -176,17 +180,92 @@
 
       var times = rawTimes.slice(0);
 
-      angular.forEach(times, function(rawTime, index) {
-        if (rawTime === self.DNF) {
-          times.splice(index, 1);
+      for (var i = 0; i < times.length; i++) {
+        if (times[i] === self.DNF) {
+          times.splice(i, 1);
         }
-      });
+      }
 
       if (times.length === 0) {
         return self.DNF;
       }
 
       return Number((times.reduce(function(pv, cv) { return pv + cv; }, 0) / times.length).toFixed(0));
+
+    };
+
+    /**
+     * Calculate the best avg, stDev, index
+     * @param rawTimes
+     * @param n
+     * @returns {{index: number, avg: number, stDev: number}}
+     */
+    self.calculateBestAverage = function(rawTimes, n) {
+
+      var currentAvg, bestAvg = self.DNF, index = -1;
+
+      for (var i = 0; i < rawTimes.length - n; i++) {
+        currentAvg = self.calculateAverage(rawTimes.slice(i, i + n));
+        if (currentAvg < bestAvg) {
+          bestAvg = currentAvg;
+          index = i;
+        }
+      }
+
+      return {
+        index: index,
+        avg: bestAvg,
+        stDev: bestAvg !== self.DNF ? self.calculateStandardDeviation(rawTimes.slice(index, index + n), true) : -1
+      };
+
+    };
+
+    /**
+     *
+     * @param rawTimes
+     * @param n
+     * @returns {number}
+     */
+    self.calculateBestMean = function(rawTimes, n) {
+
+      var currentMean, bestMean = self.DNF, index = -1;
+
+      for (var i = 0; i < rawTimes.length - n; i++) {
+        currentMean = self.calculateMean(rawTimes.slice(i, i + n));
+        if (currentMean < bestMean) {
+          bestMean = currentMean;
+          index = i;
+        }
+      }
+
+      return {
+        index: index,
+        mean: bestMean,
+        stDev: bestMean !== self.DNF ? self.calculateStandardDeviation(rawTimes.slice(index, index + n), false) : -1
+      };
+
+    };
+
+    /**
+     * Calculate the standard deviation.
+     * @param rawTimes
+     * @param trimmed
+     * @returns {number}
+     */
+    self.calculateStandardDeviation = function(rawTimes, trimmed) {
+
+      var times = rawTimes.slice(0);
+
+      if (trimmed) {
+        times.splice(times.indexOf(Math.min.apply(null, times)), 1);
+        times.splice(times.indexOf(Math.max.apply(null, times)), 1);
+      }
+
+      var avg = self.calculateMean(times);
+
+      var squareDiffs = times.map(function(time) { return Math.pow(time - avg, 2); });
+
+      return Math.sqrt(self.calculateMean(squareDiffs));
 
     };
 
@@ -199,9 +278,9 @@
 
       var rawTimes = [];
 
-      angular.forEach(results, function(result) {
-        rawTimes.push(result.rawTime);
-      });
+      for (var i = 0; i < results.length; i++) {
+        rawTimes.push(results[i].rawTime);
+      }
 
       return rawTimes;
 
@@ -215,19 +294,15 @@
     self.countNonDNFs = function(rawTimes) {
 
       var count = 0;
-      angular.forEach(rawTimes, function(rawTime) {
-        count = rawTime !== self.DNF ? count + 1 : count;
-      });
+
+      for (var i = 0; i< rawTimes.length; i++) {
+        if (rawTimes[i] !== self.DNF) {
+          count += 1;
+        }
+      }
+
       return count;
 
-    };
-
-    /**
-     * Returns DNF value for other services to use.
-     * @returns {number}
-     */
-    self.getDNF = function() {
-      return self.DNF;
     };
 
     /**
@@ -239,6 +314,10 @@
 
       if (timeString === 'DNF') {
         return self.DNF;
+      }
+
+      if (timeString === 'N/A') {
+        return -1;
       }
 
       var res = timeString.split(':');
@@ -267,28 +346,21 @@
         return 'DNF';
       }
 
-      var time = moment(timeMilliseconds);
+      if (timeMilliseconds < 0) {
+        return 'N/A';
+      }
 
-      if (precision === 2) {
-        if (timeMilliseconds < 10000) {
-          return time.format('s.SS');
-        } else if (timeMilliseconds < 60000) {
-          return time.format('ss.SS');
-        } else if (timeMilliseconds < 3600000) {
-          return time.format('m:ss.SS');
-        } else {
-          return time.utc().format('H:mm:ss.SS');
-        }
+      var time = moment(timeMilliseconds);
+      var ms = precision === 2 ? 'SS' : 'SSS';
+
+      if (timeMilliseconds < 10000) {
+        return time.format('s.' + ms);
+      } else if (timeMilliseconds < 60000) {
+        return time.format('ss.' + ms);
+      } else if (timeMilliseconds < 3600000) {
+        return time.format('m:ss.' + ms);
       } else {
-        if (timeMilliseconds < 10000) {
-          return time.format('s.SSS');
-        } else if (timeMilliseconds < 60000) {
-          return time.format('ss.SSS');
-        } else if (timeMilliseconds < 3600000) {
-          return time.format('m:ss.SSS');
-        } else {
-          return time.utc().format('H:mm:ss.SSS');
-        }
+        return time.utc().format('H:mm:ss.' + ms);
       }
 
     };
@@ -841,7 +913,7 @@
 
     var self = this;
 
-    var DNF = Calculator.getDNF();
+    var DNF = Calculator.DNF;
 
     /**
      * Gets results for the session.
@@ -1300,17 +1372,19 @@
 
   'use strict';
 
-  function StatisticsController($scope, StatisticsService) {
+  function StatisticsController($scope, StatisticsService, Events) {
 
     var self = this;
-    
+
+    self.event = Events.getEvent($scope.eventId);
+
     $scope.$watch('results', function() {
       self.statistics = StatisticsService.getStatistics($scope.results);
     });
 
   }
 
-  angular.module('statistics').controller('StatisticsController', ['$scope', 'StatisticsService', StatisticsController]);
+  angular.module('statistics').controller('StatisticsController', ['$scope', 'StatisticsService', 'Events', StatisticsController]);
 
 })();
 
@@ -1324,7 +1398,7 @@
 
     self.getStatistics = function(results) {
 
-      var rawTimes = Calculator.extractRawTimes(results);
+      var best, rawTimes = Calculator.extractRawTimes(results);
 
       var statistics = {
         solves: {
@@ -1333,43 +1407,49 @@
           best: Calculator.convertTimeFromMillisecondsToString(Math.min.apply(null, rawTimes)),
           worst: Calculator.convertTimeFromMillisecondsToString(Math.max.apply(null, rawTimes))
         },
-        sessionMean: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateSessionMean(rawTimes)),
-        sessionAvg: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateAverage(rawTimes))
+        sessionMean: {
+          mean: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateSessionMean(rawTimes)),
+          stDev: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateStandardDeviation(rawTimes, false))
+        },
+        sessionAvg: {
+          avg: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateAverage(rawTimes)),
+          stDev: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateStandardDeviation(rawTimes, true))
+        },
+        averages: []
       };
 
       if (rawTimes.length >= 3) {
-        statistics.mo3 = {
-          current: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateMean(rawTimes.slice(rawTimes.length - 5, rawTimes.length - 2))),
-          best: ''
-        };
+        best = Calculator.calculateBestMean(rawTimes, 3);
+        statistics.averages.push({
+          type: 'mo3',
+          current: {
+            avg: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateMean(rawTimes.slice(rawTimes.length - 3, rawTimes.length))),
+            stDev: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateStandardDeviation(rawTimes.slice(rawTimes.length - 3, rawTimes.length), false))
+          },
+          best: {
+            avg: Calculator.convertTimeFromMillisecondsToString(best.mean),
+            stDev: Calculator.convertTimeFromMillisecondsToString(best.stDev)
+          }
+        });
       }
 
-      if (rawTimes.length >= 5) {
-        statistics.avg5 = {
-          current: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateAverage(rawTimes.slice(rawTimes.length - 7, rawTimes.length - 2))),
-          best: ''
-        };
-      }
+      var typesOfAverages = [5, 12, 50, 100];
 
-      if (rawTimes.length >= 12) {
-        statistics.avg12 = {
-          current: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateAverage(rawTimes.slice(rawTimes.length - 14, rawTimes.length - 2))),
-          best: ''
-        };
-      }
-
-      if (rawTimes.length >= 50) {
-        statistics.avg50 = {
-          current: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateAverage(rawTimes.slice(rawTimes.length - 52, rawTimes.length - 2))),
-          best: ''
-        };
-      }
-
-      if (rawTimes.length >= 100) {
-        statistics.avg100 = {
-          current: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateAverage(rawTimes.slice(rawTimes.length - 102, rawTimes.length - 2))),
-          best: ''
-        };
+      for (var i = 0; i < typesOfAverages.length; i++) {
+        if (rawTimes.length >= typesOfAverages[i]) {
+          best = Calculator.calculateBestAverage(rawTimes, typesOfAverages[i]);
+          statistics.averages.push({
+            type: 'avg' + typesOfAverages[i],
+            current: {
+              avg: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateAverage(rawTimes.slice(rawTimes.length - typesOfAverages[i], rawTimes.length))),
+              stDev: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateStandardDeviation(rawTimes.slice(rawTimes.length - typesOfAverages[i], rawTimes.length), true))
+            },
+            best: {
+              avg: Calculator.convertTimeFromMillisecondsToString(best.avg),
+              stDev: Calculator.convertTimeFromMillisecondsToString(best.stDev)
+            }
+          });
+        }
       }
 
       return statistics;
