@@ -17,7 +17,7 @@
       }
     });
 
-    self.openModal = function(index, avg, numberOfResults) {
+    self.openModal = function(index, numberOfResults) {
       if (index >= numberOfResults) {
         $uibModal.open({
           animation: true,
@@ -26,13 +26,8 @@
           controllerAs: 'ctrl',
           size: 'md',
           resolve: {
-            data: function () {
-              return {
-                index: index,
-                numberOfResults: numberOfResults,
-                results: $scope.results,
-                avg: avg
-              };
+            results: function () {
+              return $scope.results.slice(index - numberOfResults, index);
             }
           }
         });

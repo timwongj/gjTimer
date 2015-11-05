@@ -118,6 +118,9 @@
 #resultsModal .li-results {
   margin-bottom: .125em;
 }
+#resultsModal .date {
+  font-weight: 300;
+}
 .popover-title,
 .popover-content {
   padding: .5em;
@@ -157,7 +160,7 @@
   padding: .125em;
 }
 #statistics table {
-  margin-top: .5em;
+  margin: .5em 0;
 }
 #statistics table td,
 #statistics table th {

@@ -2,43 +2,32 @@
 
   'use strict';
 
-  function ResultsModalService() {
+  function ResultsModalService(Calculator) {
 
     var self = this;
 
     /**
      * Get results for the results modal.
      * @param results
-     * @param index
-     * @param numberOfResults
-     * @returns [Object] - modalResults
+     * @returns [Object] - results
      */
-    self.getModalResults = function(results, index, numberOfResults) {
+    self.getModalResults = function(results) {
 
-      var rawTimes = [], PLUS_TWO = 2000, DNF = 2147485547, modalResults = results.slice(index - numberOfResults, index);
+      var rawTimes = Calculator.extractRawTimes(results);
 
-      // add penalties
-      angular.forEach(modalResults, function(result) {
+      results[rawTimes.indexOf(Math.min.apply(null, rawTimes))].min = true;
+      results[rawTimes.indexOf(Math.max.apply(null, rawTimes))].max = true;
 
-        if (result.penalty === 'DNF') {
-          rawTimes.push(DNF);
-        } else if (result.penalty === '+2') {
-          rawTimes.push(result.time + PLUS_TWO);
-        } else {
-          rawTimes.push(result.time);
-        }
-
-      });
-
-      modalResults[rawTimes.indexOf(Math.min.apply(null, rawTimes))].min = true;
-      modalResults[rawTimes.indexOf(Math.max.apply(null, rawTimes))].max = true;
-
-      return modalResults;
+      return {
+        results: results,
+        avg: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateAverage(rawTimes)),
+        stDev: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateStandardDeviation(rawTimes, true))
+      };
 
     };
 
   }
 
-  angular.module('results').service('ResultsModalService', ResultsModalService);
+  angular.module('results').service('ResultsModalService', ['Calculator', ResultsModalService]);
 
 })();

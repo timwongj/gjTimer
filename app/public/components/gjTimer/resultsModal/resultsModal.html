@@ -3,11 +3,14 @@
     <button type="button" class="close" ng-click="ctrl.close()">
       <span aria-hidden="true" class="btn-close">&times;</span>
     </button>
-    <h4 class="modal-title" ng-bind="ctrl.title"></h4>
+    <h4 class="modal-title">
+      <span ng-bind="ctrl.results.avg + ' average of ' + ctrl.results.results.length"></span>
+      <span ng-if="ctrl.results.stDev !== 'N/A'">&nbsp;(&rho;={{ctrl.results.stDev}})</span>
+    </h4>
   </div>
   <div class="modal-body">
     <ol class="ol-results">
-      <li class="li-results" ng-repeat="result in ctrl.results">
+      <li class="li-results" ng-repeat="result in ctrl.results.results">
         <span ng-if="(result.min !== undefined) || (result.max !== undefined)" ng-bind="'(' + result.detailedTime + ')'"></span>
         <span ng-if="(result.min === undefined) && (result.max === undefined)" ng-bind="result.detailedTime"></span>
         <span ng-bind="' - ' + result.scramble"></span>
@@ -16,6 +19,6 @@
     </ol>
   </div>
   <div class="modal-footer">
-    <span ng-bind="ctrl.results[ctrl.results.length - 1].date"></span>
+    <span class="date" ng-bind="ctrl.results.results[ctrl.results.results.length - 1].date"></span>
   </div>
 </div>
