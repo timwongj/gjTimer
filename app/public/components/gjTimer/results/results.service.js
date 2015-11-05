@@ -6,6 +6,8 @@
 
     var self = this;
 
+    var DNF = Calculator.DNF;
+
     /**
      * Gets results for the session.
      * @param sessionId
@@ -30,33 +32,42 @@
         if (res[0].substring(res[0].length - 1, res[0].length) === '+') {
           result.time = Number(res[0].substring(0, res[0].length - 1));
           result.penalty = '+2';
+          result.rawTime = Number((result.time + 2000).toFixed());
           result.displayedTime = Calculator.convertTimeFromMillisecondsToString(Number(res[0].substring(0, res[0].length - 1)) + 2000, precision) + '+';
           result.detailedTime = Calculator.convertTimeFromMillisecondsToString(Number(res[0].substring(0, res[0].length - 1)) + 2000, precision) + '+';
         } else if (res[0].substring(res[0].length - 1, res[0].length) === '-') {
           result.time = Number(res[0].substring(0, res[0].length - 1));
           result.penalty = 'DNF';
+          result.rawTime = DNF;
           result.displayedTime = 'DNF';
           result.detailedTime = 'DNF(' + Calculator.convertTimeFromMillisecondsToString(Number(res[0].substring(0, res[0].length - 1)), precision) + ')';
         } else {
           result.time = Number(res[0]);
           result.penalty = '';
+          result.rawTime = result.time;
           result.displayedTime = Calculator.convertTimeFromMillisecondsToString(Number(res[0]), precision);
           result.detailedTime = Calculator.convertTimeFromMillisecondsToString(Number(res[0]), precision);
         }
 
+        results.push(result);
+
+      });
+
+      var rawTimes = Calculator.extractRawTimes(results);
+
+      angular.forEach(results, function(result, index) {
+
         if (index >= 4) {
-          result.avg5 = Calculator.convertTimeFromMillisecondsToString(Calculator.calculateAverage(results.slice(index - 4, index + 1)), precision);
+          result.avg5 = Calculator.convertTimeFromMillisecondsToString(Calculator.calculateAverage(rawTimes.slice(index - 4, index + 1)), precision);
         } else {
           result.avg5 = 'DNF';
         }
 
         if (index >= 11) {
-          result.avg12 = Calculator.convertTimeFromMillisecondsToString(Calculator.calculateAverage(results.slice(index - 11, index + 1)), precision);
+          result.avg12 = Calculator.convertTimeFromMillisecondsToString(Calculator.calculateAverage(rawTimes.slice(index - 11, index + 1)), precision);
         } else {
           result.avg12 = 'DNF';
         }
-
-        results.push(result);
 
       });
 

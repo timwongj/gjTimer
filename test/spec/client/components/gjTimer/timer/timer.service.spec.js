@@ -5,6 +5,7 @@
   var TimerService,
     LocalStorage,
     Calculator,
+    moment,
     precision,
     time,
     timeString,

@@ -1,3 +1,41 @@
 <div id="statistics">
-  <h4>Statistics</h4>
+  <div>
+    <span class="stat" ng-bind="ctrl.event + ': ' + ctrl.statistics.solves.solved + '/' + ctrl.statistics.solves.attempted"></span>
+  </div>
+  <div>
+    <span class="stat" ng-bind="'Best: ' + ctrl.statistics.solves.best"></span>
+    <span class="stat" ng-bind="'Worst: ' + ctrl.statistics.solves.worst"></span>
+  </div>
+  <div>
+    <span class="stat" ng-bind="'Mean: ' + ctrl.statistics.sessionMean.mean"></span>
+    <span class="stat" ng-if="ctrl.statistics.sessionMean.stDev !== 'N/A'">&nbsp;(&rho;={{ctrl.statistics.sessionMean.stDev}})</span>
+  </div>
+  <div>
+    <span class="stat" ng-bind="'Avg: ' + ctrl.statistics.sessionAvg.avg"></span>
+    <span class="stat" ng-if="ctrl.statistics.sessionAvg.stDev !== 'N/A'">&nbsp;(&rho;={{ctrl.statistics.sessionAvg.stDev}})</span>
+  </div>
+  <table class="table table-bordered">
+    <thead>
+    <tr>
+      <th></th>
+      <th>Current</th>
+      <th>Best</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="average in ctrl.statistics.averages">
+      <td>
+        <span ng-bind="average.type"></span>
+      </td>
+      <td>
+        <span ng-bind="average.current.avg"></span>
+        <span ng-if="average.current.stDev !== 'N/A'">&nbsp;(&rho;={{average.current.stDev}})</span>
+      </td>
+      <td>
+        <span ng-bind="average.best.avg"></span>
+        <span ng-if="average.best.stDev !== 'N/A'">&nbsp;(&rho;={{average.best.stDev}})</span>
+      </td>
+    </tr>
+    </tbody>
+  </table>
 </div>

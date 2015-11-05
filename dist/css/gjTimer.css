@@ -156,6 +156,16 @@
   margin: .125em;
   padding: .125em;
 }
+#statistics table {
+  margin-top: .5em;
+}
+#statistics table td,
+#statistics table th {
+  padding: .25em;
+}
+#statistics .stat {
+  font-weight: 500;
+}
 #timer {
   text-align: center;
 }
