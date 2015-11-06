@@ -152,7 +152,7 @@
 
       var squareDiffs = times.map(function(time) { return Math.pow(time - avg, 2); });
 
-      return Math.sqrt(self.calculateMean(squareDiffs));
+      return Number(Math.sqrt(self.calculateMean(squareDiffs)).toFixed(0));
 
     };
 
