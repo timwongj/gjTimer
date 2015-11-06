@@ -67,7 +67,10 @@
         return self.DNF;
       }
 
-      return Number((times.reduce(function(pv, cv) { return pv + cv; }, 0) / times.length).toFixed(0));
+      return {
+        mean: Number((times.reduce(function(pv, cv) { return pv + cv; }, 0) / times.length).toFixed(0)),
+        stDev: self.calculateStandardDeviation(times, false)
+      };
 
     };
 

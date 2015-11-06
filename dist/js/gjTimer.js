@@ -194,7 +194,10 @@
         return self.DNF;
       }
 
-      return Number((times.reduce(function(pv, cv) { return pv + cv; }, 0) / times.length).toFixed(0));
+      return {
+        mean: Number((times.reduce(function(pv, cv) { return pv + cv; }, 0) / times.length).toFixed(0)),
+        stDev: self.calculateStandardDeviation(times, false)
+      };
 
     };
 
@@ -1505,6 +1508,7 @@
 
       var best, rawTimes = Calculator.extractRawTimes(results);
 
+      var sessionMean = Calculator.calculateSessionMean(rawTimes);
       var statistics = {
         solves: {
           attempted: rawTimes.length,
@@ -1513,8 +1517,8 @@
           worst: Calculator.convertTimeFromMillisecondsToString(Math.max.apply(null, rawTimes))
         },
         sessionMean: {
-          mean: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateSessionMean(rawTimes)),
-          stDev: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateStandardDeviation(rawTimes, false))
+          mean: Calculator.convertTimeFromMillisecondsToString(sessionMean.mean),
+          stDev: Calculator.convertTimeFromMillisecondsToString(sessionMean.stDev)
         },
         sessionAvg: {
           avg: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateAverage(rawTimes)),
