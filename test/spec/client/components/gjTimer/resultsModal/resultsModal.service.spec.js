@@ -4,11 +4,11 @@
 
   describe('The resultsModal service', function() {
 
-    it('should dose gj', function() {
+    beforeEach(module('gjTimer'));
 
-      expect('gj').toEqual('gj');
+    beforeEach(inject(function($injector) {
 
-    });
+    }));
 
   });
 

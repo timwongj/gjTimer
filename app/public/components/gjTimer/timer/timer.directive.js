@@ -13,7 +13,8 @@
         scramble: '=',
         sessionId: '=',
         settings: '='
-      }
+      },
+      bindToController: true
     };
   }
 

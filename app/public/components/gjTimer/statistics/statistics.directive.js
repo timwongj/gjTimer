@@ -8,9 +8,10 @@
       templateUrl: 'dist/components/gjTimer/statistics/statistics.html',
       controller: 'StatisticsController',
       controllerAs: 'ctrl',
-      scopeId: {
+      scope: {
         results: '='
-      }
+      },
+      bindToController: true
     };
   }
 

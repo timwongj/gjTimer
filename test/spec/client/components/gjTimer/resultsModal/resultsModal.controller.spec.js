@@ -4,11 +4,11 @@
 
   describe('The resultsModal controller', function() {
 
-    it('should dose gj', function() {
+    beforeEach(module('results'));
 
-      expect('gj').toEqual('gj');
+    beforeEach(inject(function($injector) {
 
-    });
+    }));
 
   });
 

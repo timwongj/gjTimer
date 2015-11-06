@@ -568,9 +568,8 @@
       templateUrl: 'dist/components/gjTimer/cub/cub.html',
       controller: 'CubController',
       controllerAs: 'ctrl',
-      scope: {
-        eventId: '='
-      }
+      scope: true,
+      bindToController: true
     };
   }
 
@@ -647,7 +646,8 @@
         eventId: '=',
         sessionId: '=',
         settings: '='
-      }
+      },
+      bindToController: true
     };
   }
 
@@ -663,13 +663,13 @@
 
     var self = this;
 
+    self.settings = MenuBarService.initSettings();
     self.sessions = MenuBarService.initSessions();
     self.session = MenuBarService.initSession();
     self.events = Events.getEvents();
     self.event = { eventId: self.session.eventId, event: Events.getEvent(self.session.eventId) };
-    $scope.sessionId = self.session.sessionId;
-    $scope.eventId = self.session.eventId;
-    $scope.settings = MenuBarService.getSettings();
+    self.sessionId = self.session.sessionId;
+    self.eventId = self.session.eventId;
 
     self.showDetails = window.innerWidth > 500;
     $(window).resize(function(){
@@ -680,28 +680,28 @@
     // TODO - find a better solution to waiting for controllers to initialize before broadcasting
     // The cutoff for successful broadcast is ~15-20ms, so 50 should be sufficient for now.
     $timeout(function() {
-      $rootScope.$broadcast('new scramble', $scope.eventId);
+      $rootScope.$broadcast('new scramble', self.eventId);
     }, 50);
 
     self.changeSession = function(sessionId) {
       self.session = MenuBarService.changeSession(sessionId);
-      $scope.sessionId = sessionId;
-      $scope.eventId = self.session.eventId;
+      self.sessionId = sessionId;
+      self.eventId = self.session.eventId;
       $rootScope.$broadcast('refresh results', sessionId);
       if (self.event.eventId !== self.session.eventId) {
-        $rootScope.$broadcast('new scramble', $scope.eventId);
+        $rootScope.$broadcast('new scramble', self.eventId);
       }
-      self.event = { eventId: $scope.eventId, event: Events.getEvent($scope.eventId) };
+      self.event = { eventId: self.eventId, event: Events.getEvent(self.eventId) };
     };
 
     self.changeEvent = function(event) {
-      $scope.eventId = MenuBarService.changeEvent($scope.sessionId, Events.getEventId(event));
-      self.session.eventId = $scope.eventId;
-      self.event = { eventId: $scope.eventId, event: Events.getEvent($scope.eventId) };
-      $rootScope.$broadcast('new scramble', $scope.eventId);
+      self.eventId = MenuBarService.changeEvent(self.sessionId, Events.getEventId(event));
+      self.session.eventId = self.eventId;
+      self.event = { eventId: self.eventId, event: Events.getEvent(self.eventId) };
+      $rootScope.$broadcast('new scramble', self.eventId);
     };
 
-    self.settings = function() {
+    self.openSettings = function() {
       $uibModal.open({
         animation: true,
         templateUrl: 'dist/components/gjTimer/settings/settings.html',
@@ -710,16 +710,16 @@
         size: 'md',
         resolve: {
           settings: function () {
-            return $scope.settings;
+            return self.settings;
           }
         }
       });
     };
 
     self.resetSession = function() {
-      if (confirm('Are you sure you want to reset ' + $scope.sessionId + '?')) {
-        self.session = MenuBarService.resetSession($scope.sessionId);
-        $rootScope.$broadcast('refresh results', $scope.sessionId);
+      if (confirm('Are you sure you want to reset ' + self.sessionId + '?')) {
+        self.session = MenuBarService.resetSession(self.sessionId);
+        $rootScope.$broadcast('refresh results', self.sessionId);
       }
     };
 
@@ -746,6 +746,36 @@
       resultsPrecision: 2,
       timerPrecision: 3,
       timerRefreshInterval: 50
+    };
+
+    /**
+     * Gets settings from local storage or initializes it if it doesn't exist.
+     * @returns {*}
+     */
+    self.initSettings = function() {
+      var settings = LocalStorage.getJSON('settings');
+      if (settings === null) {
+        LocalStorage.setJSON('settings', DEFAULT_SETTINGS);
+        return DEFAULT_SETTINGS;
+      } else {
+        for (var key in DEFAULT_SETTINGS) {
+          if (DEFAULT_SETTINGS.hasOwnProperty(key)) {
+            if (!settings.hasOwnProperty(key)) {
+              settings[key] = DEFAULT_SETTINGS[key];
+              LocalStorage.setJSON('settings', settings);
+            }
+          }
+        }
+        return settings;
+      }
+    };
+
+    /**
+     * Saves settings.
+     * @param settings
+     */
+    self.saveSettings = function(settings) {
+      LocalStorage.setJSON('settings', settings);
     };
 
     /**
@@ -839,28 +869,9 @@
 
     };
 
-    self.getSettings = function() {
-      var settings = LocalStorage.getJSON('settings');
-      if (settings === null) {
-        LocalStorage.setJSON('settings', DEFAULT_SETTINGS);
-        return DEFAULT_SETTINGS;
-      } else {
-        for (var key in DEFAULT_SETTINGS) {
-          if (DEFAULT_SETTINGS.hasOwnProperty(key)) {
-            if (!settings.hasOwnProperty(key)) {
-              settings[key] = DEFAULT_SETTINGS[key];
-              LocalStorage.setJSON('settings', settings);
-            }
-          }
-        }
-        return settings;
-      }
-    };
-
-    self.saveSettings = function(settings) {
-      LocalStorage.setJSON('settings', settings);
-    };
-
+    /**
+     * Resets everything.
+     */
     self.resetAll = function() {
       LocalStorage.clear();
     };
@@ -885,7 +896,8 @@
         results: '=',
         sessionId: '=',
         settings: '='
-      }
+      },
+      bindToController: true
     };
   }
 
@@ -901,12 +913,10 @@
 
     var self = this;
 
-    $scope.results = ResultsService.getResults($scope.sessionId, $scope.settings.resultsPrecision);
-    self.results = $scope.results;
+    self.results = ResultsService.getResults(self.sessionId, self.settings.resultsPrecision);
 
     $scope.$on('refresh results', function($event, sessionId) {
-      $scope.results = ResultsService.getResults(sessionId || $scope.sessionId, $scope.settings.resultsPrecision);
-      self.results = $scope.results;
+      self.results = ResultsService.getResults(sessionId || self.sessionId, self.settings.resultsPrecision);
       if ($scope.$root.$$phase != '$apply' && $scope.$root.$$phase != '$digest') {
         $scope.$apply();
       }
@@ -922,7 +932,7 @@
           size: 'lg',
           resolve: {
             results: function () {
-              return $scope.results.slice(index - numberOfResults, index);
+              return self.results.slice(index - numberOfResults, index);
             }
           }
         });
@@ -1078,9 +1088,49 @@
 
   'use strict';
 
-  function resultsPopoverDirective($rootScope, $timeout, $http, $q, $templateCache, ResultsService) {
+  function resultsPopoverDirective($rootScope, $timeout, $http, $q, $templateCache) {
 
-    var getTemplate = function() {
+    return {
+      restrict: 'E',
+      scope: {
+        index: '=',
+        result: '=',
+        sessionId: '='
+      },
+      controller: 'ResultsPopoverController',
+      controllerAs: 'ctrl',
+      bindToController: true,
+      link: link
+    };
+
+    function link (scope, element) {
+      getTemplate().then(function(content) {
+        $rootScope.insidePopover = -1;
+        $(element).popover({
+          animation: false,
+          content: content,
+          html: true,
+          placement: 'right',
+          title: scope.ctrl.result.detailedTime
+        });
+        $(element).bind('mouseenter', function () {
+          scope.ctrl.insideDiv = scope.ctrl.index;
+          $timeout(function() {
+            $(element).popover('show');
+            scope.ctrl.attachEvents(element);
+          }, 1);
+        });
+        $(element).bind('mouseleave', function () {
+          scope.ctrl.insideDiv = -1;
+          $timeout(function() {
+            if ($rootScope.insidePopover !== scope.ctrl.index)
+              $(element).popover('hide');
+          }, 1);
+        });
+      });
+    }
+
+    function getTemplate() {
       var def = $q.defer(), template = $templateCache.get('dist/components/gjTimer/resultsPopover/resultsPopover.html');
       if (typeof template === "undefined") {
         $http.get('dist/components/gjTimer/resultsPopover/resultsPopover.html')
@@ -1092,94 +1142,56 @@
         def.resolve(template);
       }
       return def.promise;
-    };
-
-    return {
-      restrict: 'E',
-      scope: {
-        index: '=',
-        result: '=',
-        sessionId: '='
-      },
-      controller: 'ResultsPopoverController',
-      controllerAs: 'ctrl',
-      link: function (scope, element, attrs) {
-        getTemplate().then(function(content) {
-          scope.popoverDelay = 1; // just needs to be at least 1
-          $rootScope.insidePopover = -1;
-          $(element).popover({
-            animation: false,
-            content: content,
-            html: true,
-            placement: 'right',
-            title: scope.result.detailedTime
-          });
-          $(element).bind('mouseenter', function () {
-            scope.insideDiv = scope.index;
-            $timeout(function() {
-              $(element).popover('show');
-              scope.attachEvents(element);
-            }, scope.popoverDelay);
-          });
-          $(element).bind('mouseleave', function () {
-            scope.insideDiv = -1;
-            $timeout(function() {
-              if ($rootScope.insidePopover !== scope.index)
-                $(element).popover('hide');
-            }, scope.popoverDelay);
-          });
-        });
-      }
-    };
+    }
 
   }
 
-  angular.module('results').directive('resultsPopover', ['$rootScope', '$timeout', '$http', '$q', '$templateCache', 'ResultsService', resultsPopoverDirective]);
+  angular.module('results').directive('resultsPopover', ['$rootScope', '$timeout', '$http', '$q', '$templateCache', resultsPopoverDirective]);
 
 })();
 (function() {
 
   'use strict';
 
-  function ResultsPopoverController($scope, $rootScope, $timeout, ResultsPopoverService) {
+  function ResultsPopoverController($rootScope, $timeout, ResultsPopoverService) {
 
     var self = this;
 
-    $scope.attachEvents = function (element) {
+    self.attachEvents = function (element) {
 
       $('.popover').on('mouseenter', function () {
-        $rootScope.insidePopover = $scope.index;
+        $rootScope.insidePopover = self.index;
       }).on('mouseleave', function () {
         $rootScope.insidePopover = -1;
         $timeout(function() {
-          if ($scope.insideDiv !== $scope.index) {
+          if (self.insideDiv !== self.index) {
             $(element).popover('hide');
           }
-        }, $scope.popoverDelay);
+        }, 1);
       });
 
       $('.popover-btn-penalty-ok').on('click', function() {
-        ResultsPopoverService.penalty($scope.sessionId, $scope.index, '');
-        $rootScope.$broadcast('refresh results', $scope.sessionId);
+        ResultsPopoverService.penalty(self.sessionId, self.index, '');
+        $rootScope.$broadcast('refresh results');
         $(element).popover('hide');
       });
 
       $('.popover-btn-penalty-plus').on('click', function() {
-        ResultsPopoverService.penalty($scope.sessionId, $scope.index, '+2');
-        $rootScope.$broadcast('refresh results', $scope.sessionId);
+        ResultsPopoverService.penalty(self.sessionId, self.index, '+2');
+        $rootScope.$broadcast('refresh results');
         $(element).popover('hide');
       });
 
       $('.popover-btn-penalty-dnf').on('click', function() {
-        ResultsPopoverService.penalty($scope.sessionId, $scope.index, 'DNF');
-        $rootScope.$broadcast('refresh results', $scope.sessionId);
+        ResultsPopoverService.penalty(self.sessionId, self.index, 'DNF');
+        $rootScope.$broadcast('refresh results');
         $(element).popover('hide');
       });
 
       $('.popover-btn-remove').on('click', function() {
         if (confirm('Are you sure you want to delete this time?')) {
-          ResultsPopoverService.remove($scope.sessionId, $scope.index);
-          $rootScope.$broadcast('refresh results', $scope.sessionId);
+          ResultsPopoverService.remove(self.sessionId, self.index);
+          $rootScope.$broadcast('refresh results');
         }
         $(element).popover('hide');
       });
@@ -1188,7 +1200,7 @@
 
   }
 
-  angular.module('results').controller('ResultsPopoverController', ['$scope', '$rootScope', '$timeout', 'ResultsPopoverService', ResultsPopoverController]);
+  angular.module('results').controller('ResultsPopoverController', ['$rootScope', '$timeout', 'ResultsPopoverService', ResultsPopoverController]);
 
 })();
 
@@ -1275,7 +1287,8 @@
       scope: {
         eventId: '=',
         scramble: '='
-      }
+      },
+      bindToController: true
     };
   }
 
@@ -1293,8 +1306,8 @@
 
     $scope.$on('new scramble', function($event, eventId) {
 
-      $scope.scramble = ScrambleService.getNewScramble(eventId);
-      self.scramble = $sce.trustAsHtml($scope.scramble);
+      self.scramble = ScrambleService.getNewScramble(eventId);
+      self.displayedScramble = $sce.trustAsHtml(self.scramble);
       self.scrambleStyle = Events.getEventStyle(eventId);
       $rootScope.$broadcast('draw scramble', eventId, ScrambleService.getScrambleState());
 
@@ -1401,9 +1414,10 @@
       templateUrl: 'dist/components/gjTimer/statistics/statistics.html',
       controller: 'StatisticsController',
       controllerAs: 'ctrl',
-      scopeId: {
+      scope: {
         results: '='
-      }
+      },
+      bindToController: true
     };
   }
 
@@ -1419,13 +1433,15 @@
 
     var self = this;
 
-    $scope.$watch('results', function() {
-      self.statistics = StatisticsService.getStatistics($scope.results);
+    $scope.$watch(function() {
+      return self.results;
+    }, function() {
+      self.statistics = StatisticsService.getStatistics(self.results);
     });
 
     self.openModal = function(format, $index) {
       var length = self.statistics.averages[$index].length;
-      var index = format === 'best' ? self.statistics.averages[$index].best.index : $scope.results.length - length;
+      var index = format === 'best' ? self.statistics.averages[$index].best.index : self.results.length - length;
       $uibModal.open({
         animation: true,
         templateUrl: 'dist/components/gjTimer/resultsModal/resultsModal.html',
@@ -1434,7 +1450,7 @@
         size: 'lg',
         resolve: {
           results: function() {
-            return $scope.results.slice(index, index + length);
+            return self.results.slice(index, index + length);
           }
         }
       });
@@ -1537,7 +1553,8 @@
         scramble: '=',
         sessionId: '=',
         settings: '='
-      }
+      },
+      bindToController: true
     };
   }
 
@@ -1553,7 +1570,7 @@
 
     var self = this, timer, state = 'reset', SPACE_BAR_KEY_CODE = 32;
 
-    self.time = $scope.settings.timerPrecision === 2 ? moment(0).format('s.SS') : moment(0).format('s.SSS');
+    self.time = self.settings.timerPrecision === 2 ? moment(0).format('s.SS') : moment(0).format('s.SSS');
 
     var STYLES = {
       BLACK: { 'color': '#000000' },
@@ -1562,13 +1579,13 @@
     };
 
     $scope.$on('refresh settings', function() {
-      self.time = $scope.settings.timerPrecision === 2 ? moment(0).format('s.SS') : moment(0).format('s.SSS');
+      self.time = self.settings.timerPrecision === 2 ? moment(0).format('s.SS') : moment(0).format('s.SSS');
     });
 
     $scope.$on('keydown', function($event, event) {
       if ((state === 'reset') && (event.keyCode === SPACE_BAR_KEY_CODE)) {
         state = 'keydown';
-        self.time = $scope.settings.timerPrecision === 2 ? moment(0).format('s.SS') : moment(0).format('s.SSS');
+        self.time = self.settings.timerPrecision === 2 ? moment(0).format('s.SS') : moment(0).format('s.SSS');
         self.timerStyle = STYLES.RED;
         $timeout(function() {
           if (state === 'keydown') {
@@ -1576,14 +1593,14 @@
             self.timerStyle = STYLES.GREEN;
             $rootScope.$broadcast('timer focus');
           }
-        }, $scope.settings.timerStartDelay);
+        }, self.settings.timerStartDelay);
       } else if (state === 'timing') {
         state = 'stopped';
         $interval.cancel(timer);
         $rootScope.$broadcast('timer unfocus');
-        TimerService.saveResult(self.time, $scope.scramble, $scope.sessionId);
-        $rootScope.$broadcast('refresh results', $scope.sessionId);
-        $rootScope.$broadcast('new scramble', $scope.eventId);
+        TimerService.saveResult(self.time, self.scramble, self.sessionId);
+        $rootScope.$broadcast('refresh results', self.sessionId);
+        $rootScope.$broadcast('new scramble', self.eventId);
       }
     });
 
@@ -1593,14 +1610,14 @@
         state = 'timing';
         TimerService.startTimer();
         timer = $interval(function() {
-          self.time = TimerService.getTime($scope.settings.timerPrecision);
-        }, $scope.settings.timerRefreshInterval);
+          self.time = TimerService.getTime(self.settings.timerPrecision);
+        }, self.settings.timerRefreshInterval);
       } else if (state === 'keydown') {
         state = 'reset';
       } else if (state === 'stopped') {
         $timeout(function() {
           state = 'reset';
-        }, $scope.settings.timerStopDelay);
+        }, self.settings.timerStopDelay);
       }
     });
 

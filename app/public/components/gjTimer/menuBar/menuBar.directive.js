@@ -12,7 +12,8 @@
         eventId: '=',
         sessionId: '=',
         settings: '='
-      }
+      },
+      bindToController: true
     };
   }
 

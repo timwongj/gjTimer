@@ -6,12 +6,10 @@
 
     var self = this;
 
-    $scope.results = ResultsService.getResults($scope.sessionId, $scope.settings.resultsPrecision);
-    self.results = $scope.results;
+    self.results = ResultsService.getResults(self.sessionId, self.settings.resultsPrecision);
 
     $scope.$on('refresh results', function($event, sessionId) {
-      $scope.results = ResultsService.getResults(sessionId || $scope.sessionId, $scope.settings.resultsPrecision);
-      self.results = $scope.results;
+      self.results = ResultsService.getResults(sessionId || self.sessionId, self.settings.resultsPrecision);
       if ($scope.$root.$$phase != '$apply' && $scope.$root.$$phase != '$digest') {
         $scope.$apply();
       }
@@ -27,7 +25,7 @@
           size: 'lg',
           resolve: {
             results: function () {
-              return $scope.results.slice(index - numberOfResults, index);
+              return self.results.slice(index - numberOfResults, index);
             }
           }
         });

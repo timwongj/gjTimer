@@ -6,13 +6,15 @@
 
     var self = this;
 
-    $scope.$watch('results', function() {
-      self.statistics = StatisticsService.getStatistics($scope.results);
+    $scope.$watch(function() {
+      return self.results;
+    }, function() {
+      self.statistics = StatisticsService.getStatistics(self.results);
     });
 
     self.openModal = function(format, $index) {
       var length = self.statistics.averages[$index].length;
-      var index = format === 'best' ? self.statistics.averages[$index].best.index : $scope.results.length - length;
+      var index = format === 'best' ? self.statistics.averages[$index].best.index : self.results.length - length;
       $uibModal.open({
         animation: true,
         templateUrl: 'dist/components/gjTimer/resultsModal/resultsModal.html',
@@ -21,7 +23,7 @@
         size: 'lg',
         resolve: {
           results: function() {
-            return $scope.results.slice(index, index + length);
+            return self.results.slice(index, index + length);
           }
         }
       });

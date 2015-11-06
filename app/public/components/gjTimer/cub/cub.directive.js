@@ -8,9 +8,8 @@
       templateUrl: 'dist/components/gjTimer/cub/cub.html',
       controller: 'CubController',
       controllerAs: 'ctrl',
-      scope: {
-        eventId: '='
-      }
+      scope: true,
+      bindToController: true
     };
   }
 
