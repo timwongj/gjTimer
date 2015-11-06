@@ -6,11 +6,11 @@
 
     var self = this;
 
-    $scope.results = ResultsService.getResults($scope.sessionId, $scope.settings.precision);
+    $scope.results = ResultsService.getResults($scope.sessionId, $scope.settings.resultsPrecision);
     self.results = $scope.results;
 
-    $scope.$on('refresh data', function($event, sessionId) {
-      $scope.results = ResultsService.getResults(sessionId, $scope.settings.precision);
+    $scope.$on('refresh results', function($event, sessionId) {
+      $scope.results = ResultsService.getResults(sessionId || $scope.sessionId, $scope.settings.resultsPrecision);
       self.results = $scope.results;
       if ($scope.$root.$$phase != '$apply' && $scope.$root.$$phase != '$digest') {
         $scope.$apply();

@@ -8,6 +8,15 @@
 
     var NUMBER_OF_SESSIONS = 15;
 
+    var DEFAULT_SETTINGS = {
+      input: 'timer',
+      timerStartDelay: 50,
+      timerStopDelay: 50,
+      resultsPrecision: 2,
+      timerPrecision: 3,
+      timerRefreshInterval: 50
+    };
+
     /**
      * Initializes sessions in local storage if they do not exist.
      * @returns [String] - sessionId
@@ -97,6 +106,28 @@
       LocalStorage.setJSON(sessionId, session);
       return session.eventId;
 
+    };
+
+    self.getSettings = function() {
+      var settings = LocalStorage.getJSON('settings');
+      if (settings === null) {
+        LocalStorage.setJSON('settings', DEFAULT_SETTINGS);
+        return DEFAULT_SETTINGS;
+      } else {
+        for (var key in DEFAULT_SETTINGS) {
+          if (DEFAULT_SETTINGS.hasOwnProperty(key)) {
+            if (!settings.hasOwnProperty(key)) {
+              settings[key] = DEFAULT_SETTINGS[key];
+              LocalStorage.setJSON('settings', settings);
+            }
+          }
+        }
+        return settings;
+      }
+    };
+
+    self.saveSettings = function(settings) {
+      LocalStorage.setJSON('settings', settings);
     };
 
   }
