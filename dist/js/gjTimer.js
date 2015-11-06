@@ -219,14 +219,8 @@
      */
     self.calculateSessionMeanAndStandardDeviationString = function(rawTimes, precision) {
 
-      var times = rawTimes.slice(0);
-
       // remove DNFs
-      for (var i = 0; i < times.length; i++) {
-        if (times[i] === self.DNF) {
-          times.splice(i, 1);
-        }
-      }
+      var times = rawTimes.slice(0).filter(function(time) { return time !== self.DNF; });
 
       return {
         mean: self.calculateAverageString(times, false, precision),
@@ -286,14 +280,7 @@
      */
     self.countNonDNFs = function(rawTimes) {
 
-      var count = 0;
-      for (var i = 0; i< rawTimes.length; i++) {
-        if (rawTimes[i] !== self.DNF) {
-          count += 1;
-        }
-      }
-
-      return count;
+      return rawTimes.slice(0).filter(function(time) { return time !== self.DNF; }).length;
 
     };
 
@@ -306,10 +293,6 @@
 
       if (timeString === 'DNF') {
         return self.DNF;
-      }
-
-      if (timeString === 'N/A') {
-        return -1;
       }
 
       var res = timeString.split(':');
@@ -334,11 +317,7 @@
      */
     self.convertTimeFromMillisecondsToString = function(timeMilliseconds, precision) {
 
-      if ((timeMilliseconds < 0) || (timeMilliseconds === Infinity)) {
-        return 'N/A';
-      }
-
-      if (timeMilliseconds === self.DNF) {
+      if ((timeMilliseconds === self.DNF) || (timeMilliseconds < 0) || (timeMilliseconds === Infinity)) {
         return 'DNF';
       }
 
