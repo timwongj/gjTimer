@@ -1,5 +1,5 @@
 @color-jumbotron: #eee;
-@height-section: calc(~"100vh - 4em");
+@height-section-md: calc(~"100vh - 4em");
 @breakpoint-sm: 48em;
 @breakpoint-md: 62em;
 
@@ -12,7 +12,7 @@
 
 .jumbotron-timer, .jumbotron-results, .jumbotron-statistics {
   @media (min-width: @breakpoint-md) {
-    height: @height-section;
+    height: @height-section-md;
   }
   margin-bottom: 0;
   border-radius: 2px !important;
@@ -76,7 +76,7 @@
 }
 
 @height-results: calc(~"100vh - 5.875em");
-@height-results-mobile: 21.5em;
+@height-results-sm: 21.5em;
 
 #results {
 
@@ -88,8 +88,8 @@
     display: block;
     overflow: auto;
     height: @height-results;
-    @media screen and (max-width: 62em) {
-      height: @height-results-mobile;
+    @media screen and (max-width: @breakpoint-md) {
+      height: @height-results-sm;
     }
   }
 
@@ -195,7 +195,7 @@
 
 #settings {
 
-  .modal-header {
+  .modal-header, .modal-body, .modal-footer {
     padding: .5em;
   }
 
@@ -207,16 +207,32 @@
     vertical-align: middle;
   }
 
-  .modal-body {
-    padding: .5em;
+  .setting {
+    margin: .25em;
+  }
+
+  .label-setting {
+    margin: 0 .125em;
+    min-width: 10em;
+    text-align: right;
+  }
+
+  .btn-group {
+    margin: 0 .125em;
   }
 
 }
+
+@height-statistics-sm: 22.0625em;
 
 #statistics {
 
   margin: .125em;
   padding: .125em;
+
+  @media screen and (min-width: @breakpoint-sm) and (max-width: @breakpoint-md) {
+    height: @height-statistics-sm;
+  }
 
   .stat {
     white-space: nowrap;

@@ -12,13 +12,13 @@
     self.event = { eventId: self.session.eventId, event: Events.getEvent(self.session.eventId) };
     $scope.sessionId = self.session.sessionId;
     $scope.eventId = self.session.eventId;
-    $scope.settings = {
-      precision: 2, // 2 digits after decimal
-      timerPrecision: 3, // 3 digits after decimal
-      timerStartDelay: 100, // milliseconds
-      timerStopDelay: 100, // milliseconds
-      timerRefreshInterval: 50 // milliseconds
-    };
+    $scope.settings = MenuBarService.getSettings();
+
+    self.showDetails = true;
+    $(window).resize(function(){
+      self.showDetails = window.innerWidth > 460;
+      $scope.$apply();
+    });
 
     // TODO - find a better solution to waiting for controllers to initialize before broadcasting
     // The cutoff for successful broadcast is ~15-20ms, so 50 should be sufficient for now.
@@ -30,7 +30,7 @@
       self.session = MenuBarService.changeSession(sessionId);
       $scope.sessionId = sessionId;
       $scope.eventId = self.session.eventId;
-      $rootScope.$broadcast('refresh data', sessionId);
+      $rootScope.$broadcast('refresh results', sessionId);
       if (self.event.eventId !== self.session.eventId) {
         $rootScope.$broadcast('new scramble', $scope.eventId);
       }
@@ -62,7 +62,7 @@
     self.resetSession = function() {
       if (confirm('Are you sure you want to reset ' + $scope.sessionId + '?')) {
         self.session = MenuBarService.resetSession($scope.sessionId);
-        $rootScope.$broadcast('refresh data', $scope.sessionId);
+        $rootScope.$broadcast('refresh results', $scope.sessionId);
       }
     };
 

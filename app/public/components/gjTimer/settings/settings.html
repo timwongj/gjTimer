@@ -6,6 +6,46 @@
     <h4 class="modal-title">Settings</h4>
   </div>
   <div class="modal-body">
-
+    <div class="setting">
+      <label class="label-setting">Input</label>
+      <div class="btn-group">
+        <label class="btn btn-default btn-sm" ng-repeat="option in ctrl.options.input"
+               ng-model="ctrl.settings.input" uib-btn-radio="option" ng-bind="option"></label>
+      </div>
+    </div>
+    <div class="setting">
+      <label class="label-setting">Timer Start Delay</label>
+      <div class="btn-group">
+        <label class="btn btn-default btn-sm" ng-repeat="option in ctrl.options.timerStartDelay"
+               ng-model="ctrl.settings.timerStartDelay" uib-btn-radio="option" ng-bind="option"></label>
+      </div>
+    </div>
+    <div class="setting">
+      <label class="label-setting">Results Precision</label>
+      <div class="btn-group">
+        <label class="btn btn-default btn-sm" ng-repeat="option in ctrl.options.resultsPrecision"
+               ng-model="ctrl.settings.resultsPrecision" uib-btn-radio="option" ng-bind="option"></label>
+      </div>
+    </div>
+    <div class="setting">
+      <label class="label-setting">Timer Precision</label>
+      <div class="btn-group">
+        <label class="btn btn-default btn-sm" ng-repeat="option in ctrl.options.timerPrecision"
+               ng-model="ctrl.settings.timerPrecision" uib-btn-radio="option" ng-bind="option"></label>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <div class="pull-left">
+      <button class="btn btn-danger btn-sm" ng-click="ctrl.resetAll()">
+        <span class="glyphicon glyphicon-trash"></span>&nbsp;Reset All
+      </button>
+    </div>
+    <div class="pull-right">
+      <button class="btn btn-default btn-sm" ng-click="ctrl.close()">Cancel</button>
+      <button class="btn btn-success btn-sm" ng-click="ctrl.save()">
+        <span class="glyphicon glyphicon-floppy-save"></span>&nbsp;Save
+      </button>
+    </div>
   </div>
 </div>

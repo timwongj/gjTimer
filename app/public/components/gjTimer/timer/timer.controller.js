@@ -14,6 +14,10 @@
       GREEN: { 'color': '#2EB82E' }
     };
 
+    $scope.$on('refresh settings', function() {
+      self.time = $scope.settings.timerPrecision === 2 ? moment(0).format('s.SS') : moment(0).format('s.SSS');
+    });
+
     $scope.$on('keydown', function($event, event) {
       if ((state === 'reset') && (event.keyCode === SPACE_BAR_KEY_CODE)) {
         state = 'keydown';
@@ -31,7 +35,7 @@
         $interval.cancel(timer);
         $rootScope.$broadcast('timer unfocus');
         TimerService.saveResult(self.time, $scope.scramble, $scope.sessionId);
-        $rootScope.$broadcast('refresh data', $scope.sessionId);
+        $rootScope.$broadcast('refresh results', $scope.sessionId);
         $rootScope.$broadcast('new scramble', $scope.eventId);
       }
     });

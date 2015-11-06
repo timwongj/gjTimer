@@ -16,6 +16,7 @@
             tooltip-placement="bottom"
             onclick="this.blur()">
       <span class="glyphicon glyphicon-trash"></span>
+      <span ng-if="ctrl.showDetails">&nbsp;Reset</span>
     </button>
   </div>
   <div class="btn-group" uib-dropdown uib-keyboard-nav>
@@ -36,6 +37,7 @@
             tooltip-placement="bottom"
             onclick="this.blur()">
       <span class="glyphicon glyphicon-cog"></span>
+      <span ng-if="ctrl.showDetails">&nbsp;Settings</span>
     </button>
   </div>
 </div>

@@ -669,13 +669,13 @@
     self.event = { eventId: self.session.eventId, event: Events.getEvent(self.session.eventId) };
     $scope.sessionId = self.session.sessionId;
     $scope.eventId = self.session.eventId;
-    $scope.settings = {
-      precision: 2, // 2 digits after decimal
-      timerPrecision: 3, // 3 digits after decimal
-      timerStartDelay: 100, // milliseconds
-      timerStopDelay: 100, // milliseconds
-      timerRefreshInterval: 50 // milliseconds
-    };
+    $scope.settings = MenuBarService.getSettings();
+
+    self.showDetails = true;
+    $(window).resize(function(){
+      self.showDetails = window.innerWidth > 460;
+      $scope.$apply();
+    });
 
     // TODO - find a better solution to waiting for controllers to initialize before broadcasting
     // The cutoff for successful broadcast is ~15-20ms, so 50 should be sufficient for now.
@@ -687,7 +687,7 @@
       self.session = MenuBarService.changeSession(sessionId);
       $scope.sessionId = sessionId;
       $scope.eventId = self.session.eventId;
-      $rootScope.$broadcast('refresh data', sessionId);
+      $rootScope.$broadcast('refresh results', sessionId);
       if (self.event.eventId !== self.session.eventId) {
         $rootScope.$broadcast('new scramble', $scope.eventId);
       }
@@ -719,7 +719,7 @@
     self.resetSession = function() {
       if (confirm('Are you sure you want to reset ' + $scope.sessionId + '?')) {
         self.session = MenuBarService.resetSession($scope.sessionId);
-        $rootScope.$broadcast('refresh data', $scope.sessionId);
+        $rootScope.$broadcast('refresh results', $scope.sessionId);
       }
     };
 
@@ -738,6 +738,15 @@
     var self = this;
 
     var NUMBER_OF_SESSIONS = 15;
+
+    var DEFAULT_SETTINGS = {
+      input: 'timer',
+      timerStartDelay: 50,
+      timerStopDelay: 50,
+      resultsPrecision: 2,
+      timerPrecision: 3,
+      timerRefreshInterval: 50
+    };
 
     /**
      * Initializes sessions in local storage if they do not exist.
@@ -830,6 +839,32 @@
 
     };
 
+    self.getSettings = function() {
+      var settings = LocalStorage.getJSON('settings');
+      if (settings === null) {
+        LocalStorage.setJSON('settings', DEFAULT_SETTINGS);
+        return DEFAULT_SETTINGS;
+      } else {
+        for (var key in DEFAULT_SETTINGS) {
+          if (DEFAULT_SETTINGS.hasOwnProperty(key)) {
+            if (!settings.hasOwnProperty(key)) {
+              settings[key] = DEFAULT_SETTINGS[key];
+              LocalStorage.setJSON('settings', settings);
+            }
+          }
+        }
+        return settings;
+      }
+    };
+
+    self.saveSettings = function(settings) {
+      LocalStorage.setJSON('settings', settings);
+    };
+
+    self.resetAll = function() {
+      LocalStorage.clear();
+    };
+
   }
 
   angular.module('menuBar').service('MenuBarService', ['LocalStorage', MenuBarService]);
@@ -866,11 +901,11 @@
 
     var self = this;
 
-    $scope.results = ResultsService.getResults($scope.sessionId, $scope.settings.precision);
+    $scope.results = ResultsService.getResults($scope.sessionId, $scope.settings.resultsPrecision);
     self.results = $scope.results;
 
-    $scope.$on('refresh data', function($event, sessionId) {
-      $scope.results = ResultsService.getResults(sessionId, $scope.settings.precision);
+    $scope.$on('refresh results', function($event, sessionId) {
+      $scope.results = ResultsService.getResults(sessionId || $scope.sessionId, $scope.settings.resultsPrecision);
       self.results = $scope.results;
       if ($scope.$root.$$phase != '$apply' && $scope.$root.$$phase != '$digest') {
         $scope.$apply();
@@ -1125,26 +1160,26 @@
 
       $('.popover-btn-penalty-ok').on('click', function() {
         ResultsPopoverService.penalty($scope.sessionId, $scope.index, '');
-        $rootScope.$broadcast('refresh data', $scope.sessionId);
+        $rootScope.$broadcast('refresh results', $scope.sessionId);
         $(element).popover('hide');
       });
 
       $('.popover-btn-penalty-plus').on('click', function() {
         ResultsPopoverService.penalty($scope.sessionId, $scope.index, '+2');
-        $rootScope.$broadcast('refresh data', $scope.sessionId);
+        $rootScope.$broadcast('refresh results', $scope.sessionId);
         $(element).popover('hide');
       });
 
       $('.popover-btn-penalty-dnf').on('click', function() {
         ResultsPopoverService.penalty($scope.sessionId, $scope.index, 'DNF');
-        $rootScope.$broadcast('refresh data', $scope.sessionId);
+        $rootScope.$broadcast('refresh results', $scope.sessionId);
         $(element).popover('hide');
       });
 
       $('.popover-btn-remove').on('click', function() {
         if (confirm('Are you sure you want to delete this time?')) {
           ResultsPopoverService.remove($scope.sessionId, $scope.index);
-          $rootScope.$broadcast('refresh data', $scope.sessionId);
+          $rootScope.$broadcast('refresh results', $scope.sessionId);
         }
         $(element).popover('hide');
       });
@@ -1317,10 +1352,34 @@
 
   'use strict';
 
-  function SettingsController($modalInstance, settings, MenuBarService) {
+  function SettingsController($rootScope, $modalInstance, settings, MenuBarService) {
 
     var self = this;
+
     self.settings = settings;
+
+    self.options = {
+      input: ['timer', 'keyboard', 'stackmat'],
+      timerStartDelay: [0, 50, 100],
+      resultsPrecision: [2, 3],
+      timerPrecision: [2, 3]
+    };
+
+    self.save = function() {
+      MenuBarService.saveSettings(self.settings);
+      $modalInstance.dismiss();
+      $rootScope.$broadcast('refresh settings');
+      $rootScope.$broadcast('refresh results');
+    };
+
+    self.resetAll = function() {
+      if (confirm('Are you sure you want to reset everything?')) {
+        MenuBarService.resetAll();
+        $modalInstance.dismiss();
+        $rootScope.$broadcast('refresh settings');
+        $rootScope.$broadcast('refresh results');
+      }
+    };
 
     self.close = function() {
       $modalInstance.dismiss();
@@ -1328,7 +1387,7 @@
 
   }
 
-  angular.module('menuBar').controller('SettingsController', ['$modalInstance', 'settings', 'MenuBarService', SettingsController]);
+  angular.module('menuBar').controller('SettingsController', ['$rootScope', '$modalInstance', 'settings', 'MenuBarService', SettingsController]);
 
 })();
 
@@ -1502,6 +1561,10 @@
       GREEN: { 'color': '#2EB82E' }
     };
 
+    $scope.$on('refresh settings', function() {
+      self.time = $scope.settings.timerPrecision === 2 ? moment(0).format('s.SS') : moment(0).format('s.SSS');
+    });
+
     $scope.$on('keydown', function($event, event) {
       if ((state === 'reset') && (event.keyCode === SPACE_BAR_KEY_CODE)) {
         state = 'keydown';
@@ -1519,7 +1582,7 @@
         $interval.cancel(timer);
         $rootScope.$broadcast('timer unfocus');
         TimerService.saveResult(self.time, $scope.scramble, $scope.sessionId);
-        $rootScope.$broadcast('refresh data', $scope.sessionId);
+        $rootScope.$broadcast('refresh results', $scope.sessionId);
         $rootScope.$broadcast('new scramble', $scope.eventId);
       }
     });

@@ -1,5 +1,5 @@
 @height-results: calc(~"100vh - 5.875em");
-@height-results-mobile: 21.5em;
+@height-results-sm: 21.5em;
 
 #results {
 
@@ -11,8 +11,8 @@
     display: block;
     overflow: auto;
     height: @height-results;
-    @media screen and (max-width: 62em) {
-      height: @height-results-mobile;
+    @media screen and (max-width: @breakpoint-md) {
+      height: @height-results-sm;
     }
   }
 
