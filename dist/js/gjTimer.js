@@ -63,7 +63,11 @@
     $scope.keydown = function($event) {
 
       if (event.keyCode === ENTER_KEY_CODE) {
-        $rootScope.$broadcast('new scramble', $scope.eventId);
+        if ($rootScope.isTyping) {
+          event.preventDefault();
+        } else {
+          $rootScope.$broadcast('new scramble', $scope.eventId);
+        }
       } else if (event.keyCode === SPACEBAR_KEY_CODE) {
         event.preventDefault();
       }
@@ -1157,6 +1161,8 @@
 
     var self = this;
 
+    var ENTER_KEY_CODE = 13;
+
     self.attachEvents = function (element) {
 
       $('.popover').on('mouseenter', function () {
@@ -1195,6 +1201,18 @@
         }
         $(element).popover('hide');
       });
+
+      $('.popover-input-comment').on('focus', function() {
+        $rootScope.isTyping = true;
+      }).on('blur', function() {
+        $rootScope.isTyping = false;
+      }).on('keydown', function(event) {
+        if (event.keyCode === ENTER_KEY_CODE) {
+          ResultsPopoverService.comment(self.sessionId, self.index, $('.popover-input-comment')[0].value);
+          $rootScope.$broadcast('refresh results');
+          $(element).popover('hide');
+        }
+      })[0].value = self.result.comment;
 
     };
 
@@ -1253,9 +1271,9 @@
      * @param index
      */
     self.remove = function(sessionId, index) {
-      var session = JSON.parse(localStorage.getItem(sessionId));
+      var session = LocalStorage.getJSON(sessionId);
       session.results.splice(index, 1);
-      localStorage.setItem(sessionId, JSON.stringify(session));
+      LocalStorage.setJSON(sessionId, session);
     };
 
     /**
@@ -1265,7 +1283,20 @@
      * @param comment
      */
     self.comment = function(sessionId, index, comment) {
-      console.log('comment ' + sessionId + ' - ' + index + ' - ' + comment);
+      var session = LocalStorage.getJSON(sessionId);
+      var result = session.results[index].split('|');
+      if (comment !== '') {
+        if (result[3]) {
+          result[3] = comment;
+          session.results[index] = result.join('|');
+        } else {
+          session.results[index] = session.results[index] + '|' + comment;
+        }
+      } else if (result[3]) {
+        result.splice(3, 1);
+        session.results[index] = result.join('|');
+      }
+      LocalStorage.setJSON(sessionId, session);
     };
 
   }

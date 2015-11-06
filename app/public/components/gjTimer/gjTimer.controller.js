@@ -13,7 +13,11 @@
     $scope.keydown = function($event) {
 
       if (event.keyCode === ENTER_KEY_CODE) {
-        $rootScope.$broadcast('new scramble', $scope.eventId);
+        if ($rootScope.isTyping) {
+          event.preventDefault();
+        } else {
+          $rootScope.$broadcast('new scramble', $scope.eventId);
+        }
       } else if (event.keyCode === SPACEBAR_KEY_CODE) {
         event.preventDefault();
       }

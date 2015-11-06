@@ -105,7 +105,7 @@
 }
 #resultsModal .modal-body {
   padding: .5em;
-  max-height: calc(100vh - 15em);
+  max-height: calc(100vh - 12em);
   overflow-y: auto;
 }
 #resultsModal .modal-footer {
@@ -135,7 +135,7 @@
 #resultsPopover .form-group-buttons {
   margin-bottom: .25em;
 }
-#resultsPopover .input-comment {
+#resultsPopover .popover-input-comment {
   margin-top: .25em;
   padding: .25em .5em;
   width: 8.5em;
