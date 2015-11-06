@@ -671,9 +671,9 @@
     $scope.eventId = self.session.eventId;
     $scope.settings = MenuBarService.getSettings();
 
-    self.showDetails = true;
+    self.showDetails = window.innerWidth > 500;
     $(window).resize(function(){
-      self.showDetails = window.innerWidth > 460;
+      self.showDetails = window.innerWidth > 500;
       $scope.$apply();
     });
 
