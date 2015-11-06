@@ -10,6 +10,7 @@
       controllerAs: 'ctrl',
       scope: {
         eventId: '=',
+        results: '=',
         scramble: '=',
         sessionId: '=',
         settings: '='

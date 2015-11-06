@@ -2,7 +2,7 @@
 
   'use strict';
 
-  function TimerController($scope, $rootScope, $interval, $timeout, TimerService) {
+  function TimerController($scope, $rootScope, $interval, $timeout, TimerService, ResultsService) {
 
     var self = this, timer, state = 'reset', SPACE_BAR_KEY_CODE = 32;
 
@@ -34,8 +34,7 @@
         state = 'stopped';
         $interval.cancel(timer);
         $rootScope.$broadcast('timer unfocus');
-        TimerService.saveResult(self.time, self.scramble, self.sessionId);
-        $rootScope.$broadcast('refresh results', self.sessionId);
+        ResultsService.saveResult(self.results, self.time, self.scramble, self.sessionId, self.settings.resultsPrecision);
         $rootScope.$broadcast('new scramble', self.eventId);
       }
     });
@@ -59,6 +58,6 @@
 
   }
 
-  angular.module('timer').controller('TimerController', ['$scope', '$rootScope', '$interval', '$timeout', 'TimerService', TimerController]);
+  angular.module('timer').controller('TimerController', ['$scope', '$rootScope', '$interval', '$timeout', 'TimerService', 'ResultsService', TimerController]);
 
 })();

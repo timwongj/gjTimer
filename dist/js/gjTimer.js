@@ -651,6 +651,7 @@
       controllerAs: 'ctrl',
       scope: {
         eventId: '=',
+        results: '=',
         sessionId: '=',
         settings: '='
       },
@@ -725,8 +726,9 @@
 
     self.resetSession = function() {
       if (confirm('Are you sure you want to reset ' + self.sessionId + '?')) {
-        self.session = MenuBarService.resetSession(self.sessionId);
-        $rootScope.$broadcast('refresh results', self.sessionId);
+        MenuBarService.resetSession(self.sessionId);
+        self.session.results = [];
+        self.results = [];
       }
     };
 
@@ -850,14 +852,12 @@
     /**
      * Resets the session in local storage by clearing the results list.
      * @param sessionId
-     * @returns {object} session
      */
     self.resetSession = function(sessionId) {
 
       var session = LocalStorage.getJSON(sessionId);
       session.results = [];
       LocalStorage.setJSON(sessionId, session);
-      return session;
 
     };
 
@@ -924,9 +924,6 @@
 
     $scope.$on('refresh results', function($event, sessionId) {
       self.results = ResultsService.getResults(sessionId || self.sessionId, self.settings.resultsPrecision);
-      if ($scope.$root.$$phase != '$apply' && $scope.$root.$$phase != '$digest') {
-        $scope.$apply();
-      }
     });
 
     self.openModal = function(index, numberOfResults) {
@@ -971,12 +968,12 @@
 
       var results = [], rawResults = LocalStorage.getJSON(sessionId).results;
 
-      angular.forEach(rawResults, function(rawResult, index) {
+      for (var i = 0; i < rawResults.length; i++) {
 
-        var res = rawResult.split('|');
+        var res = rawResults[i].split('|');
 
         var result = {
-          index: index,
+          index: i,
           scramble: res[1],
           date: new Date(Number(res[2])),
           comment: res[3] ? res[3] : ''
@@ -988,7 +985,7 @@
           result.penalty = '+2';
           result.rawTime = Number((result.time + 2000).toFixed());
           result.displayedTime = Calculator.convertTimeFromMillisecondsToString(Number(res[0].substring(0, res[0].length - 1)) + 2000, precision) + '+';
-          result.detailedTime = Calculator.convertTimeFromMillisecondsToString(Number(res[0].substring(0, res[0].length - 1)) + 2000, precision) + '+';
+          result.detailedTime = result.displayedTime;
         } else if (res[0].substring(res[0].length - 1, res[0].length) === '-') {
           result.time = Number(res[0].substring(0, res[0].length - 1));
           result.penalty = 'DNF';
@@ -1000,33 +997,167 @@
           result.penalty = '';
           result.rawTime = result.time;
           result.displayedTime = Calculator.convertTimeFromMillisecondsToString(Number(res[0]), precision);
-          result.detailedTime = Calculator.convertTimeFromMillisecondsToString(Number(res[0]), precision);
+          result.detailedTime = result.displayedTime;
         }
 
         results.push(result);
-
-      });
+        
+      }
 
       var rawTimes = Calculator.extractRawTimes(results);
 
-      angular.forEach(results, function(result, index) {
-
-        if (index >= 4) {
-          result.avg5 = Calculator.convertTimeFromMillisecondsToString(Calculator.calculateAverage(rawTimes.slice(index - 4, index + 1)), precision);
-        } else {
-          result.avg5 = 'DNF';
-        }
-
-        if (index >= 11) {
-          result.avg12 = Calculator.convertTimeFromMillisecondsToString(Calculator.calculateAverage(rawTimes.slice(index - 11, index + 1)), precision);
-        } else {
-          result.avg12 = 'DNF';
-        }
-
-      });
+      for (var j = 0; j < results.length; j++) {
+        results[j] = self.populateAverages(rawTimes, results[j], j, precision);
+      }
 
       return results;
 
+    };
+
+    /**
+     * Saves the result in the format of 'Time in milliseconds'|'Scramble'|'Date in milliseconds'.
+     * @param results
+     * @param time
+     * @param scramble
+     * @param sessionId
+     * @param precision
+     */
+    self.saveResult = function(results, time, scramble, sessionId, precision) {
+
+      var timeMilliseconds = Calculator.convertTimeFromStringToMilliseconds(time);
+      var timeStringWithPrecision = Calculator.convertTimeFromMillisecondsToString(timeMilliseconds, precision);
+
+      var result = {
+        comment: '',
+        date: new Date(),
+        detailedTime: timeStringWithPrecision,
+        displayedTime: timeStringWithPrecision,
+        index: results.length,
+        penalty: '',
+        rawTime: timeMilliseconds,
+        scramble: scramble,
+        time: timeMilliseconds
+      };
+
+      var rawTimes = Calculator.extractRawTimes(results);
+      rawTimes.push(Calculator.extractRawTimes([result])[0]);
+      result = self.populateAverages(rawTimes, result, result.index, precision);
+
+      results.push(result);
+
+      var session = LocalStorage.getJSON(sessionId);
+      session.results.push(Calculator.convertTimeFromStringToMilliseconds(time) + '|' + scramble + '|' + Date.now());
+      LocalStorage.setJSON(sessionId, session);
+
+    };
+
+    /**
+     * Populate avg5 and avg12 field
+     * @param rawTimes
+     * @param result
+     * @param index
+     * @param precision
+     */
+    self.populateAverages = function(rawTimes, result, index, precision) {
+
+      if (index >= 4) {
+        result.avg5 = Calculator.convertTimeFromMillisecondsToString(Calculator.calculateAverage(rawTimes.slice(index - 4, index + 1)), precision);
+      } else {
+        result.avg5 = 'DNF';
+      }
+
+      if (index >= 11) {
+        result.avg12 = Calculator.convertTimeFromMillisecondsToString(Calculator.calculateAverage(rawTimes.slice(index - 11, index + 1)), precision);
+      } else {
+        result.avg12 = 'DNF';
+      }
+
+      return result;
+
+    };
+
+    /**
+     * Changes the penalty for a solve.
+     * @param result
+     * @param sessionId
+     * @param index
+     * @param penalty
+     * @param precision
+     */
+    self.penalty = function(result, sessionId, index, penalty, precision) {
+      var session = LocalStorage.getJSON(sessionId);
+      var res = session.results[index];
+      var pen = res.substring(res.indexOf('|') - 1, res.indexOf('|'));
+      switch(penalty) {
+        case '':
+          result.penalty = '';
+          result.displayedTime = Calculator.convertTimeFromMillisecondsToString(result.time, precision);
+          result.detailedTime = result.displayedTime;
+          if ((pen === '+') || (pen === '-')) {
+            res = res.substring(0, res.indexOf('|') - 1) + res.substring(res.indexOf('|'), res.length);
+          }
+          break;
+        case '+2':
+          result.penalty = '+2';
+          result.displayedTime = Calculator.convertTimeFromMillisecondsToString(result.time + 2000, precision) + '+';
+          result.detailedTime = result.displayedTime;
+          if ((pen === '+') || (pen === '-')) {
+            res = res.substring(0, res.indexOf('|') - 1) + '+' + res.substring(res.indexOf('|'), res.length);
+          } else {
+            res = res.substring(0, res.indexOf('|')) + '+' + res.substring(res.indexOf('|'), res.length);
+          }
+          break;
+        case 'DNF':
+          result.penalty = 'DNF';
+          result.displayedTime = 'DNF';
+          result.detailedTime = 'DNF(' + Calculator.convertTimeFromMillisecondsToString(result.time, precision) + ')';
+          if ((pen === '+') || (pen === '-')) {
+            res = res.substring(0, res.indexOf('|') - 1) + '-' + res.substring(res.indexOf('|'), res.length);
+          } else {
+            res = res.substring(0, res.indexOf('|')) + '-' + res.substring(res.indexOf('|'), res.length);
+          }
+          break;
+      }
+      session.results[index] = res;
+      LocalStorage.setJSON(sessionId, session);
+    };
+
+    /**
+     * Removes a solve.
+     * @param results
+     * @param sessionId
+     * @param index
+     */
+    self.remove = function(results, sessionId, index) {
+      results.splice(index, 1);
+      var session = LocalStorage.getJSON(sessionId);
+      session.results.splice(index, 1);
+      LocalStorage.setJSON(sessionId, session);
+    };
+
+    /**
+     * Adds or edits a comment for a solve.
+     * @param result
+     * @param sessionId
+     * @param index
+     * @param comment
+     */
+    self.comment = function(result, sessionId, index, comment) {
+      result.comment = comment;
+      var session = LocalStorage.getJSON(sessionId);
+      var res = session.results[index].split('|');
+      if (comment !== '') {
+        if (res[3]) {
+          res[3] = comment;
+          session.results[index] = res.join('|');
+        } else {
+          session.results[index] = session.results[index] + '|' + comment;
+        }
+      } else if (res[3]) {
+        res.splice(3, 1);
+        session.results[index] = res.join('|');
+      }
+      LocalStorage.setJSON(sessionId, session);
     };
 
   }
@@ -1101,7 +1232,9 @@
       restrict: 'E',
       scope: {
         index: '=',
+        precision: '=',
         result: '=',
+        results: '=',
         sessionId: '='
       },
       controller: 'ResultsPopoverController',
@@ -1160,7 +1293,7 @@
 
   'use strict';
 
-  function ResultsPopoverController($rootScope, $timeout, ResultsPopoverService) {
+  function ResultsPopoverController($scope, $rootScope, $timeout, ResultsService) {
 
     var self = this;
 
@@ -1180,29 +1313,29 @@
       });
 
       $('.popover-btn-penalty-ok').on('click', function() {
-        ResultsPopoverService.penalty(self.sessionId, self.index, '');
-        $rootScope.$broadcast('refresh results');
+        ResultsService.penalty(self.result, self.sessionId, self.index, '', self.precision);
+        $scope.$apply();
         $(element).popover('hide');
       });
 
       $('.popover-btn-penalty-plus').on('click', function() {
-        ResultsPopoverService.penalty(self.sessionId, self.index, '+2');
-        $rootScope.$broadcast('refresh results');
+        ResultsService.penalty(self.result, self.sessionId, self.index, '+2', self.precision);
+        $scope.$apply();
         $(element).popover('hide');
       });
 
       $('.popover-btn-penalty-dnf').on('click', function() {
-        ResultsPopoverService.penalty(self.sessionId, self.index, 'DNF');
-        $rootScope.$broadcast('refresh results');
+        ResultsService.penalty(self.result, self.sessionId, self.index, 'DNF', self.precision);
+        $scope.$apply();
         $(element).popover('hide');
       });
 
       $('.popover-btn-remove').on('click', function() {
         if (confirm('Are you sure you want to delete this time?')) {
-          ResultsPopoverService.remove(self.sessionId, self.index);
-          $rootScope.$broadcast('refresh results');
+          ResultsService.remove(self.results, self.sessionId, self.index);
+          $scope.$apply();
+          $(element).popover('hide');
         }
-        $(element).popover('hide');
       });
 
       $('.popover-input-comment').on('focus', function() {
@@ -1211,8 +1344,8 @@
         $rootScope.isTyping = false;
       }).on('keydown', function(event) {
         if (event.keyCode === ENTER_KEY_CODE) {
-          ResultsPopoverService.comment(self.sessionId, self.index, $('.popover-input-comment')[0].value);
-          $rootScope.$broadcast('refresh results');
+          ResultsService.comment(self.result, self.sessionId, self.index, $('.popover-input-comment')[0].value);
+          $scope.$apply();
           $(element).popover('hide');
         }
       })[0].value = self.result.comment;
@@ -1221,90 +1354,7 @@
 
   }
 
-  angular.module('results').controller('ResultsPopoverController', ['$rootScope', '$timeout', 'ResultsPopoverService', ResultsPopoverController]);
-
-})();
-
-(function() {
-
-  'use strict';
-
-  function ResultsPopoverService(LocalStorage) {
-
-    var self = this;
-
-    /**
-     * Changes the penalty for a solve.
-     * @param sessionId
-     * @param index
-     * @param penalty
-     */
-    self.penalty = function(sessionId, index, penalty) {
-      var session = LocalStorage.getJSON(sessionId);
-      var result = session.results[index];
-      var pen = result.substring(result.indexOf('|') - 1, result.indexOf('|'));
-      switch(penalty) {
-        case '':
-          if ((pen === '+') || (pen === '-')) {
-            result = result.substring(0, result.indexOf('|') - 1) + result.substring(result.indexOf('|'), result.length);
-          }
-          break;
-        case '+2':
-          if ((pen === '+') || (pen === '-')) {
-            result = result.substring(0, result.indexOf('|') - 1) + '+' + result.substring(result.indexOf('|'), result.length);
-          } else {
-            result = result.substring(0, result.indexOf('|')) + '+' + result.substring(result.indexOf('|'), result.length);
-          }
-          break;
-        case 'DNF':
-          if ((pen === '+') || (pen === '-')) {
-            result = result.substring(0, result.indexOf('|') - 1) + '-' + result.substring(result.indexOf('|'), result.length);
-          } else {
-            result = result.substring(0, result.indexOf('|')) + '-' + result.substring(result.indexOf('|'), result.length);
-          }
-          break;
-      }
-      session.results[index] = result;
-      LocalStorage.setJSON(sessionId, session);
-    };
-
-    /**
-     * Removes a solve.
-     * @param sessionId
-     * @param index
-     */
-    self.remove = function(sessionId, index) {
-      var session = LocalStorage.getJSON(sessionId);
-      session.results.splice(index, 1);
-      LocalStorage.setJSON(sessionId, session);
-    };
-
-    /**
-     * Adds or edits a comment for a solve.
-     * @param sessionId
-     * @param index
-     * @param comment
-     */
-    self.comment = function(sessionId, index, comment) {
-      var session = LocalStorage.getJSON(sessionId);
-      var result = session.results[index].split('|');
-      if (comment !== '') {
-        if (result[3]) {
-          result[3] = comment;
-          session.results[index] = result.join('|');
-        } else {
-          session.results[index] = session.results[index] + '|' + comment;
-        }
-      } else if (result[3]) {
-        result.splice(3, 1);
-        session.results[index] = result.join('|');
-      }
-      LocalStorage.setJSON(sessionId, session);
-    };
-
-  }
-
-  angular.module('results').service('ResultsPopoverService', ['LocalStorage', ResultsPopoverService]);
+  angular.module('results').controller('ResultsPopoverController', ['$scope', '$rootScope', '$timeout', 'ResultsService', ResultsPopoverController]);
 
 })();
 
@@ -1585,6 +1635,7 @@
       controllerAs: 'ctrl',
       scope: {
         eventId: '=',
+        results: '=',
         scramble: '=',
         sessionId: '=',
         settings: '='
@@ -1601,7 +1652,7 @@
 
   'use strict';
 
-  function TimerController($scope, $rootScope, $interval, $timeout, TimerService) {
+  function TimerController($scope, $rootScope, $interval, $timeout, TimerService, ResultsService) {
 
     var self = this, timer, state = 'reset', SPACE_BAR_KEY_CODE = 32;
 
@@ -1633,8 +1684,7 @@
         state = 'stopped';
         $interval.cancel(timer);
         $rootScope.$broadcast('timer unfocus');
-        TimerService.saveResult(self.time, self.scramble, self.sessionId);
-        $rootScope.$broadcast('refresh results', self.sessionId);
+        ResultsService.saveResult(self.results, self.time, self.scramble, self.sessionId, self.settings.resultsPrecision);
         $rootScope.$broadcast('new scramble', self.eventId);
       }
     });
@@ -1658,7 +1708,7 @@
 
   }
 
-  angular.module('timer').controller('TimerController', ['$scope', '$rootScope', '$interval', '$timeout', 'TimerService', TimerController]);
+  angular.module('timer').controller('TimerController', ['$scope', '$rootScope', '$interval', '$timeout', 'TimerService', 'ResultsService', TimerController]);
 
 })();
 
@@ -1687,20 +1737,6 @@
     self.startTimer = function() {
 
       self.startTime = Date.now();
-
-    };
-
-    /**
-     * Saves the result in the format of 'Time in milliseconds'|'Scramble'|'Date in milliseconds'.
-     * @param time
-     * @param scramble
-     * @param sessionId
-     */
-    self.saveResult = function(time, scramble, sessionId) {
-
-      var session = LocalStorage.getJSON(sessionId);
-      session.results.push(Calculator.convertTimeFromStringToMilliseconds(time) + '|' + scramble + '|' + Date.now());
-      LocalStorage.setJSON(sessionId, session);
 
     };
 
