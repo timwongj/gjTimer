@@ -56,7 +56,10 @@
 
         sessionMean = Calculator.calculateSessionMean(rawTimes);
 
-        expect(sessionMean).toEqual(649);
+        expect(sessionMean).toEqual({
+          mean: 649,
+          stDev: 139
+        });
 
       });
 
