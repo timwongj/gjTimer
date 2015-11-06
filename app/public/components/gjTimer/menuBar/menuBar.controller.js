@@ -6,13 +6,13 @@
 
     var self = this;
 
+    self.settings = MenuBarService.initSettings();
     self.sessions = MenuBarService.initSessions();
     self.session = MenuBarService.initSession();
     self.events = Events.getEvents();
     self.event = { eventId: self.session.eventId, event: Events.getEvent(self.session.eventId) };
     self.sessionId = self.session.sessionId;
     self.eventId = self.session.eventId;
-    self.settings = MenuBarService.getSettings();
 
     self.showDetails = window.innerWidth > 500;
     $(window).resize(function(){

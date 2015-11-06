@@ -4,11 +4,11 @@
 
   describe('The settings controller', function() {
 
-    it('should dose gj', function() {
+    beforeEach(module('settings'));
 
-      expect('gj').toEqual('gj');
+    beforeEach(inject(function($injector) {
 
-    });
+    }));
 
   });
 

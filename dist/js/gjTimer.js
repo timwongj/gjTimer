@@ -663,13 +663,13 @@
 
     var self = this;
 
+    self.settings = MenuBarService.initSettings();
     self.sessions = MenuBarService.initSessions();
     self.session = MenuBarService.initSession();
     self.events = Events.getEvents();
     self.event = { eventId: self.session.eventId, event: Events.getEvent(self.session.eventId) };
     self.sessionId = self.session.sessionId;
     self.eventId = self.session.eventId;
-    self.settings = MenuBarService.getSettings();
 
     self.showDetails = window.innerWidth > 500;
     $(window).resize(function(){
@@ -746,6 +746,36 @@
       resultsPrecision: 2,
       timerPrecision: 3,
       timerRefreshInterval: 50
+    };
+
+    /**
+     * Gets settings from local storage or initializes it if it doesn't exist.
+     * @returns {*}
+     */
+    self.initSettings = function() {
+      var settings = LocalStorage.getJSON('settings');
+      if (settings === null) {
+        LocalStorage.setJSON('settings', DEFAULT_SETTINGS);
+        return DEFAULT_SETTINGS;
+      } else {
+        for (var key in DEFAULT_SETTINGS) {
+          if (DEFAULT_SETTINGS.hasOwnProperty(key)) {
+            if (!settings.hasOwnProperty(key)) {
+              settings[key] = DEFAULT_SETTINGS[key];
+              LocalStorage.setJSON('settings', settings);
+            }
+          }
+        }
+        return settings;
+      }
+    };
+
+    /**
+     * Saves settings.
+     * @param settings
+     */
+    self.saveSettings = function(settings) {
+      LocalStorage.setJSON('settings', settings);
     };
 
     /**
@@ -839,28 +869,9 @@
 
     };
 
-    self.getSettings = function() {
-      var settings = LocalStorage.getJSON('settings');
-      if (settings === null) {
-        LocalStorage.setJSON('settings', DEFAULT_SETTINGS);
-        return DEFAULT_SETTINGS;
-      } else {
-        for (var key in DEFAULT_SETTINGS) {
-          if (DEFAULT_SETTINGS.hasOwnProperty(key)) {
-            if (!settings.hasOwnProperty(key)) {
-              settings[key] = DEFAULT_SETTINGS[key];
-              LocalStorage.setJSON('settings', settings);
-            }
-          }
-        }
-        return settings;
-      }
-    };
-
-    self.saveSettings = function(settings) {
-      LocalStorage.setJSON('settings', settings);
-    };
-
+    /**
+     * Resets everything.
+     */
     self.resetAll = function() {
       LocalStorage.clear();
     };

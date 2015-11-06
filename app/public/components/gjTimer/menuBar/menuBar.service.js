@@ -18,6 +18,36 @@
     };
 
     /**
+     * Gets settings from local storage or initializes it if it doesn't exist.
+     * @returns {*}
+     */
+    self.initSettings = function() {
+      var settings = LocalStorage.getJSON('settings');
+      if (settings === null) {
+        LocalStorage.setJSON('settings', DEFAULT_SETTINGS);
+        return DEFAULT_SETTINGS;
+      } else {
+        for (var key in DEFAULT_SETTINGS) {
+          if (DEFAULT_SETTINGS.hasOwnProperty(key)) {
+            if (!settings.hasOwnProperty(key)) {
+              settings[key] = DEFAULT_SETTINGS[key];
+              LocalStorage.setJSON('settings', settings);
+            }
+          }
+        }
+        return settings;
+      }
+    };
+
+    /**
+     * Saves settings.
+     * @param settings
+     */
+    self.saveSettings = function(settings) {
+      LocalStorage.setJSON('settings', settings);
+    };
+
+    /**
      * Initializes sessions in local storage if they do not exist.
      * @returns [String] - sessionId
      */
@@ -108,28 +138,9 @@
 
     };
 
-    self.getSettings = function() {
-      var settings = LocalStorage.getJSON('settings');
-      if (settings === null) {
-        LocalStorage.setJSON('settings', DEFAULT_SETTINGS);
-        return DEFAULT_SETTINGS;
-      } else {
-        for (var key in DEFAULT_SETTINGS) {
-          if (DEFAULT_SETTINGS.hasOwnProperty(key)) {
-            if (!settings.hasOwnProperty(key)) {
-              settings[key] = DEFAULT_SETTINGS[key];
-              LocalStorage.setJSON('settings', settings);
-            }
-          }
-        }
-        return settings;
-      }
-    };
-
-    self.saveSettings = function(settings) {
-      LocalStorage.setJSON('settings', settings);
-    };
-
+    /**
+     * Resets everything.
+     */
     self.resetAll = function() {
       LocalStorage.clear();
     };
