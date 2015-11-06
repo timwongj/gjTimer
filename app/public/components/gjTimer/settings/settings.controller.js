@@ -22,6 +22,15 @@
       $rootScope.$broadcast('refresh results');
     };
 
+    self.resetAll = function() {
+      if (confirm('Are you sure you want to reset everything?')) {
+        MenuBarService.resetAll();
+        $modalInstance.dismiss();
+        $rootScope.$broadcast('refresh settings');
+        $rootScope.$broadcast('refresh results');
+      }
+    };
+
     self.close = function() {
       $modalInstance.dismiss();
     };

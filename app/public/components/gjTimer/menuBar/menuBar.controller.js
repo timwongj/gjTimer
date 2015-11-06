@@ -14,6 +14,12 @@
     $scope.eventId = self.session.eventId;
     $scope.settings = MenuBarService.getSettings();
 
+    self.showDetails = window.innerWidth > 500;
+    $(window).resize(function(){
+      self.showDetails = window.innerWidth > 500;
+      $scope.$apply();
+    });
+
     // TODO - find a better solution to waiting for controllers to initialize before broadcasting
     // The cutoff for successful broadcast is ~15-20ms, so 50 should be sufficient for now.
     $timeout(function() {

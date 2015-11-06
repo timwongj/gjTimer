@@ -1,7 +1,13 @@
+@height-statistics-sm: 22.0625em;
+
 #statistics {
 
   margin: .125em;
   padding: .125em;
+
+  @media screen and (min-width: @breakpoint-sm) and (max-width: @breakpoint-md) {
+    height: @height-statistics-sm;
+  }
 
   .stat {
     white-space: nowrap;

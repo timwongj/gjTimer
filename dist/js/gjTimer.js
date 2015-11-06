@@ -671,6 +671,12 @@
     $scope.eventId = self.session.eventId;
     $scope.settings = MenuBarService.getSettings();
 
+    self.showDetails = window.innerWidth > 500;
+    $(window).resize(function(){
+      self.showDetails = window.innerWidth > 500;
+      $scope.$apply();
+    });
+
     // TODO - find a better solution to waiting for controllers to initialize before broadcasting
     // The cutoff for successful broadcast is ~15-20ms, so 50 should be sufficient for now.
     $timeout(function() {
@@ -853,6 +859,10 @@
 
     self.saveSettings = function(settings) {
       LocalStorage.setJSON('settings', settings);
+    };
+
+    self.resetAll = function() {
+      LocalStorage.clear();
     };
 
   }
@@ -1360,6 +1370,15 @@
       $modalInstance.dismiss();
       $rootScope.$broadcast('refresh settings');
       $rootScope.$broadcast('refresh results');
+    };
+
+    self.resetAll = function() {
+      if (confirm('Are you sure you want to reset everything?')) {
+        MenuBarService.resetAll();
+        $modalInstance.dismiss();
+        $rootScope.$broadcast('refresh settings');
+        $rootScope.$broadcast('refresh results');
+      }
     };
 
     self.close = function() {
