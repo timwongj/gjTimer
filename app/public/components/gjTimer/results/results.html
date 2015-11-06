@@ -15,7 +15,10 @@
           <div ng-bind="ctrl.results.length - $index"></div>
         </td>
         <td class="time">
-          <results-popover index="ctrl.results.length - $index - 1" result="result" session-id="ctrl.sessionId">
+          <results-popover index="ctrl.results.length - $index - 1"
+                           precision="ctrl.settings.resultsPrecision"
+                           result="result" results="ctrl.results"
+                           session-id="ctrl.sessionId">
             <div ng-bind="result.displayedTime"></div>
           </results-popover>
         </td>

@@ -10,6 +10,7 @@
 
       var best, rawTimes = Calculator.extractRawTimes(results);
 
+      var sessionMean = Calculator.calculateSessionMean(rawTimes);
       var statistics = {
         solves: {
           attempted: rawTimes.length,
@@ -18,8 +19,8 @@
           worst: Calculator.convertTimeFromMillisecondsToString(Math.max.apply(null, rawTimes))
         },
         sessionMean: {
-          mean: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateSessionMean(rawTimes)),
-          stDev: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateStandardDeviation(rawTimes, false))
+          mean: Calculator.convertTimeFromMillisecondsToString(sessionMean.mean),
+          stDev: Calculator.convertTimeFromMillisecondsToString(sessionMean.stDev)
         },
         sessionAvg: {
           avg: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateAverage(rawTimes)),

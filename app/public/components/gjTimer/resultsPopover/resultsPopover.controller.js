@@ -2,7 +2,7 @@
 
   'use strict';
 
-  function ResultsPopoverController($rootScope, $timeout, ResultsPopoverService) {
+  function ResultsPopoverController($scope, $rootScope, $timeout, ResultsService) {
 
     var self = this;
 
@@ -22,29 +22,29 @@
       });
 
       $('.popover-btn-penalty-ok').on('click', function() {
-        ResultsPopoverService.penalty(self.sessionId, self.index, '');
-        $rootScope.$broadcast('refresh results');
+        ResultsService.penalty(self.result, self.sessionId, self.index, '', self.precision);
+        $scope.$apply();
         $(element).popover('hide');
       });
 
       $('.popover-btn-penalty-plus').on('click', function() {
-        ResultsPopoverService.penalty(self.sessionId, self.index, '+2');
-        $rootScope.$broadcast('refresh results');
+        ResultsService.penalty(self.result, self.sessionId, self.index, '+2', self.precision);
+        $scope.$apply();
         $(element).popover('hide');
       });
 
       $('.popover-btn-penalty-dnf').on('click', function() {
-        ResultsPopoverService.penalty(self.sessionId, self.index, 'DNF');
-        $rootScope.$broadcast('refresh results');
+        ResultsService.penalty(self.result, self.sessionId, self.index, 'DNF', self.precision);
+        $scope.$apply();
         $(element).popover('hide');
       });
 
       $('.popover-btn-remove').on('click', function() {
         if (confirm('Are you sure you want to delete this time?')) {
-          ResultsPopoverService.remove(self.sessionId, self.index);
-          $rootScope.$broadcast('refresh results');
+          ResultsService.remove(self.results, self.sessionId, self.index);
+          $scope.$apply();
+          $(element).popover('hide');
         }
-        $(element).popover('hide');
       });
 
       $('.popover-input-comment').on('focus', function() {
@@ -53,8 +53,8 @@
         $rootScope.isTyping = false;
       }).on('keydown', function(event) {
         if (event.keyCode === ENTER_KEY_CODE) {
-          ResultsPopoverService.comment(self.sessionId, self.index, $('.popover-input-comment')[0].value);
-          $rootScope.$broadcast('refresh results');
+          ResultsService.comment(self.result, self.sessionId, self.index, $('.popover-input-comment')[0].value);
+          $scope.$apply();
           $(element).popover('hide');
         }
       })[0].value = self.result.comment;
@@ -63,6 +63,6 @@
 
   }
 
-  angular.module('results').controller('ResultsPopoverController', ['$rootScope', '$timeout', 'ResultsPopoverService', ResultsPopoverController]);
+  angular.module('results').controller('ResultsPopoverController', ['$scope', '$rootScope', '$timeout', 'ResultsService', ResultsPopoverController]);
 
 })();

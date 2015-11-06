@@ -112,14 +112,12 @@
     /**
      * Resets the session in local storage by clearing the results list.
      * @param sessionId
-     * @returns {object} session
      */
     self.resetSession = function(sessionId) {
 
       var session = LocalStorage.getJSON(sessionId);
       session.results = [];
       LocalStorage.setJSON(sessionId, session);
-      return session;
 
     };
 

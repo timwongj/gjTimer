@@ -64,10 +64,16 @@
       }
 
       if (times.length === 0) {
-        return self.DNF;
+        return {
+          mean: self.DNF,
+          stDev: self.calculateStandardDeviation(times, false)
+        };
       }
 
-      return Number((times.reduce(function(pv, cv) { return pv + cv; }, 0) / times.length).toFixed(0));
+      return {
+        mean: Number((times.reduce(function(pv, cv) { return pv + cv; }, 0) / times.length).toFixed(0)),
+        stDev: self.calculateStandardDeviation(times, false)
+      };
 
     };
 
@@ -130,6 +136,10 @@
      * @returns {number}
      */
     self.calculateStandardDeviation = function(rawTimes, trimmed) {
+
+      if (rawTimes.length === 0) {
+        return -1;
+      }
 
       var times = rawTimes.slice(0);
 
@@ -219,12 +229,12 @@
      */
     self.convertTimeFromMillisecondsToString = function(timeMilliseconds, precision) {
 
-      if (timeMilliseconds === self.DNF) {
-        return 'DNF';
+      if ((timeMilliseconds < 0) || (timeMilliseconds === Infinity)) {
+        return 'N/A';
       }
 
-      if (timeMilliseconds < 0) {
-        return 'N/A';
+      if (timeMilliseconds === self.DNF) {
+        return 'DNF';
       }
 
       var time = moment(timeMilliseconds);

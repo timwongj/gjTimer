@@ -10,9 +10,6 @@
 
     $scope.$on('refresh results', function($event, sessionId) {
       self.results = ResultsService.getResults(sessionId || self.sessionId, self.settings.resultsPrecision);
-      if ($scope.$root.$$phase != '$apply' && $scope.$root.$$phase != '$digest') {
-        $scope.$apply();
-      }
     });
 
     self.openModal = function(index, numberOfResults) {

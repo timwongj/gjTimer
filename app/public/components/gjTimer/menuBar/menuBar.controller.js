@@ -61,8 +61,9 @@
 
     self.resetSession = function() {
       if (confirm('Are you sure you want to reset ' + self.sessionId + '?')) {
-        self.session = MenuBarService.resetSession(self.sessionId);
-        $rootScope.$broadcast('refresh results', self.sessionId);
+        MenuBarService.resetSession(self.sessionId);
+        self.session.results = [];
+        self.results = [];
       }
     };
 

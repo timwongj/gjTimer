@@ -8,7 +8,9 @@
       restrict: 'E',
       scope: {
         index: '=',
+        precision: '=',
         result: '=',
+        results: '=',
         sessionId: '='
       },
       controller: 'ResultsPopoverController',
