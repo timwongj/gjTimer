@@ -64,7 +64,10 @@
       }
 
       if (times.length === 0) {
-        return self.DNF;
+        return {
+          mean: self.DNF,
+          stDev: self.calculateStandardDeviation(times, false)
+        };
       }
 
       return {
@@ -133,6 +136,10 @@
      * @returns {number}
      */
     self.calculateStandardDeviation = function(rawTimes, trimmed) {
+
+      if (rawTimes.length === 0) {
+        return -1;
+      }
 
       var times = rawTimes.slice(0);
 
@@ -222,12 +229,12 @@
      */
     self.convertTimeFromMillisecondsToString = function(timeMilliseconds, precision) {
 
-      if (timeMilliseconds === self.DNF) {
-        return 'DNF';
+      if ((timeMilliseconds < 0) || (timeMilliseconds === Infinity)) {
+        return 'N/A';
       }
 
-      if (timeMilliseconds < 0) {
-        return 'N/A';
+      if (timeMilliseconds === self.DNF) {
+        return 'DNF';
       }
 
       var time = moment(timeMilliseconds);
