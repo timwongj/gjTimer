@@ -9,9 +9,10 @@
     /**
      * Get results for the results modal.
      * @param results
+     * @param precision
      * @returns [Object] - results
      */
-    self.getModalResults = function(results) {
+    self.getModalResults = function(results, precision) {
 
       var rawTimes = Calculator.extractRawTimes(results);
 
@@ -20,8 +21,8 @@
 
       return {
         results: results,
-        avg: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateAverage(rawTimes)),
-        stDev: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateStandardDeviation(rawTimes, true))
+        avg: Calculator.calculateAverageString(rawTimes, true, precision),
+        stDev: Calculator.calculateStandardDeviationString(rawTimes, true, precision)
       };
 
     };

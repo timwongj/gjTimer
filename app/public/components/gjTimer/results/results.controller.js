@@ -23,6 +23,9 @@
           resolve: {
             results: function () {
               return self.results.slice(index - numberOfResults, index);
+            },
+            precision: function() {
+              return self.settings.resultsPrecision;
             }
           }
         });

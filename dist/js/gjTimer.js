@@ -133,126 +133,42 @@
 
     var self = this;
 
-    self.DNF = 864000000;
+    self.DNF = 864000000; // needs to be a high number (set to 1 day)
 
     /**
      * Calculates the average of the results.
      * @param rawTimes
+     * @param trimmed
      * @returns {number}
      */
-    self.calculateAverage = function(rawTimes) {
-
-      if (rawTimes.length < 3) {
-        return self.DNF;
-      }
+    self.calculateAverage = function(rawTimes, trimmed) {
 
       var times = rawTimes.slice(0);
 
       // remove best and worst time
-      times.splice(times.indexOf(Math.min.apply(null, times)), 1);
-      times.splice(times.indexOf(Math.max.apply(null, times)), 1);
+      if (trimmed) {
+        times.splice(times.indexOf(Math.min.apply(null, times)), 1);
+        times.splice(times.indexOf(Math.max.apply(null, times)), 1);
+      }
 
-      if (times.indexOf(self.DNF) >= 0) {
+      if ((times.indexOf(self.DNF) >= 0) || times.length === 0) {
         return self.DNF;
       } else {
-        return Number((times.reduce(function(pv, cv) { return pv + cv; }, 0) / times.length).toFixed(0));
+        return Number((times.reduce(function(pv, cv) { return pv + cv; }, 0) / times.length).toFixed());
       }
 
     };
 
     /**
-     * Calculates the mean of the results.
+     * Calculates the average of the results.
      * @param rawTimes
-     * @returns {number}
+     * @param trimmed
+     * @param precision
+     * @returns {string}
      */
-    self.calculateMean = function(rawTimes) {
+    self.calculateAverageString = function(rawTimes, trimmed, precision) {
 
-      if ((rawTimes.indexOf(self.DNF) >= 0) || (rawTimes.length === 0)) {
-        return self.DNF;
-      } else {
-        return Number((rawTimes.reduce(function(pv, cv) { return pv + cv; }, 0) / rawTimes.length).toFixed(0));
-      }
-
-    };
-
-    /**
-     * Calculates the mean of the results ignoring the DNFs.
-     * @param rawTimes
-     * @returns {number}
-     */
-    self.calculateSessionMean = function(rawTimes) {
-
-      var times = rawTimes.slice(0);
-
-      for (var i = 0; i < times.length; i++) {
-        if (times[i] === self.DNF) {
-          times.splice(i, 1);
-        }
-      }
-
-      if (times.length === 0) {
-        return {
-          mean: self.DNF,
-          stDev: self.calculateStandardDeviation(times, false)
-        };
-      }
-
-      return {
-        mean: Number((times.reduce(function(pv, cv) { return pv + cv; }, 0) / times.length).toFixed(0)),
-        stDev: self.calculateStandardDeviation(times, false)
-      };
-
-    };
-
-    /**
-     * Calculate the best avg, stDev, index
-     * @param rawTimes
-     * @param n
-     * @returns {{index: number, avg: number, stDev: number}}
-     */
-    self.calculateBestAverage = function(rawTimes, n) {
-
-      var currentAvg, bestAvg = self.DNF, index = -1;
-
-      for (var i = 0; i < rawTimes.length - n; i++) {
-        currentAvg = self.calculateAverage(rawTimes.slice(i, i + n));
-        if (currentAvg < bestAvg) {
-          bestAvg = currentAvg;
-          index = i;
-        }
-      }
-
-      return {
-        index: index,
-        avg: bestAvg,
-        stDev: bestAvg !== self.DNF ? self.calculateStandardDeviation(rawTimes.slice(index, index + n), true) : -1
-      };
-
-    };
-
-    /**
-     *
-     * @param rawTimes
-     * @param n
-     * @returns {number}
-     */
-    self.calculateBestMean = function(rawTimes, n) {
-
-      var currentMean, bestMean = self.DNF, index = -1;
-
-      for (var i = 0; i < rawTimes.length - n; i++) {
-        currentMean = self.calculateMean(rawTimes.slice(i, i + n));
-        if (currentMean < bestMean) {
-          bestMean = currentMean;
-          index = i;
-        }
-      }
-
-      return {
-        index: index,
-        mean: bestMean,
-        stDev: bestMean !== self.DNF ? self.calculateStandardDeviation(rawTimes.slice(index, index + n), false) : -1
-      };
+      return self.convertTimeFromMillisecondsToString(self.calculateAverage(rawTimes, trimmed), precision);
 
     };
 
@@ -264,22 +180,86 @@
      */
     self.calculateStandardDeviation = function(rawTimes, trimmed) {
 
-      if (rawTimes.length === 0) {
-        return -1;
-      }
-
       var times = rawTimes.slice(0);
 
+      // remove best and worst time
       if (trimmed) {
         times.splice(times.indexOf(Math.min.apply(null, times)), 1);
         times.splice(times.indexOf(Math.max.apply(null, times)), 1);
       }
 
-      var avg = self.calculateMean(times);
+      if ((times.indexOf(self.DNF) >= 0) || times.length === 0) {
+        return self.DNF;
+      } else {
+        var avg = self.calculateAverage(times, false);
+        var squareDiffs = times.map(function(time) { return Math.pow(time - avg, 2); });
+        return Number(Math.sqrt(self.calculateAverage(squareDiffs, false)).toFixed());
+      }
 
-      var squareDiffs = times.map(function(time) { return Math.pow(time - avg, 2); });
+    };
 
-      return Number(Math.sqrt(self.calculateMean(squareDiffs)).toFixed(0));
+    /**
+     * Calculate the standard deviation.
+     * @param rawTimes
+     * @param trimmed
+     * @param precision
+     * @returns {string}
+     */
+    self.calculateStandardDeviationString = function(rawTimes, trimmed, precision) {
+
+      return self.convertTimeFromMillisecondsToString(self.calculateStandardDeviation(rawTimes, trimmed), precision);
+
+    };
+
+    /**
+     * Calculates the mean of the results ignoring the DNFs.
+     * @param rawTimes
+     * @param precision
+     * @returns {string}
+     */
+    self.calculateSessionMeanAndStandardDeviationString = function(rawTimes, precision) {
+
+      var times = rawTimes.slice(0);
+
+      // remove DNFs
+      for (var i = 0; i < times.length; i++) {
+        if (times[i] === self.DNF) {
+          times.splice(i, 1);
+        }
+      }
+
+      return {
+        mean: self.calculateAverageString(times, false, precision),
+        stDev: self.calculateStandardDeviationString(times, false, precision)
+      };
+
+    };
+
+    /**
+     * Calculate the best avg, stDev, index
+     * @param rawTimes
+     * @param trimmed
+     * @param n
+     * @param precision
+     * @returns {{index: number, avg: number, stDev: number}}
+     */
+    self.calculateBestAverageAndStandardDeviationString = function(rawTimes, trimmed, n, precision) {
+
+      var currentAvg, bestAvg = self.DNF, index = -1;
+
+      for (var i = 0; i < rawTimes.length - n; i++) {
+        currentAvg = self.calculateAverage(rawTimes.slice(i, i + n), trimmed);
+        if (currentAvg < bestAvg) {
+          bestAvg = currentAvg;
+          index = i;
+        }
+      }
+
+      return {
+        index: index,
+        avg: self.convertTimeFromMillisecondsToString(bestAvg, precision),
+        stDev: self.calculateStandardDeviationString(rawTimes.slice(index, index + n), trimmed, precision)
+      };
 
     };
 
@@ -291,7 +271,6 @@
     self.extractRawTimes = function(results) {
 
       var rawTimes = [];
-
       for (var i = 0; i < results.length; i++) {
         rawTimes.push(results[i].rawTime);
       }
@@ -308,7 +287,6 @@
     self.countNonDNFs = function(rawTimes) {
 
       var count = 0;
-
       for (var i = 0; i< rawTimes.length; i++) {
         if (rawTimes[i] !== self.DNF) {
           count += 1;
@@ -944,6 +922,9 @@
           resolve: {
             results: function () {
               return self.results.slice(index - numberOfResults, index);
+            },
+            precision: function() {
+              return self.settings.resultsPrecision;
             }
           }
         });
@@ -1068,13 +1049,13 @@
     self.populateAverages = function(rawTimes, result, index, precision) {
 
       if (index >= 4) {
-        result.avg5 = Calculator.convertTimeFromMillisecondsToString(Calculator.calculateAverage(rawTimes.slice(index - 4, index + 1)), precision);
+        result.avg5 = Calculator.calculateAverageString(rawTimes.slice(index - 4, index + 1), true, precision);
       } else {
         result.avg5 = 'DNF';
       }
 
       if (index >= 11) {
-        result.avg12 = Calculator.convertTimeFromMillisecondsToString(Calculator.calculateAverage(rawTimes.slice(index - 11, index + 1)), precision);
+        result.avg12 = Calculator.calculateAverageString(rawTimes.slice(index - 11, index + 1), true, precision);
       } else {
         result.avg12 = 'DNF';
       }
@@ -1177,11 +1158,11 @@
 
   'use strict';
 
-  function ResultsModalController($modalInstance, results, ResultsModalService) {
+  function ResultsModalController($modalInstance, results, precision, ResultsModalService) {
 
     var self = this;
 
-    self.results = ResultsModalService.getModalResults(results);
+    self.results = ResultsModalService.getModalResults(results, precision);
 
     self.type = results.length === 3 ? 'mean' : 'average';
 
@@ -1206,9 +1187,10 @@
     /**
      * Get results for the results modal.
      * @param results
+     * @param precision
      * @returns [Object] - results
      */
-    self.getModalResults = function(results) {
+    self.getModalResults = function(results, precision) {
 
       var rawTimes = Calculator.extractRawTimes(results);
 
@@ -1217,8 +1199,8 @@
 
       return {
         results: results,
-        avg: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateAverage(rawTimes)),
-        stDev: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateStandardDeviation(rawTimes, true))
+        avg: Calculator.calculateAverageString(rawTimes, true, precision),
+        stDev: Calculator.calculateStandardDeviationString(rawTimes, true, precision)
       };
 
     };
@@ -1561,11 +1543,16 @@
 
     var self = this;
 
-    self.getStatistics = function(results) {
+    /**
+     * Get statistics.
+     * @param results
+     * @param precision
+     * @returns {{solves: {attempted: number, solved: number, best: string, worst: string}, sessionMean: ({mean, stDev}|string), sessionAvg: {avg: string, stDev: string}, averages: Array}}
+     */
+    self.getStatistics = function(results, precision) {
 
-      var best, rawTimes = Calculator.extractRawTimes(results);
+      var rawTimes = Calculator.extractRawTimes(results);
 
-      var sessionMean = Calculator.calculateSessionMean(rawTimes);
       var statistics = {
         solves: {
           attempted: rawTimes.length,
@@ -1573,30 +1560,23 @@
           best: Calculator.convertTimeFromMillisecondsToString(Math.min.apply(null, rawTimes)),
           worst: Calculator.convertTimeFromMillisecondsToString(Math.max.apply(null, rawTimes))
         },
-        sessionMean: {
-          mean: Calculator.convertTimeFromMillisecondsToString(sessionMean.mean),
-          stDev: Calculator.convertTimeFromMillisecondsToString(sessionMean.stDev)
-        },
+        sessionMean: Calculator.calculateSessionMeanAndStandardDeviationString(rawTimes, precision),
         sessionAvg: {
-          avg: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateAverage(rawTimes)),
-          stDev: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateStandardDeviation(rawTimes, true))
+          avg: Calculator.calculateAverageString(rawTimes, true, precision),
+          stDev: Calculator.calculateStandardDeviationString(rawTimes, true, precision)
         },
         averages: []
       };
 
       if (rawTimes.length >= 3) {
-        best = Calculator.calculateBestMean(rawTimes, 3);
         statistics.averages.push({
           type: 'm',
           length: 3,
           current: {
-            avg: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateMean(rawTimes.slice(rawTimes.length - 3, rawTimes.length))),
-            stDev: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateStandardDeviation(rawTimes.slice(rawTimes.length - 3, rawTimes.length), false))
+            avg: Calculator.calculateAverageString(rawTimes.slice(rawTimes.length - 3, rawTimes.length), false, precision),
+            stDev: Calculator.calculateStandardDeviationString(rawTimes.slice(rawTimes.length - 3, rawTimes.length), false, precision)
           },
-          best: {
-            avg: Calculator.convertTimeFromMillisecondsToString(best.mean),
-            stDev: Calculator.convertTimeFromMillisecondsToString(best.stDev)
-          }
+          best: Calculator.calculateBestAverageAndStandardDeviationString(rawTimes, false, 3, precision)
         });
       }
 
@@ -1604,18 +1584,14 @@
 
       for (var i = 0; i < typesOfAverages.length; i++) {
         if (rawTimes.length >= typesOfAverages[i]) {
-          best = Calculator.calculateBestAverage(rawTimes, typesOfAverages[i]);
           statistics.averages.push({
             type: 'a',
             length: typesOfAverages[i],
             current: {
-              avg: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateAverage(rawTimes.slice(rawTimes.length - typesOfAverages[i], rawTimes.length))),
-              stDev: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateStandardDeviation(rawTimes.slice(rawTimes.length - typesOfAverages[i], rawTimes.length), true))
+              avg: Calculator.calculateAverageString(rawTimes.slice(rawTimes.length - typesOfAverages[i], rawTimes.length), true, precision),
+              stDev: Calculator.calculateStandardDeviation(rawTimes.slice(rawTimes.length - typesOfAverages[i], rawTimes.length), true, precision)
             },
-            best: {
-              avg: Calculator.convertTimeFromMillisecondsToString(best.avg),
-              stDev: Calculator.convertTimeFromMillisecondsToString(best.stDev)
-            }
+            best: Calculator.calculateBestAverageAndStandardDeviationString(rawTimes, true, typesOfAverages[i], precision)
           });
         }
       }
