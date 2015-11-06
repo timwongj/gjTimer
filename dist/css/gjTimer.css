@@ -171,6 +171,11 @@
   margin: .125em;
   padding: .125em;
 }
+@media screen and (min-width: 48em) and (max-width: 62em) {
+  #statistics {
+    height: 22.0625em;
+  }
+}
 #statistics .stat {
   white-space: nowrap;
   font-weight: 500;

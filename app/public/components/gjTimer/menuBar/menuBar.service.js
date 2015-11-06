@@ -130,6 +130,10 @@
       LocalStorage.setJSON('settings', settings);
     };
 
+    self.resetAll = function() {
+      LocalStorage.clear();
+    };
+
   }
 
   angular.module('menuBar').service('MenuBarService', ['LocalStorage', MenuBarService]);

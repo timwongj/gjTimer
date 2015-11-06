@@ -36,9 +36,16 @@
     </div>
   </div>
   <div class="modal-footer">
+    <div class="pull-left">
+      <button class="btn btn-danger btn-sm" ng-click="ctrl.resetAll()">
+        <span class="glyphicon glyphicon-trash"></span>&nbsp;Reset All
+      </button>
+    </div>
     <div class="pull-right">
       <button class="btn btn-default btn-sm" ng-click="ctrl.close()">Cancel</button>
-      <button class="btn btn-success btn-sm" ng-click="ctrl.save()">Save</button>
+      <button class="btn btn-success btn-sm" ng-click="ctrl.save()">
+        <span class="glyphicon glyphicon-floppy-save"></span>&nbsp;Save
+      </button>
     </div>
   </div>
 </div>
