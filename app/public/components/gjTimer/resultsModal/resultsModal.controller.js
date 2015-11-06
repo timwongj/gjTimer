@@ -2,11 +2,11 @@
 
   'use strict';
 
-  function ResultsModalController($modalInstance, results, ResultsModalService) {
+  function ResultsModalController($modalInstance, results, precision, ResultsModalService) {
 
     var self = this;
 
-    self.results = ResultsModalService.getModalResults(results);
+    self.results = ResultsModalService.getModalResults(results, precision);
 
     self.type = results.length === 3 ? 'mean' : 'average';
 

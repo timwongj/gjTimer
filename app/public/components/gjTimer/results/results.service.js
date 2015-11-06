@@ -110,13 +110,13 @@
     self.populateAverages = function(rawTimes, result, index, precision) {
 
       if (index >= 4) {
-        result.avg5 = Calculator.convertTimeFromMillisecondsToString(Calculator.calculateAverage(rawTimes.slice(index - 4, index + 1)), precision);
+        result.avg5 = Calculator.calculateAverageString(rawTimes.slice(index - 4, index + 1), true, precision);
       } else {
         result.avg5 = 'DNF';
       }
 
       if (index >= 11) {
-        result.avg12 = Calculator.convertTimeFromMillisecondsToString(Calculator.calculateAverage(rawTimes.slice(index - 11, index + 1)), precision);
+        result.avg12 = Calculator.calculateAverageString(rawTimes.slice(index - 11, index + 1), true, precision);
       } else {
         result.avg12 = 'DNF';
       }

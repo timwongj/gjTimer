@@ -22,46 +22,33 @@
 
     describe('calculateAverage function', function() {
 
-      it('should calculate the average of the results without penalties', function() {
+    });
 
-        rawTimes = [644, 848, 708, 420, 625];
-
-        average = Calculator.calculateAverage(rawTimes);
-
-        expect(average).toEqual(659);
-
-      });
+    describe('calculateAverageString function', function() {
 
     });
 
-    describe('calculateMean function', function() {
-
-      it('should calculate the mean of the results without penalties', function() {
-
-        rawTimes = [644, 708, 625];
-
-        mean = Calculator.calculateMean(rawTimes);
-
-        expect(mean).toEqual(659);
-
-      });
+    describe('calculateStandardDeviation function', function() {
 
     });
 
-    describe('calculateSessionMean function', function() {
+    describe('calculateStandardDeviationString function', function() {
 
-      it('should calculate the large mean of the results without penalties', function() {
+    });
 
-        rawTimes = [644, 848, 708, 420, 625];
+    describe('calculateSessionMeanAndStandardDeviationString function', function() {
 
-        sessionMean = Calculator.calculateSessionMean(rawTimes);
+    });
 
-        expect(sessionMean).toEqual({
-          mean: 649,
-          stDev: 139
-        });
+    describe('calculateBestAverageAndStandardDeviationString function', function() {
 
-      });
+    });
+
+    describe('extractRawTimes function', function() {
+
+    });
+
+    describe('countNonDNFs function', function() {
 
     });
 

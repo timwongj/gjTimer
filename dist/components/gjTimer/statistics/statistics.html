@@ -5,10 +5,10 @@
     <span class="stat">Worst: {{ctrl.statistics.solves.worst}} | </span>
   </div>
   <div>
-    <span class="stat" ng-if="ctrl.statistics.sessionMean.stDev === 'N/A'">Mean: {{ctrl.statistics.sessionMean.mean}} | </span>
-    <span class="stat" ng-if="ctrl.statistics.sessionMean.stDev !== 'N/A'">Mean: {{ctrl.statistics.sessionMean.mean}} (&rho;={{ctrl.statistics.sessionMean.stDev}}) | </span>
-    <span class="stat" ng-if="ctrl.statistics.sessionAvg.stDev === 'N/A'">Avg: {{ctrl.statistics.sessionAvg.avg}}</span>
-    <span class="stat" ng-if="ctrl.statistics.sessionAvg.stDev !== 'N/A'">Avg: {{ctrl.statistics.sessionAvg.avg}} (&rho;={{ctrl.statistics.sessionAvg.stDev}})</span>
+    <span class="stat" ng-if="ctrl.statistics.sessionMean.stDev === 'DNF'">Mean: {{ctrl.statistics.sessionMean.mean}} | </span>
+    <span class="stat" ng-if="ctrl.statistics.sessionMean.stDev !== 'DNF'">Mean: {{ctrl.statistics.sessionMean.mean}} (&rho;={{ctrl.statistics.sessionMean.stDev}}) | </span>
+    <span class="stat" ng-if="ctrl.statistics.sessionAvg.stDev === 'DNF'">Avg: {{ctrl.statistics.sessionAvg.avg}}</span>
+    <span class="stat" ng-if="ctrl.statistics.sessionAvg.stDev !== 'DNF'">Avg: {{ctrl.statistics.sessionAvg.avg}} (&rho;={{ctrl.statistics.sessionAvg.stDev}})</span>
   </div>
   <table class="table table-bordered table-hover">
     <thead>
@@ -25,11 +25,11 @@
       </td>
       <td class="data" ng-click="ctrl.openModal('current', $index)">
         <span ng-bind="average.current.avg"></span>
-        <span ng-if="average.current.stDev !== 'N/A'">&nbsp;(&rho;={{average.current.stDev}})</span>
+        <span ng-if="average.current.stDev !== 'DNF'">&nbsp;(&rho;={{average.current.stDev}})</span>
       </td>
       <td class="data" ng-click="ctrl.openModal('best', $index)">
         <span ng-bind="average.best.avg"></span>
-        <span ng-if="average.best.stDev !== 'N/A'">&nbsp;(&rho;={{average.best.stDev}})</span>
+        <span ng-if="average.best.stDev !== 'DNF'">&nbsp;(&rho;={{average.best.stDev}})</span>
       </td>
     </tr>
     </tbody>

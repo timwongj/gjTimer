@@ -6,11 +6,16 @@
 
     var self = this;
 
-    self.getStatistics = function(results) {
+    /**
+     * Get statistics.
+     * @param results
+     * @param precision
+     * @returns {{solves: {attempted: number, solved: number, best: string, worst: string}, sessionMean: ({mean, stDev}|string), sessionAvg: {avg: string, stDev: string}, averages: Array}}
+     */
+    self.getStatistics = function(results, precision) {
 
-      var best, rawTimes = Calculator.extractRawTimes(results);
+      var rawTimes = Calculator.extractRawTimes(results);
 
-      var sessionMean = Calculator.calculateSessionMean(rawTimes);
       var statistics = {
         solves: {
           attempted: rawTimes.length,
@@ -18,30 +23,23 @@
           best: Calculator.convertTimeFromMillisecondsToString(Math.min.apply(null, rawTimes)),
           worst: Calculator.convertTimeFromMillisecondsToString(Math.max.apply(null, rawTimes))
         },
-        sessionMean: {
-          mean: Calculator.convertTimeFromMillisecondsToString(sessionMean.mean),
-          stDev: Calculator.convertTimeFromMillisecondsToString(sessionMean.stDev)
-        },
+        sessionMean: Calculator.calculateSessionMeanAndStandardDeviationString(rawTimes, precision),
         sessionAvg: {
-          avg: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateAverage(rawTimes)),
-          stDev: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateStandardDeviation(rawTimes, true))
+          avg: Calculator.calculateAverageString(rawTimes, true, precision),
+          stDev: Calculator.calculateStandardDeviationString(rawTimes, true, precision)
         },
         averages: []
       };
 
       if (rawTimes.length >= 3) {
-        best = Calculator.calculateBestMean(rawTimes, 3);
         statistics.averages.push({
           type: 'm',
           length: 3,
           current: {
-            avg: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateMean(rawTimes.slice(rawTimes.length - 3, rawTimes.length))),
-            stDev: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateStandardDeviation(rawTimes.slice(rawTimes.length - 3, rawTimes.length), false))
+            avg: Calculator.calculateAverageString(rawTimes.slice(rawTimes.length - 3, rawTimes.length), false, precision),
+            stDev: Calculator.calculateStandardDeviationString(rawTimes.slice(rawTimes.length - 3, rawTimes.length), false, precision)
           },
-          best: {
-            avg: Calculator.convertTimeFromMillisecondsToString(best.mean),
-            stDev: Calculator.convertTimeFromMillisecondsToString(best.stDev)
-          }
+          best: Calculator.calculateBestAverageAndStandardDeviationString(rawTimes, false, 3, precision)
         });
       }
 
@@ -49,18 +47,14 @@
 
       for (var i = 0; i < typesOfAverages.length; i++) {
         if (rawTimes.length >= typesOfAverages[i]) {
-          best = Calculator.calculateBestAverage(rawTimes, typesOfAverages[i]);
           statistics.averages.push({
             type: 'a',
             length: typesOfAverages[i],
             current: {
-              avg: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateAverage(rawTimes.slice(rawTimes.length - typesOfAverages[i], rawTimes.length))),
-              stDev: Calculator.convertTimeFromMillisecondsToString(Calculator.calculateStandardDeviation(rawTimes.slice(rawTimes.length - typesOfAverages[i], rawTimes.length), true))
+              avg: Calculator.calculateAverageString(rawTimes.slice(rawTimes.length - typesOfAverages[i], rawTimes.length), true, precision),
+              stDev: Calculator.calculateStandardDeviation(rawTimes.slice(rawTimes.length - typesOfAverages[i], rawTimes.length), true, precision)
             },
-            best: {
-              avg: Calculator.convertTimeFromMillisecondsToString(best.avg),
-              stDev: Calculator.convertTimeFromMillisecondsToString(best.stDev)
-            }
+            best: Calculator.calculateBestAverageAndStandardDeviationString(rawTimes, true, typesOfAverages[i], precision)
           });
         }
       }
