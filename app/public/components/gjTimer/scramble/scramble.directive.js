@@ -11,7 +11,8 @@
       scope: {
         eventId: '=',
         scramble: '='
-      }
+      },
+      bindToController: true
     };
   }
 

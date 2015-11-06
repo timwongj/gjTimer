@@ -11,12 +11,13 @@
 }
 
 .jumbotron-timer, .jumbotron-results, .jumbotron-statistics {
+  margin-bottom: 0;
+  border-radius: 0 !important;
+  background-color: @color-jumbotron;
   @media (min-width: @breakpoint-md) {
     height: @height-section-md;
+    border-radius: 2px !important;
   }
-  margin-bottom: 0;
-  border-radius: 2px !important;
-  background-color: @color-jumbotron;
 }
 
 .jumbotron-timer {
@@ -38,6 +39,13 @@
   border-radius: 2px;
 }
 
+.modal {
+  top: 5%;
+}
+
+.modal-content {
+  border-radius: 3px;
+}
 #cub {
 
   margin: .25em;
@@ -118,10 +126,6 @@
 }
 
 @max-height-modal-body: calc(~"100vh - 15em");
-
-.modal {
-  top: 5%;
-}
 
 #resultsModal {
 

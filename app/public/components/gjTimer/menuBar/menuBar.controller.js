@@ -10,9 +10,9 @@
     self.session = MenuBarService.initSession();
     self.events = Events.getEvents();
     self.event = { eventId: self.session.eventId, event: Events.getEvent(self.session.eventId) };
-    $scope.sessionId = self.session.sessionId;
-    $scope.eventId = self.session.eventId;
-    $scope.settings = MenuBarService.getSettings();
+    self.sessionId = self.session.sessionId;
+    self.eventId = self.session.eventId;
+    self.settings = MenuBarService.getSettings();
 
     self.showDetails = window.innerWidth > 500;
     $(window).resize(function(){
@@ -23,28 +23,28 @@
     // TODO - find a better solution to waiting for controllers to initialize before broadcasting
     // The cutoff for successful broadcast is ~15-20ms, so 50 should be sufficient for now.
     $timeout(function() {
-      $rootScope.$broadcast('new scramble', $scope.eventId);
+      $rootScope.$broadcast('new scramble', self.eventId);
     }, 50);
 
     self.changeSession = function(sessionId) {
       self.session = MenuBarService.changeSession(sessionId);
-      $scope.sessionId = sessionId;
-      $scope.eventId = self.session.eventId;
+      self.sessionId = sessionId;
+      self.eventId = self.session.eventId;
       $rootScope.$broadcast('refresh results', sessionId);
       if (self.event.eventId !== self.session.eventId) {
-        $rootScope.$broadcast('new scramble', $scope.eventId);
+        $rootScope.$broadcast('new scramble', self.eventId);
       }
-      self.event = { eventId: $scope.eventId, event: Events.getEvent($scope.eventId) };
+      self.event = { eventId: self.eventId, event: Events.getEvent(self.eventId) };
     };
 
     self.changeEvent = function(event) {
-      $scope.eventId = MenuBarService.changeEvent($scope.sessionId, Events.getEventId(event));
-      self.session.eventId = $scope.eventId;
-      self.event = { eventId: $scope.eventId, event: Events.getEvent($scope.eventId) };
-      $rootScope.$broadcast('new scramble', $scope.eventId);
+      self.eventId = MenuBarService.changeEvent(self.sessionId, Events.getEventId(event));
+      self.session.eventId = self.eventId;
+      self.event = { eventId: self.eventId, event: Events.getEvent(self.eventId) };
+      $rootScope.$broadcast('new scramble', self.eventId);
     };
 
-    self.settings = function() {
+    self.openSettings = function() {
       $uibModal.open({
         animation: true,
         templateUrl: 'dist/components/gjTimer/settings/settings.html',
@@ -53,16 +53,16 @@
         size: 'md',
         resolve: {
           settings: function () {
-            return $scope.settings;
+            return self.settings;
           }
         }
       });
     };
 
     self.resetSession = function() {
-      if (confirm('Are you sure you want to reset ' + $scope.sessionId + '?')) {
-        self.session = MenuBarService.resetSession($scope.sessionId);
-        $rootScope.$broadcast('refresh results', $scope.sessionId);
+      if (confirm('Are you sure you want to reset ' + self.sessionId + '?')) {
+        self.session = MenuBarService.resetSession(self.sessionId);
+        $rootScope.$broadcast('refresh results', self.sessionId);
       }
     };
 

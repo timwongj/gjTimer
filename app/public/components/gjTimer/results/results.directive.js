@@ -12,7 +12,8 @@
         results: '=',
         sessionId: '=',
         settings: '='
-      }
+      },
+      bindToController: true
     };
   }
 

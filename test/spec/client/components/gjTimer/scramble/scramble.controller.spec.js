@@ -53,19 +53,19 @@
 
     describe('new scramble event', function() {
 
-      it('should call the getNewScramble function from the ScrambleService with the eventId and set $scope.scramble to the new scramble', function() {
+      it('should call the getNewScramble function from the ScrambleService with the eventId and set self.scramble to the new scramble', function() {
 
         $rootScope.$broadcast('new scramble', eventId);
         expect(ScrambleService.getNewScramble).toHaveBeenCalledWith(eventId);
-        expect($scope.scramble).toEqual(scramble);
+        expect(ScrambleController.scramble).toEqual(scramble);
 
       });
 
       it('should call the trustAsHtml function from the $sce service and set self.scramble to it', function() {
 
         $rootScope.$broadcast('new scramble', eventId);
-        expect($sce.trustAsHtml).toHaveBeenCalledWith($scope.scramble);
-        expect(ScrambleController.scramble.$$unwrapTrustedValue()).toEqual($scope.scramble);
+        expect($sce.trustAsHtml).toHaveBeenCalledWith(ScrambleController.scramble);
+        expect(ScrambleController.displayedScramble.$$unwrapTrustedValue()).toEqual(ScrambleController.scramble);
 
       });
 
@@ -76,7 +76,6 @@
         expect(ScrambleController.scrambleStyle).toEqual(style);
 
       });
-
 
       it('should broadcast the draw scramble event', function() {
 
