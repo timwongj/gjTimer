@@ -6,6 +6,8 @@
 
     var self = this;
 
+    var ENTER_KEY_CODE = 13;
+
     self.attachEvents = function (element) {
 
       $('.popover').on('mouseenter', function () {
@@ -44,6 +46,18 @@
         }
         $(element).popover('hide');
       });
+
+      $('.popover-input-comment').on('focus', function() {
+        $rootScope.isTyping = true;
+      }).on('blur', function() {
+        $rootScope.isTyping = false;
+      }).on('keydown', function(event) {
+        if (event.keyCode === ENTER_KEY_CODE) {
+          ResultsPopoverService.comment(self.sessionId, self.index, $('.popover-input-comment')[0].value);
+          $rootScope.$broadcast('refresh results');
+          $(element).popover('hide');
+        }
+      })[0].value = self.result.comment;
 
     };
 

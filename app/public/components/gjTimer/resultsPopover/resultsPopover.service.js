@@ -47,9 +47,9 @@
      * @param index
      */
     self.remove = function(sessionId, index) {
-      var session = JSON.parse(localStorage.getItem(sessionId));
+      var session = LocalStorage.getJSON(sessionId);
       session.results.splice(index, 1);
-      localStorage.setItem(sessionId, JSON.stringify(session));
+      LocalStorage.setJSON(sessionId, session);
     };
 
     /**
@@ -59,7 +59,20 @@
      * @param comment
      */
     self.comment = function(sessionId, index, comment) {
-      console.log('comment ' + sessionId + ' - ' + index + ' - ' + comment);
+      var session = LocalStorage.getJSON(sessionId);
+      var result = session.results[index].split('|');
+      if (comment !== '') {
+        if (result[3]) {
+          result[3] = comment;
+          session.results[index] = result.join('|');
+        } else {
+          session.results[index] = session.results[index] + '|' + comment;
+        }
+      } else if (result[3]) {
+        result.splice(3, 1);
+        session.results[index] = result.join('|');
+      }
+      LocalStorage.setJSON(sessionId, session);
     };
 
   }
