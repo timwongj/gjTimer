@@ -6,7 +6,7 @@
 
     var self = this;
 
-    $scope.$watch(function() {
+    $scope.$watchCollection(function() {
       return self.results;
     }, function() {
       self.statistics = StatisticsService.getStatistics(self.results);
