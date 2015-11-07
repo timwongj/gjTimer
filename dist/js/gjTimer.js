@@ -713,10 +713,12 @@
     var NUMBER_OF_SESSIONS = 15;
 
     var DEFAULT_SETTINGS = {
-      input: 'timer',
-      timerStartDelay: 50,
-      timerStopDelay: 50,
+      input: 'Timer',
+      saveScrambles: 'Yes',
+      timerStartDelay: 0,
+      timerStopDelay: 100,
       resultsPrecision: 2,
+      statisticsPrecision: 2,
       timerPrecision: 3,
       timerRefreshInterval: 50
     };
@@ -1151,7 +1153,7 @@
 
   }
 
-  angular.module('results').controller('ResultsModalController', ['$modalInstance', 'results', 'ResultsModalService', ResultsModalController]);
+  angular.module('results').controller('ResultsModalController', ['$modalInstance', 'results', 'precision', 'ResultsModalService', ResultsModalController]);
 
 })();
 
@@ -1421,17 +1423,25 @@
 
     var self = this;
 
-    self.settings = settings;
+    self.settings = [
+      { id: 'input', description: 'Input', options: ['Timer', 'Keyboard', 'Stackmat'] },
+      { id: 'saveScrambles', description: 'Save Scrambles', options: ['Yes', 'No'] },
+      { id: 'timerStartDelay', description: 'Timer Start Delay', options: [0, 100, 200, 500] },
+      { id: 'timerStopDelay', description: 'Timer Stop Delay', options: [0, 100, 200, 500] },
+      { id: 'timerPrecision', description: 'Timer Precision', options: [2, 3] },
+      { id: 'resultsPrecision', description: 'Results Precision', options: [2, 3] },
+      { id: 'statisticsPrecision', description: 'Stats Precision', options: [2, 3] },
+    ];
 
-    self.options = {
-      input: ['timer', 'keyboard', 'stackmat'],
-      timerStartDelay: [0, 50, 100],
-      resultsPrecision: [2, 3],
-      timerPrecision: [2, 3]
-    };
+    for (var i = 0; i < self.settings.length; i++) {
+      self.settings[i].value = settings[self.settings[i].id];
+    }
 
     self.save = function() {
-      MenuBarService.saveSettings(self.settings);
+      for (var i = 0; i < self.settings.length; i++) {
+        settings[self.settings[i].id] = self.settings[i].value;
+      }
+      MenuBarService.saveSettings(settings);
       $modalInstance.dismiss();
       $rootScope.$broadcast('refresh settings');
       $rootScope.$broadcast('refresh results');
@@ -1467,7 +1477,8 @@
       controller: 'StatisticsController',
       controllerAs: 'ctrl',
       scope: {
-        results: '='
+        results: '=',
+        settings: '='
       },
       bindToController: true
     };
@@ -1488,7 +1499,7 @@
     $scope.$watchCollection(function() {
       return self.results;
     }, function() {
-      self.statistics = StatisticsService.getStatistics(self.results);
+      self.statistics = StatisticsService.getStatistics(self.results, self.settings.statisticsPrecision);
     });
 
     self.openModal = function(format, $index) {
@@ -1503,6 +1514,9 @@
         resolve: {
           results: function() {
             return self.results.slice(index, index + length);
+          },
+          precision: function() {
+            return self.settings.resultsPrecision;
           }
         }
       });
@@ -1536,8 +1550,8 @@
         solves: {
           attempted: rawTimes.length,
           solved: Calculator.countNonDNFs(rawTimes),
-          best: Calculator.convertTimeFromMillisecondsToString(Math.min.apply(null, rawTimes)),
-          worst: Calculator.convertTimeFromMillisecondsToString(Math.max.apply(null, rawTimes))
+          best: Calculator.convertTimeFromMillisecondsToString(Math.min.apply(null, rawTimes), precision),
+          worst: Calculator.convertTimeFromMillisecondsToString(Math.max.apply(null, rawTimes), precision)
         },
         sessionMean: Calculator.calculateSessionMeanAndStandardDeviationString(rawTimes, precision),
         sessionAvg: {

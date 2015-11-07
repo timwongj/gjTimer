@@ -9,7 +9,7 @@
     $scope.$watchCollection(function() {
       return self.results;
     }, function() {
-      self.statistics = StatisticsService.getStatistics(self.results);
+      self.statistics = StatisticsService.getStatistics(self.results, self.settings.statisticsPrecision);
     });
 
     self.openModal = function(format, $index) {
@@ -24,6 +24,9 @@
         resolve: {
           results: function() {
             return self.results.slice(index, index + length);
+          },
+          precision: function() {
+            return self.settings.resultsPrecision;
           }
         }
       });

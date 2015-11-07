@@ -20,8 +20,8 @@
         solves: {
           attempted: rawTimes.length,
           solved: Calculator.countNonDNFs(rawTimes),
-          best: Calculator.convertTimeFromMillisecondsToString(Math.min.apply(null, rawTimes)),
-          worst: Calculator.convertTimeFromMillisecondsToString(Math.max.apply(null, rawTimes))
+          best: Calculator.convertTimeFromMillisecondsToString(Math.min.apply(null, rawTimes), precision),
+          worst: Calculator.convertTimeFromMillisecondsToString(Math.max.apply(null, rawTimes), precision)
         },
         sessionMean: Calculator.calculateSessionMeanAndStandardDeviationString(rawTimes, precision),
         sessionAvg: {

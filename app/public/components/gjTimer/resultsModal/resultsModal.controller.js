@@ -16,6 +16,6 @@
 
   }
 
-  angular.module('results').controller('ResultsModalController', ['$modalInstance', 'results', 'ResultsModalService', ResultsModalController]);
+  angular.module('results').controller('ResultsModalController', ['$modalInstance', 'results', 'precision', 'ResultsModalService', ResultsModalController]);
 
 })();
