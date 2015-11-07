@@ -47,6 +47,7 @@ module.exports = (function() {
 
     // services
     'app/public/components/shared/services/calculator.service.js',
+    'app/public/components/shared/services/constants.service.js',
     'app/public/components/shared/services/events.service.js',
     'app/public/components/shared/services/localStorage.service.js',
 

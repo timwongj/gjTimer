@@ -2,11 +2,9 @@
 
   'use strict';
 
-  function ResultsPopoverController($scope, $rootScope, $timeout, ResultsService) {
+  function ResultsPopoverController($scope, $rootScope, $timeout, ResultsService, Constants) {
 
     var self = this;
-
-    var ENTER_KEY_CODE = 13;
 
     self.attachEvents = function (element) {
 
@@ -54,7 +52,7 @@
           $rootScope.isTypingComment = false;
         }, 1);
       }).on('keydown', function(event) {
-        if (event.keyCode === ENTER_KEY_CODE) {
+        if (event.keyCode === Constants.KEY_CODES.ENTER) {
           ResultsService.comment(self.result, self.sessionId, self.index, $('.popover-input-comment')[0].value);
           $scope.$apply();
           $(element).popover('hide');
@@ -65,6 +63,6 @@
 
   }
 
-  angular.module('results').controller('ResultsPopoverController', ['$scope', '$rootScope', '$timeout', 'ResultsService', ResultsPopoverController]);
+  angular.module('results').controller('ResultsPopoverController', ['$scope', '$rootScope', '$timeout', 'ResultsService', 'Constants', ResultsPopoverController]);
 
 })();

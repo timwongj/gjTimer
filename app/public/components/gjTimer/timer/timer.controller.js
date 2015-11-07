@@ -2,20 +2,11 @@
 
   'use strict';
 
-  function TimerController($scope, $rootScope, $interval, $timeout, TimerService, ResultsService) {
+  function TimerController($scope, $rootScope, $interval, $timeout, TimerService, ResultsService, Constants) {
 
     var self = this;
 
     var timer, inspection, state = 'reset', penalty = '', comment = '', precision = self.settings.timerPrecision;
-    var SPACE_BAR_KEY_CODE = 32;
-
-    var STYLES = {
-      BLACK: { 'color': '#000000' },
-      RED: { 'color': '#FF0000' },
-      ORANGE: { 'color': '#FFA500' },
-      GREEN: { 'color': '#2EB82E' },
-      BLUE: { 'color': '#0000FF' }
-    };
 
     if (self.settings.input === 'Timer') {
       self.time = self.settings.inspection !== 'On' ? (precision === 2 ? '0.00' : '0.000') : '15';
@@ -38,13 +29,13 @@
       if (self.settings.input === 'Timer') {
         if (self.settings.inspection === 'On') {
 
-          if ((state === 'reset') && (event.keyCode === SPACE_BAR_KEY_CODE)) {
+          if ((state === 'reset') && (event.keyCode === Constants.KEY_CODES.SPACE_BAR)) {
             self.prepareInspection();
-          } else if ((state === 'inspecting') && (event.keyCode === SPACE_BAR_KEY_CODE)) {
+          } else if ((state === 'inspecting') && (event.keyCode === Constants.KEY_CODES.SPACE_BAR)) {
             self.prepareTimerWIthInspection();
           }
 
-        } else if ((state === 'reset') && (event.keyCode === SPACE_BAR_KEY_CODE)) {
+        } else if ((state === 'reset') && (event.keyCode === Constants.KEY_CODES.SPACE_BAR)) {
           self.prepareTimer();
         }
 
@@ -61,16 +52,16 @@
       if (self.settings.input === 'Timer') {
         if (self.settings.inspection === 'On') {
 
-          if ((state === 'pre inspection') && (event.keyCode === SPACE_BAR_KEY_CODE)) {
+          if ((state === 'pre inspection') && (event.keyCode === Constants.KEY_CODES.SPACE_BAR)) {
             self.startInspection();
-          } else if ((state === 'pre timing') && (event.keyCode === SPACE_BAR_KEY_CODE)) {
+          } else if ((state === 'pre timing') && (event.keyCode === Constants.KEY_CODES.SPACE_BAR)) {
             self.stopInspection();
             self.startTimer();
           } else {
             self.resetTimer();
           }
 
-        } else if ((state === 'ready') && (event.keyCode === SPACE_BAR_KEY_CODE)) {
+        } else if ((state === 'ready') && (event.keyCode === Constants.KEY_CODES.SPACE_BAR)) {
           self.startTimer();
         } else {
           self.resetTimer();
@@ -83,11 +74,11 @@
 
       state = 'keydown';
       self.time = precision === 2 ? '0.00' : '0.000';
-      self.timerStyle = STYLES.ORANGE;
+      self.timerStyle = Constants.STYLES.COLOR.ORANGE;
       $timeout(function () {
         if (state === 'keydown') {
           state = 'ready';
-          self.timerStyle = STYLES.GREEN;
+          self.timerStyle = Constants.STYLES.COLOR.GREEN;
           $rootScope.$broadcast('timer focus');
         }
       }, self.settings.timerStartDelay);
@@ -97,7 +88,7 @@
     self.startTimer = function() {
 
       state = 'timing';
-      self.timerStyle = STYLES.BLACK;
+      self.timerStyle = Constants.STYLES.COLOR.BLACK;
       TimerService.startTimer();
       timer = $interval(function () {
         self.time = TimerService.getTime(precision);
@@ -117,7 +108,7 @@
     self.prepareInspection = function() {
 
       state = 'pre inspection';
-      self.timerStyle = STYLES.ORANGE;
+      self.timerStyle = Constants.STYLES.COLOR.ORANGE;
       self.time = '15';
       $rootScope.$broadcast('timer focus');
 
@@ -126,15 +117,15 @@
     self.startInspection = function() {
 
       state = 'inspecting';
-      self.timerStyle = STYLES.BLUE;
+      self.timerStyle = Constants.STYLES.COLOR.BLUE;
       TimerService.startInspection();
       inspection = $interval(function() {
         var time = TimerService.getInspectionTime();
         if (time > 0) {
           self.time = time;
         } else if (time > -2) {
-          if (self.timerStyle !== STYLES.ORANGE) {
-            self.timerStyle = STYLES.RED;
+          if (self.timerStyle !== Constants.STYLES.COLOR.ORANGE) {
+            self.timerStyle = Constants.STYLES.COLOR.RED;
           }
           self.time = '+2';
           penalty = '+2';
@@ -149,7 +140,7 @@
     self.prepareTimerWIthInspection = function() {
 
       state = 'pre timing';
-      self.timerStyle = STYLES.ORANGE;
+      self.timerStyle = Constants.STYLES.COLOR.ORANGE;
 
     };
 
@@ -161,7 +152,7 @@
 
     self.resetTimer = function() {
 
-      self.timerStyle = STYLES.BLACK;
+      self.timerStyle = Constants.STYLES.COLOR.BLACK;
       $rootScope.$broadcast('timer unfocus');
       if ((state === 'keydown') || (state === 'stopped')) {
         state = 'reset';
@@ -184,6 +175,6 @@
 
   }
 
-  angular.module('timer').controller('TimerController', ['$scope', '$rootScope', '$interval', '$timeout', 'TimerService', 'ResultsService', TimerController]);
+  angular.module('timer').controller('TimerController', ['$scope', '$rootScope', '$interval', '$timeout', 'TimerService', 'ResultsService', 'Constants', TimerController]);
 
 })();

@@ -2,11 +2,9 @@
 
   'use strict';
 
-  function SettingsController($scope, $rootScope, $modalInstance, settings, MenuBarService) {
+  function SettingsController($scope, $rootScope, $modalInstance, settings, MenuBarService, Constants) {
 
     var self = this;
-
-    var ENTER_KEY_CODE = 13, ESCAPE_KEY_CODE = 27;
 
     self.settings = [
       { id: 'input', title: 'Input', options: ['Timer', 'Typing', 'Stackmat'] },
@@ -27,10 +25,10 @@
 
     $scope.$on('keydown', function($event, event) {
       switch(event.keyCode) {
-        case ENTER_KEY_CODE:
+        case Constants.KEY_CODES.ENTER:
           self.save();
           break;
-        case ESCAPE_KEY_CODE:
+        case Constants.KEY_CODES.ESCAPE:
           self.close();
           break;
       }
@@ -61,6 +59,6 @@
 
   }
 
-  angular.module('menuBar').controller('SettingsController', ['$scope', '$rootScope', '$modalInstance', 'settings', 'MenuBarService', SettingsController]);
+  angular.module('menuBar').controller('SettingsController', ['$scope', '$rootScope', '$modalInstance', 'settings', 'MenuBarService', 'Constants', SettingsController]);
 
 })();
