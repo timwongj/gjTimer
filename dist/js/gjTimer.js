@@ -1485,7 +1485,7 @@
 
     var self = this;
 
-    $scope.$watch(function() {
+    $scope.$watchCollection(function() {
       return self.results;
     }, function() {
       self.statistics = StatisticsService.getStatistics(self.results);
@@ -1568,7 +1568,7 @@
             length: typesOfAverages[i],
             current: {
               avg: Calculator.calculateAverageString(rawTimes.slice(rawTimes.length - typesOfAverages[i], rawTimes.length), true, precision),
-              stDev: Calculator.calculateStandardDeviation(rawTimes.slice(rawTimes.length - typesOfAverages[i], rawTimes.length), true, precision)
+              stDev: Calculator.calculateStandardDeviationString(rawTimes.slice(rawTimes.length - typesOfAverages[i], rawTimes.length), true, precision)
             },
             best: Calculator.calculateBestAverageAndStandardDeviationString(rawTimes, true, typesOfAverages[i], precision)
           });
