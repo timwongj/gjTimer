@@ -10,6 +10,8 @@
 
     var DEFAULT_SETTINGS = {
       input: 'Timer',
+      inspection: 'No',
+      showScramble: 'Yes',
       saveScrambles: 'Yes',
       timerStartDelay: 0,
       timerStopDelay: 100,

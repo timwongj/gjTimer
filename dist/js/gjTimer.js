@@ -540,7 +540,9 @@
       templateUrl: 'dist/components/gjTimer/cub/cub.html',
       controller: 'CubController',
       controllerAs: 'ctrl',
-      scope: true,
+      scope: {
+        settings: '='
+      },
       bindToController: true
     };
   }
@@ -715,6 +717,8 @@
 
     var DEFAULT_SETTINGS = {
       input: 'Timer',
+      inspection: 'No',
+      showScramble: 'Yes',
       saveScrambles: 'Yes',
       timerStartDelay: 0,
       timerStopDelay: 100,
@@ -1429,13 +1433,15 @@
     var ENTER_KEY_CODE = 13, ESCAPE_KEY_CODE = 27;
 
     self.settings = [
-      { id: 'input', description: 'Input', options: ['Timer', 'Typing', 'Stackmat'] },
-      { id: 'saveScrambles', description: 'Save Scrambles', options: ['Yes', 'No'] },
-      { id: 'timerStartDelay', description: 'Timer Start Delay', options: [0, 100, 200, 500] },
-      { id: 'timerStopDelay', description: 'Timer Stop Delay', options: [0, 100, 200, 500] },
-      { id: 'timerPrecision', description: 'Timer Precision', options: [2, 3] },
-      { id: 'resultsPrecision', description: 'Results Precision', options: [2, 3] },
-      { id: 'statisticsPrecision', description: 'Stats Precision', options: [2, 3] },
+      { id: 'input', title: 'Input', options: ['Timer', 'Typing', 'Stackmat'] },
+      { id: 'inspection', title: 'Inspection', options: ['Yes', 'No'] },
+      { id: 'showScramble', title: 'Show Scramble', options: ['Yes', 'No'] },
+      { id: 'saveScrambles', title: 'Save Scrambles', options: ['Yes', 'No'] },
+      { id: 'timerStartDelay', title: 'Timer Start Delay', options: [0, 100, 200, 500] },
+      { id: 'timerStopDelay', title: 'Timer Stop Delay', options: [0, 100, 200, 500] },
+      { id: 'timerPrecision', title: 'Timer Precision', options: [2, 3] },
+      { id: 'resultsPrecision', title: 'Results Precision', options: [2, 3] },
+      { id: 'statisticsPrecision', title: 'Stats Precision', options: [2, 3] }
     ];
 
     for (var i = 0; i < self.settings.length; i++) {
