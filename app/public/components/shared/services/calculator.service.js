@@ -2,11 +2,9 @@
 
   'use strict';
 
-  function Calculator() {
+  function Calculator(Constants) {
 
     var self = this;
-
-    self.DNF = 864000000; // needs to be a high number (set to 1 day)
 
     /**
      * Calculates the average of the results.
@@ -24,8 +22,8 @@
         times.splice(times.indexOf(Math.max.apply(null, times)), 1);
       }
 
-      if ((times.indexOf(self.DNF) >= 0) || times.length === 0) {
-        return self.DNF;
+      if ((times.indexOf(Constants.DNF) >= 0) || times.length === 0) {
+        return Constants.DNF;
       } else {
         return Number((times.reduce(function(pv, cv) { return pv + cv; }, 0) / times.length).toFixed());
       }
@@ -61,8 +59,8 @@
         times.splice(times.indexOf(Math.max.apply(null, times)), 1);
       }
 
-      if ((times.indexOf(self.DNF) >= 0) || times.length === 0) {
-        return self.DNF;
+      if ((times.indexOf(Constants.DNF) >= 0) || times.length === 0) {
+        return Constants.DNF;
       } else {
         var avg = self.calculateAverage(times, false);
         var squareDiffs = times.map(function(time) { return Math.pow(time - avg, 2); });
@@ -93,7 +91,7 @@
     self.calculateSessionMeanAndStandardDeviationString = function(rawTimes, precision) {
 
       // remove DNFs
-      var times = rawTimes.slice(0).filter(function(time) { return time !== self.DNF; });
+      var times = rawTimes.slice(0).filter(function(time) { return time !== Constants.DNF; });
 
       return {
         mean: self.calculateAverageString(times, false, precision),
@@ -112,7 +110,7 @@
      */
     self.calculateBestAverageAndStandardDeviationString = function(rawTimes, trimmed, n, precision) {
 
-      var currentAvg, bestAvg = self.DNF, index = -1;
+      var currentAvg, bestAvg = Constants.DNF, index = -1;
 
       for (var i = 0; i < rawTimes.length - n; i++) {
         currentAvg = self.calculateAverage(rawTimes.slice(i, i + n), trimmed);
@@ -153,7 +151,7 @@
      */
     self.countNonDNFs = function(rawTimes) {
 
-      return rawTimes.slice(0).filter(function(time) { return time !== self.DNF; }).length;
+      return rawTimes.slice(0).filter(function(time) { return time !== Constants.DNF; }).length;
 
     };
 
@@ -165,7 +163,7 @@
     self.convertTimeFromStringToMilliseconds = function(timeString) {
 
       if (timeString === 'DNF') {
-        return self.DNF;
+        return Constants.DNF;
       }
 
       var res = timeString.split(':');
@@ -177,7 +175,7 @@
       } else if (res.length === 3) {
         return Number(((parseFloat(res[0]) * 60 * 60 * 1000) + (parseFloat(res[1]) * 60 * 1000) + (parseFloat(res[2]) * 1000)).toFixed());
       } else {
-        return self.DNF;
+        return Constants.DNF;
       }
 
     };
@@ -190,27 +188,34 @@
      */
     self.convertTimeFromMillisecondsToString = function(timeMilliseconds, precision) {
 
-      if ((timeMilliseconds === self.DNF) || (timeMilliseconds < 0) || (timeMilliseconds === Infinity)) {
+      if ((timeMilliseconds === Constants.DNF) || (timeMilliseconds < 0) || (timeMilliseconds === Infinity)) {
         return 'DNF';
       }
 
-      var time = moment(timeMilliseconds);
-      var ms = precision === 2 ? 'SS' : 'SSS';
+      var ms, time = moment(timeMilliseconds);
+
+      switch(precision) {
+        case 0: ms = ''; break;
+        case 1: ms = '.S'; break;
+        case 2: ms = '.SS'; break;
+        case 3: ms = '.SSS'; break;
+        default: ms = '.SS'; break;
+      }
 
       if (timeMilliseconds < 10000) {
-        return time.format('s.' + ms);
+        return time.format('s' + ms);
       } else if (timeMilliseconds < 60000) {
-        return time.format('ss.' + ms);
+        return time.format('ss' + ms);
       } else if (timeMilliseconds < 3600000) {
-        return time.format('m:ss.' + ms);
+        return time.format('m:ss' + ms);
       } else {
-        return time.utc().format('H:mm:ss.' + ms);
+        return time.utc().format('H:mm:ss' + ms);
       }
 
     };
 
   }
 
-  angular.module('gjTimer.services').service('Calculator', Calculator);
+  angular.module('gjTimer.services').service('Calculator', ['Constants', Calculator]);
 
 })();

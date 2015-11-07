@@ -2,11 +2,11 @@
 
   'use strict';
 
-  function ResultsService(LocalStorage, Calculator) {
+  function ResultsService(LocalStorage, Calculator, Constants) {
 
     var self = this;
 
-    var DNF = Calculator.DNF;
+    var DNF = Constants.DNF;
 
     /**
      * Gets results for the session.
@@ -111,7 +111,7 @@
       results.push(result);
 
       var session = LocalStorage.getJSON(sessionId);
-      session.results.push(timeString + '|' + scramble + '|' + Date.now());
+      session.results.push(timeString + '|' + scramble + '|' + Date.now() + (comment !== '' ? '|' + comment : ''));
       LocalStorage.setJSON(sessionId, session);
 
     };
@@ -156,6 +156,7 @@
       switch(penalty) {
         case '':
           result.penalty = '';
+          result.rawTime = result.time;
           result.displayedTime = Calculator.convertTimeFromMillisecondsToString(result.time, precision);
           result.detailedTime = result.displayedTime;
           if ((pen === '+') || (pen === '-')) {
@@ -164,6 +165,7 @@
           break;
         case '+2':
           result.penalty = '+2';
+          result.rawTime = result.time + 2000;
           result.displayedTime = Calculator.convertTimeFromMillisecondsToString(result.time + 2000, precision) + '+';
           result.detailedTime = result.displayedTime;
           if ((pen === '+') || (pen === '-')) {
@@ -174,6 +176,7 @@
           break;
         case 'DNF':
           result.penalty = 'DNF';
+          result.rawTime = Constants.DNF;
           result.displayedTime = 'DNF';
           result.detailedTime = 'DNF(' + Calculator.convertTimeFromMillisecondsToString(result.time, precision) + ')';
           if ((pen === '+') || (pen === '-')) {
@@ -227,6 +230,6 @@
 
   }
 
-  angular.module('results').service('ResultsService', ['LocalStorage', 'Calculator', ResultsService]);
+  angular.module('results').service('ResultsService', ['LocalStorage', 'Calculator', 'Constants', ResultsService]);
 
 })();

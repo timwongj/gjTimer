@@ -10,11 +10,11 @@
       { id: 'input', title: 'Input', options: ['Timer', 'Typing', 'Stackmat'] },
       { id: 'inspection', title: 'Inspection', options: ['On', 'Off'] },
       { id: 'bldMode', title: 'BLD Mode', options: ['On', 'Off'] },
+      { id: 'timerStartDelay', title: 'Timer Start Delay', options: [0, 100, 550, 1000] },
+      { id: 'timerPrecision', title: 'Timer Precision', options: [0, 1, 2, 3] },
+      { id: 'timerRefreshInterval', title: 'Timer Refresh', options: [50, 100, 500, 1000] },
       { id: 'showScramble', title: 'Show Scramble', options: ['Yes', 'No'] },
       { id: 'saveScrambles', title: 'Save Scrambles', options: ['Yes', 'No'] },
-      { id: 'timerStartDelay', title: 'Timer Start Delay', options: [0, 100, 200, 500] },
-      { id: 'timerStopDelay', title: 'Timer Stop Delay', options: [0, 100, 200, 500] },
-      { id: 'timerPrecision', title: 'Timer Precision', options: [2, 3] },
       { id: 'resultsPrecision', title: 'Results Precision', options: [2, 3] },
       { id: 'statisticsPrecision', title: 'Stats Precision', options: [2, 3] }
     ];

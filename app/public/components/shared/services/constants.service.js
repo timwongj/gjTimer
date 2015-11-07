@@ -36,6 +36,27 @@
       }
     };
 
+    self.SESSIONS = {
+      DEFAULT_NUMBER_OF_SESSIONS: 15
+    };
+
+    self.SETTINGS = {
+      DEFAULT_SETTINGS: {
+        input: 'Timer',
+        inspection: 'Off',
+        bldMode: 'Off',
+        timerStartDelay: 0,
+        timerPrecision: 3,
+        timerRefreshInterval: 50,
+        showScramble: 'Yes',
+        saveScrambles: 'Yes',
+        resultsPrecision: 2,
+        statisticsPrecision: 3
+      }
+    };
+
+    self.DNF = 864000000;
+
   }
 
   angular.module('gjTimer.services').service('Constants', Constants);

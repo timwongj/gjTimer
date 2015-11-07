@@ -22,18 +22,21 @@
       $('.popover-btn-penalty-ok').on('click', function() {
         ResultsService.penalty(self.result, self.sessionId, self.index, '', self.precision);
         $scope.$apply();
+        $rootScope.$broadcast('refresh statistics');
         $(element).popover('hide');
       });
 
       $('.popover-btn-penalty-plus').on('click', function() {
         ResultsService.penalty(self.result, self.sessionId, self.index, '+2', self.precision);
         $scope.$apply();
+        $rootScope.$broadcast('refresh statistics');
         $(element).popover('hide');
       });
 
       $('.popover-btn-penalty-dnf').on('click', function() {
         ResultsService.penalty(self.result, self.sessionId, self.index, 'DNF', self.precision);
         $scope.$apply();
+        $rootScope.$broadcast('refresh statistics');
         $(element).popover('hide');
       });
 

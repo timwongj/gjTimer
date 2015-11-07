@@ -126,11 +126,9 @@
 
   'use strict';
 
-  function Calculator() {
+  function Calculator(Constants) {
 
     var self = this;
-
-    self.DNF = 864000000; // needs to be a high number (set to 1 day)
 
     /**
      * Calculates the average of the results.
@@ -148,8 +146,8 @@
         times.splice(times.indexOf(Math.max.apply(null, times)), 1);
       }
 
-      if ((times.indexOf(self.DNF) >= 0) || times.length === 0) {
-        return self.DNF;
+      if ((times.indexOf(Constants.DNF) >= 0) || times.length === 0) {
+        return Constants.DNF;
       } else {
         return Number((times.reduce(function(pv, cv) { return pv + cv; }, 0) / times.length).toFixed());
       }
@@ -185,8 +183,8 @@
         times.splice(times.indexOf(Math.max.apply(null, times)), 1);
       }
 
-      if ((times.indexOf(self.DNF) >= 0) || times.length === 0) {
-        return self.DNF;
+      if ((times.indexOf(Constants.DNF) >= 0) || times.length === 0) {
+        return Constants.DNF;
       } else {
         var avg = self.calculateAverage(times, false);
         var squareDiffs = times.map(function(time) { return Math.pow(time - avg, 2); });
@@ -217,7 +215,7 @@
     self.calculateSessionMeanAndStandardDeviationString = function(rawTimes, precision) {
 
       // remove DNFs
-      var times = rawTimes.slice(0).filter(function(time) { return time !== self.DNF; });
+      var times = rawTimes.slice(0).filter(function(time) { return time !== Constants.DNF; });
 
       return {
         mean: self.calculateAverageString(times, false, precision),
@@ -236,7 +234,7 @@
      */
     self.calculateBestAverageAndStandardDeviationString = function(rawTimes, trimmed, n, precision) {
 
-      var currentAvg, bestAvg = self.DNF, index = -1;
+      var currentAvg, bestAvg = Constants.DNF, index = -1;
 
       for (var i = 0; i < rawTimes.length - n; i++) {
         currentAvg = self.calculateAverage(rawTimes.slice(i, i + n), trimmed);
@@ -277,7 +275,7 @@
      */
     self.countNonDNFs = function(rawTimes) {
 
-      return rawTimes.slice(0).filter(function(time) { return time !== self.DNF; }).length;
+      return rawTimes.slice(0).filter(function(time) { return time !== Constants.DNF; }).length;
 
     };
 
@@ -289,7 +287,7 @@
     self.convertTimeFromStringToMilliseconds = function(timeString) {
 
       if (timeString === 'DNF') {
-        return self.DNF;
+        return Constants.DNF;
       }
 
       var res = timeString.split(':');
@@ -301,7 +299,7 @@
       } else if (res.length === 3) {
         return Number(((parseFloat(res[0]) * 60 * 60 * 1000) + (parseFloat(res[1]) * 60 * 1000) + (parseFloat(res[2]) * 1000)).toFixed());
       } else {
-        return self.DNF;
+        return Constants.DNF;
       }
 
     };
@@ -314,28 +312,35 @@
      */
     self.convertTimeFromMillisecondsToString = function(timeMilliseconds, precision) {
 
-      if ((timeMilliseconds === self.DNF) || (timeMilliseconds < 0) || (timeMilliseconds === Infinity)) {
+      if ((timeMilliseconds === Constants.DNF) || (timeMilliseconds < 0) || (timeMilliseconds === Infinity)) {
         return 'DNF';
       }
 
-      var time = moment(timeMilliseconds);
-      var ms = precision === 2 ? 'SS' : 'SSS';
+      var ms, time = moment(timeMilliseconds);
+
+      switch(precision) {
+        case 0: ms = ''; break;
+        case 1: ms = '.S'; break;
+        case 2: ms = '.SS'; break;
+        case 3: ms = '.SSS'; break;
+        default: ms = '.SS'; break;
+      }
 
       if (timeMilliseconds < 10000) {
-        return time.format('s.' + ms);
+        return time.format('s' + ms);
       } else if (timeMilliseconds < 60000) {
-        return time.format('ss.' + ms);
+        return time.format('ss' + ms);
       } else if (timeMilliseconds < 3600000) {
-        return time.format('m:ss.' + ms);
+        return time.format('m:ss' + ms);
       } else {
-        return time.utc().format('H:mm:ss.' + ms);
+        return time.utc().format('H:mm:ss' + ms);
       }
 
     };
 
   }
 
-  angular.module('gjTimer.services').service('Calculator', Calculator);
+  angular.module('gjTimer.services').service('Calculator', ['Constants', Calculator]);
 
 })();
 
@@ -376,6 +381,27 @@
         WHITE: { 'background-color': self.COLORS.WHITE }
       }
     };
+
+    self.SESSIONS = {
+      DEFAULT_NUMBER_OF_SESSIONS: 15
+    };
+
+    self.SETTINGS = {
+      DEFAULT_SETTINGS: {
+        input: 'Timer',
+        inspection: 'Off',
+        bldMode: 'Off',
+        timerStartDelay: 0,
+        timerPrecision: 3,
+        timerRefreshInterval: 50,
+        showScramble: 'Yes',
+        saveScrambles: 'Yes',
+        resultsPrecision: 2,
+        statisticsPrecision: 3
+      }
+    };
+
+    self.DNF = 864000000;
 
   }
 
@@ -749,25 +775,9 @@
 
   'use strict';
 
-  function MenuBarService(LocalStorage) {
+  function MenuBarService(LocalStorage, Constants) {
 
     var self = this;
-
-    var NUMBER_OF_SESSIONS = 15;
-
-    var DEFAULT_SETTINGS = {
-      input: 'Timer',
-      inspection: 'Off',
-      bldMode: 'Off',
-      showScramble: 'Yes',
-      saveScrambles: 'Yes',
-      timerStartDelay: 0,
-      timerStopDelay: 100,
-      resultsPrecision: 2,
-      statisticsPrecision: 3,
-      timerPrecision: 3,
-      timerRefreshInterval: 50
-    };
 
     /**
      * Gets settings from local storage or initializes it if it doesn't exist.
@@ -776,13 +786,13 @@
     self.initSettings = function() {
       var settings = LocalStorage.getJSON('settings');
       if (settings === null) {
-        LocalStorage.setJSON('settings', DEFAULT_SETTINGS);
-        return DEFAULT_SETTINGS;
+        LocalStorage.setJSON('settings', Constants.SETTINGS.DEFAULT_SETTINGS);
+        return Constants.SETTINGS.DEFAULT_SETTINGS;
       } else {
-        for (var key in DEFAULT_SETTINGS) {
-          if (DEFAULT_SETTINGS.hasOwnProperty(key)) {
+        for (var key in Constants.SETTINGS.DEFAULT_SETTINGS) {
+          if (Constants.SETTINGS.DEFAULT_SETTINGS.hasOwnProperty(key)) {
             if (!settings.hasOwnProperty(key)) {
-              settings[key] = DEFAULT_SETTINGS[key];
+              settings[key] = Constants.SETTINGS.DEFAULT_SETTINGS[key];
               LocalStorage.setJSON('settings', settings);
             }
           }
@@ -807,7 +817,7 @@
 
       var sessions = [];
 
-      for (var i = 1; i <= NUMBER_OF_SESSIONS; i++) {
+      for (var i = 1; i <= Constants.SESSIONS.DEFAULT_NUMBER_OF_SESSIONS; i++) {
         sessions.push('Session ' + i);
         var session = LocalStorage.getJSON('Session ' + i);
         if (session === null) {
@@ -897,7 +907,7 @@
 
   }
 
-  angular.module('menuBar').service('MenuBarService', ['LocalStorage', MenuBarService]);
+  angular.module('menuBar').service('MenuBarService', ['LocalStorage', 'Constants', MenuBarService]);
 
 })();
 
@@ -968,11 +978,11 @@
 
   'use strict';
 
-  function ResultsService(LocalStorage, Calculator) {
+  function ResultsService(LocalStorage, Calculator, Constants) {
 
     var self = this;
 
-    var DNF = Calculator.DNF;
+    var DNF = Constants.DNF;
 
     /**
      * Gets results for the session.
@@ -1077,7 +1087,7 @@
       results.push(result);
 
       var session = LocalStorage.getJSON(sessionId);
-      session.results.push(timeString + '|' + scramble + '|' + Date.now());
+      session.results.push(timeString + '|' + scramble + '|' + Date.now() + (comment !== '' ? '|' + comment : ''));
       LocalStorage.setJSON(sessionId, session);
 
     };
@@ -1122,6 +1132,7 @@
       switch(penalty) {
         case '':
           result.penalty = '';
+          result.rawTime = result.time;
           result.displayedTime = Calculator.convertTimeFromMillisecondsToString(result.time, precision);
           result.detailedTime = result.displayedTime;
           if ((pen === '+') || (pen === '-')) {
@@ -1130,6 +1141,7 @@
           break;
         case '+2':
           result.penalty = '+2';
+          result.rawTime = result.time + 2000;
           result.displayedTime = Calculator.convertTimeFromMillisecondsToString(result.time + 2000, precision) + '+';
           result.detailedTime = result.displayedTime;
           if ((pen === '+') || (pen === '-')) {
@@ -1140,6 +1152,7 @@
           break;
         case 'DNF':
           result.penalty = 'DNF';
+          result.rawTime = Constants.DNF;
           result.displayedTime = 'DNF';
           result.detailedTime = 'DNF(' + Calculator.convertTimeFromMillisecondsToString(result.time, precision) + ')';
           if ((pen === '+') || (pen === '-')) {
@@ -1193,7 +1206,7 @@
 
   }
 
-  angular.module('results').service('ResultsService', ['LocalStorage', 'Calculator', ResultsService]);
+  angular.module('results').service('ResultsService', ['LocalStorage', 'Calculator', 'Constants', ResultsService]);
 
 })();
 
@@ -1345,18 +1358,21 @@
       $('.popover-btn-penalty-ok').on('click', function() {
         ResultsService.penalty(self.result, self.sessionId, self.index, '', self.precision);
         $scope.$apply();
+        $rootScope.$broadcast('refresh statistics');
         $(element).popover('hide');
       });
 
       $('.popover-btn-penalty-plus').on('click', function() {
         ResultsService.penalty(self.result, self.sessionId, self.index, '+2', self.precision);
         $scope.$apply();
+        $rootScope.$broadcast('refresh statistics');
         $(element).popover('hide');
       });
 
       $('.popover-btn-penalty-dnf').on('click', function() {
         ResultsService.penalty(self.result, self.sessionId, self.index, 'DNF', self.precision);
         $scope.$apply();
+        $rootScope.$broadcast('refresh statistics');
         $(element).popover('hide');
       });
 
@@ -1489,11 +1505,11 @@
       { id: 'input', title: 'Input', options: ['Timer', 'Typing', 'Stackmat'] },
       { id: 'inspection', title: 'Inspection', options: ['On', 'Off'] },
       { id: 'bldMode', title: 'BLD Mode', options: ['On', 'Off'] },
+      { id: 'timerStartDelay', title: 'Timer Start Delay', options: [0, 100, 550, 1000] },
+      { id: 'timerPrecision', title: 'Timer Precision', options: [0, 1, 2, 3] },
+      { id: 'timerRefreshInterval', title: 'Timer Refresh', options: [50, 100, 500, 1000] },
       { id: 'showScramble', title: 'Show Scramble', options: ['Yes', 'No'] },
       { id: 'saveScrambles', title: 'Save Scrambles', options: ['Yes', 'No'] },
-      { id: 'timerStartDelay', title: 'Timer Start Delay', options: [0, 100, 200, 500] },
-      { id: 'timerStopDelay', title: 'Timer Stop Delay', options: [0, 100, 200, 500] },
-      { id: 'timerPrecision', title: 'Timer Precision', options: [2, 3] },
       { id: 'resultsPrecision', title: 'Results Precision', options: [2, 3] },
       { id: 'statisticsPrecision', title: 'Stats Precision', options: [2, 3] }
     ];
@@ -1575,6 +1591,10 @@
     $scope.$watchCollection(function() {
       return self.results;
     }, function() {
+      self.statistics = StatisticsService.getStatistics(self.results, self.settings.statisticsPrecision);
+    });
+
+    $scope.$on('refresh statistics', function() {
       self.statistics = StatisticsService.getStatistics(self.results, self.settings.statisticsPrecision);
     });
 

@@ -2,25 +2,9 @@
 
   'use strict';
 
-  function MenuBarService(LocalStorage) {
+  function MenuBarService(LocalStorage, Constants) {
 
     var self = this;
-
-    var NUMBER_OF_SESSIONS = 15;
-
-    var DEFAULT_SETTINGS = {
-      input: 'Timer',
-      inspection: 'Off',
-      bldMode: 'Off',
-      showScramble: 'Yes',
-      saveScrambles: 'Yes',
-      timerStartDelay: 0,
-      timerStopDelay: 100,
-      resultsPrecision: 2,
-      statisticsPrecision: 3,
-      timerPrecision: 3,
-      timerRefreshInterval: 50
-    };
 
     /**
      * Gets settings from local storage or initializes it if it doesn't exist.
@@ -29,13 +13,13 @@
     self.initSettings = function() {
       var settings = LocalStorage.getJSON('settings');
       if (settings === null) {
-        LocalStorage.setJSON('settings', DEFAULT_SETTINGS);
-        return DEFAULT_SETTINGS;
+        LocalStorage.setJSON('settings', Constants.SETTINGS.DEFAULT_SETTINGS);
+        return Constants.SETTINGS.DEFAULT_SETTINGS;
       } else {
-        for (var key in DEFAULT_SETTINGS) {
-          if (DEFAULT_SETTINGS.hasOwnProperty(key)) {
+        for (var key in Constants.SETTINGS.DEFAULT_SETTINGS) {
+          if (Constants.SETTINGS.DEFAULT_SETTINGS.hasOwnProperty(key)) {
             if (!settings.hasOwnProperty(key)) {
-              settings[key] = DEFAULT_SETTINGS[key];
+              settings[key] = Constants.SETTINGS.DEFAULT_SETTINGS[key];
               LocalStorage.setJSON('settings', settings);
             }
           }
@@ -60,7 +44,7 @@
 
       var sessions = [];
 
-      for (var i = 1; i <= NUMBER_OF_SESSIONS; i++) {
+      for (var i = 1; i <= Constants.SESSIONS.DEFAULT_NUMBER_OF_SESSIONS; i++) {
         sessions.push('Session ' + i);
         var session = LocalStorage.getJSON('Session ' + i);
         if (session === null) {
@@ -150,6 +134,6 @@
 
   }
 
-  angular.module('menuBar').service('MenuBarService', ['LocalStorage', MenuBarService]);
+  angular.module('menuBar').service('MenuBarService', ['LocalStorage', 'Constants', MenuBarService]);
 
 })();
