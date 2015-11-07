@@ -1728,7 +1728,7 @@
 
     var self = this;
 
-    var timer, inspection, state = 'reset', penalty = '', comment = '', precision = self.settings.timerPrecision;
+    var timer, inspection, state = 'reset', penalty = '', comment = '', memo = '', precision = self.settings.timerPrecision;
 
     if (self.settings.input === 'Timer') {
       self.time = self.settings.inspection !== 'On' ? (precision === 2 ? '0.00' : '0.000') : '15';
@@ -1750,21 +1750,18 @@
 
       if (self.settings.input === 'Timer') {
         if (self.settings.inspection === 'On') {
-
           if ((state === 'reset') && (event.keyCode === Constants.KEY_CODES.SPACE_BAR)) {
             self.prepareInspection();
           } else if ((state === 'inspecting') && (event.keyCode === Constants.KEY_CODES.SPACE_BAR)) {
             self.prepareTimerWIthInspection();
           }
-
         } else if ((state === 'reset') && (event.keyCode === Constants.KEY_CODES.SPACE_BAR)) {
           self.prepareTimer();
-        }
-
-        if (state === 'timing') {
+        } else if (state === 'memorizing') {
+          self.saveMemorizationTime();
+        } else if (state === 'timing') {
           self.stopTimer();
         }
-
       }
 
     });
@@ -1773,7 +1770,6 @@
 
       if (self.settings.input === 'Timer') {
         if (self.settings.inspection === 'On') {
-
           if ((state === 'pre inspection') && (event.keyCode === Constants.KEY_CODES.SPACE_BAR)) {
             self.startInspection();
           } else if ((state === 'pre timing') && (event.keyCode === Constants.KEY_CODES.SPACE_BAR)) {
@@ -1782,9 +1778,10 @@
           } else {
             self.resetTimer();
           }
-
         } else if ((state === 'ready') && (event.keyCode === Constants.KEY_CODES.SPACE_BAR)) {
           self.startTimer();
+        } else if (state == 'execution') {
+          self.startExecutionTime();
         } else {
           self.resetTimer();
         }
@@ -1796,7 +1793,9 @@
 
       state = 'keydown';
       self.time = precision === 2 ? '0.00' : '0.000';
-      self.timerStyle = Constants.STYLES.COLOR.ORANGE;
+      if (self.settings.timerStartDelay !== 0) {
+        self.timerStyle = Constants.STYLES.COLOR.ORANGE;
+      }
       $timeout(function () {
         if (state === 'keydown') {
           state = 'ready';
@@ -1809,8 +1808,13 @@
 
     self.startTimer = function() {
 
-      state = 'timing';
-      self.timerStyle = Constants.STYLES.COLOR.BLACK;
+      if ((self.settings.bldMode === 'On') && (self.settings.inspection !== 'On')) {
+        state = 'memorizing';
+        self.timerStyle = Constants.STYLES.COLOR.BLUE;
+      } else {
+        state = 'timing';
+        self.timerStyle = Constants.STYLES.COLOR.BLACK;
+      }
       TimerService.startTimer();
       timer = $interval(function () {
         self.time = TimerService.getTime(precision);
@@ -1822,6 +1826,7 @@
 
       state = 'stopped';
       $interval.cancel(timer);
+      comment = TimerService.createCommentForBldMode(self.time, memo);
       ResultsService.saveResult(self.results, self.time, penalty, comment, self.scramble, self.sessionId, self.settings.resultsPrecision);
       $rootScope.$broadcast('new scramble', self.eventId);
 
@@ -1872,6 +1877,20 @@
 
     };
 
+    self.saveMemorizationTime = function() {
+
+      state = 'execution';
+      self.timerStyle = Constants.STYLES.COLOR.BLACK;
+      memo = self.time;
+
+    };
+
+    self.startExecutionTime = function() {
+
+      state = 'timing';
+
+    };
+
     self.resetTimer = function() {
 
       self.timerStyle = Constants.STYLES.COLOR.BLACK;
@@ -1880,6 +1899,8 @@
         state = 'reset';
       }
       penalty = '';
+      memo = '';
+      comment = '';
 
     };
 
@@ -1945,6 +1966,15 @@
     self.startInspection = function() {
 
       self.inspectionStartTime = Date.now();
+
+    };
+
+    self.createCommentForBldMode = function(time, memo) {
+
+      var timeMilliseconds = Calculator.convertTimeFromStringToMilliseconds(time);
+      var memoMilliseconds = Calculator.convertTimeFromStringToMilliseconds(memo);
+      var execution = Calculator.convertTimeFromMillisecondsToString(timeMilliseconds - memoMilliseconds);
+      return 'memo: ' + memo + ', exe: ' + execution;
 
     };
 

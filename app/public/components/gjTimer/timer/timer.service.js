@@ -45,6 +45,15 @@
 
     };
 
+    self.createCommentForBldMode = function(time, memo) {
+
+      var timeMilliseconds = Calculator.convertTimeFromStringToMilliseconds(time);
+      var memoMilliseconds = Calculator.convertTimeFromStringToMilliseconds(memo);
+      var execution = Calculator.convertTimeFromMillisecondsToString(timeMilliseconds - memoMilliseconds);
+      return 'memo: ' + memo + ', exe: ' + execution;
+
+    };
+
   }
 
   angular.module('timer').service('TimerService', ['LocalStorage', 'Calculator', TimerService]);
