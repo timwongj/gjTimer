@@ -1,11 +1,14 @@
+@screen-sm-min: 48em;
+@screen-md-min: 62em;
+@screen-lg-min: 75em;
+
 @color-jumbotron: #eee;
 @height-section-md: calc(~"100vh - 4em");
-@breakpoint-sm: 48em;
-@breakpoint-md: 62em;
+
 
 .section {
   padding: .375em 0;
-  @media (min-width: @breakpoint-sm) {
+  @media (min-width: @screen-sm-min) {
     padding: .375em;
   }
 }
@@ -14,7 +17,7 @@
   margin-bottom: 0;
   border-radius: 0 !important;
   background-color: @color-jumbotron;
-  @media (min-width: @breakpoint-md) {
+  @media (min-width: @screen-md-min) {
     height: @height-section-md;
     border-radius: 2px !important;
   }
@@ -83,7 +86,7 @@
 
 }
 
-@height-results: calc(~"100vh - 5.875em");
+@height-results-md: calc(~"100vh - 5.875em");
 @height-results-sm: 21.5em;
 
 #results {
@@ -95,9 +98,9 @@
   tbody {
     display: block;
     overflow: auto;
-    height: @height-results;
-    @media screen and (max-width: @breakpoint-md) {
-      height: @height-results-sm;
+    height: @height-results-sm;
+    @media screen and (min-width: @screen-md-min) {
+      height: @height-results-md;
     }
   }
 
@@ -234,8 +237,11 @@
   margin: .125em;
   padding: .125em;
 
-  @media screen and (min-width: @breakpoint-sm) and (max-width: @breakpoint-md) {
-    height: @height-statistics-sm;
+  @media screen and (min-width: @screen-sm-min) {
+    height: @height-statistics-sm
+  }
+  @media screen and (min-width: @screen-md-min) {
+    height: auto;
   }
 
   .stat {
@@ -261,14 +267,41 @@
 
 }
 
+@invalid-input-color: #FFCCCC;
+
 #timer {
 
   text-align: center;
 
   .time {
-    font-size: 800%;
+    font-size: 600%;
+    margin: .03125em;
+    padding: .03125em;
+    @media screen and (min-width: @screen-sm-min) {
+      font-size: 800%;
+      margin: .0625em;
+      padding: .0625em;
+    }
+  }
+
+  .input {
+    width: 70%;
+    font-size: 400%;
     margin: .0625em;
     padding: .0625em;
+    transition: 0.25s linear background;
+    @media screen and (min-width: @screen-sm-min) {
+      width: 60%;
+      font-size: 550%;
+    }
+    @media screen and (min-width: @screen-md-min) {
+      width: 80%;
+      font-size: 700%;
+    }
+  }
+
+  .input.ng-invalid {
+    background: @invalid-input-color;
   }
 
 }

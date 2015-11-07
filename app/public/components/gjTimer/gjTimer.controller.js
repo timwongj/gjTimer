@@ -6,19 +6,20 @@
 
     var COLOR_BACKGROUND_DEFAULT = '#FFFFFF'; // white
     var COLOR_BACKGROUND_FOCUS = '#EEEEEE'; // gray
-    var SPACEBAR_KEY_CODE = 32, ENTER_KEY_CODE = 13;
+    var SPACE_BAR_KEY_CODE = 32, ENTER_KEY_CODE = 13;
 
+    $rootScope.isTyping = false;
     $scope.style = { body: {}, section: {}, timer: {} };
 
     $scope.keydown = function($event) {
 
       if (event.keyCode === ENTER_KEY_CODE) {
-        if ($rootScope.isTyping) {
+        if ($rootScope.isTypingComment) {
           event.preventDefault();
-        } else {
+        } else if (!$rootScope.isTyping) {
           $rootScope.$broadcast('new scramble', $scope.eventId);
         }
-      } else if (event.keyCode === SPACEBAR_KEY_CODE) {
+      } else if (event.keyCode === SPACE_BAR_KEY_CODE) {
         event.preventDefault();
       }
       $rootScope.$broadcast('keydown', $event);

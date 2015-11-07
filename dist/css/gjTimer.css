@@ -75,11 +75,11 @@
 #results tbody {
   display: block;
   overflow: auto;
-  height: calc(100vh - 5.875em);
+  height: 21.5em;
 }
-@media screen and (max-width: 62em) {
+@media screen and (min-width: 62em) {
   #results tbody {
-    height: 21.5em;
+    height: calc(100vh - 5.875em);
   }
 }
 #results tr {
@@ -175,9 +175,14 @@
   margin: .125em;
   padding: .125em;
 }
-@media screen and (min-width: 48em) and (max-width: 62em) {
+@media screen and (min-width: 48em) {
   #statistics {
     height: 22.0625em;
+  }
+}
+@media screen and (min-width: 62em) {
+  #statistics {
+    height: auto;
   }
 }
 #statistics .stat {
@@ -201,7 +206,36 @@
   text-align: center;
 }
 #timer .time {
-  font-size: 800%;
+  font-size: 600%;
+  margin: .03125em;
+  padding: .03125em;
+}
+@media screen and (min-width: 48em) {
+  #timer .time {
+    font-size: 800%;
+    margin: .0625em;
+    padding: .0625em;
+  }
+}
+#timer .input {
+  width: 70%;
+  font-size: 400%;
   margin: .0625em;
   padding: .0625em;
+  transition: 0.25s linear background;
+}
+@media screen and (min-width: 48em) {
+  #timer .input {
+    width: 60%;
+    font-size: 550%;
+  }
+}
+@media screen and (min-width: 62em) {
+  #timer .input {
+    width: 80%;
+    font-size: 700%;
+  }
+}
+#timer .input.ng-invalid {
+  background: #ffcccc;
 }
