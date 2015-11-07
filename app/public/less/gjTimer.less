@@ -1,11 +1,14 @@
+@screen-sm-min: 48em;
+@screen-md-min: 62em;
+@screen-lg-min: 75em;
+
 @color-jumbotron: #eee;
 @height-section-md: calc(~"100vh - 4em");
-@breakpoint-sm: 48em;
-@breakpoint-md: 62em;
+
 
 .section {
   padding: .375em 0;
-  @media (min-width: @breakpoint-sm) {
+  @media (min-width: @screen-sm-min) {
     padding: .375em;
   }
 }
@@ -14,7 +17,7 @@
   margin-bottom: 0;
   border-radius: 0 !important;
   background-color: @color-jumbotron;
-  @media (min-width: @breakpoint-md) {
+  @media (min-width: @screen-md-min) {
     height: @height-section-md;
     border-radius: 2px !important;
   }

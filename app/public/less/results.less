@@ -1,4 +1,4 @@
-@height-results: calc(~"100vh - 5.875em");
+@height-results-md: calc(~"100vh - 5.875em");
 @height-results-sm: 21.5em;
 
 #results {
@@ -10,9 +10,9 @@
   tbody {
     display: block;
     overflow: auto;
-    height: @height-results;
-    @media screen and (max-width: @breakpoint-md) {
-      height: @height-results-sm;
+    height: @height-results-sm;
+    @media screen and (min-width: @screen-md-min) {
+      height: @height-results-md;
     }
   }
 

@@ -48,9 +48,11 @@
       });
 
       $('.popover-input-comment').on('focus', function() {
-        $rootScope.isTyping = true;
+        $rootScope.isTypingComment = true;
       }).on('blur', function() {
-        $rootScope.isTyping = false;
+        $timeout(function() {
+          $rootScope.isTypingComment = false;
+        }, 1);
       }).on('keydown', function(event) {
         if (event.keyCode === ENTER_KEY_CODE) {
           ResultsService.comment(self.result, self.sessionId, self.index, $('.popover-input-comment')[0].value);

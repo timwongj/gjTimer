@@ -2,12 +2,14 @@
 
   'use strict';
 
-  function SettingsController($rootScope, $modalInstance, settings, MenuBarService) {
+  function SettingsController($scope, $rootScope, $modalInstance, settings, MenuBarService) {
 
     var self = this;
 
+    var ENTER_KEY_CODE = 13, ESCAPE_KEY_CODE = 27;
+
     self.settings = [
-      { id: 'input', description: 'Input', options: ['Timer', 'Keyboard', 'Stackmat'] },
+      { id: 'input', description: 'Input', options: ['Timer', 'Typing', 'Stackmat'] },
       { id: 'saveScrambles', description: 'Save Scrambles', options: ['Yes', 'No'] },
       { id: 'timerStartDelay', description: 'Timer Start Delay', options: [0, 100, 200, 500] },
       { id: 'timerStopDelay', description: 'Timer Stop Delay', options: [0, 100, 200, 500] },
@@ -19,6 +21,17 @@
     for (var i = 0; i < self.settings.length; i++) {
       self.settings[i].value = settings[self.settings[i].id];
     }
+
+    $scope.$on('keydown', function($event, event) {
+      switch(event.keyCode) {
+        case ENTER_KEY_CODE:
+          self.save();
+          break;
+        case ESCAPE_KEY_CODE:
+          self.close();
+          break;
+      }
+    });
 
     self.save = function() {
       for (var i = 0; i < self.settings.length; i++) {
@@ -45,6 +58,6 @@
 
   }
 
-  angular.module('menuBar').controller('SettingsController', ['$rootScope', '$modalInstance', 'settings', 'MenuBarService', SettingsController]);
+  angular.module('menuBar').controller('SettingsController', ['$scope', '$rootScope', '$modalInstance', 'settings', 'MenuBarService', SettingsController]);
 
 })();

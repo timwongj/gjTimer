@@ -56,19 +56,20 @@
 
     var COLOR_BACKGROUND_DEFAULT = '#FFFFFF'; // white
     var COLOR_BACKGROUND_FOCUS = '#EEEEEE'; // gray
-    var SPACEBAR_KEY_CODE = 32, ENTER_KEY_CODE = 13;
+    var SPACE_BAR_KEY_CODE = 32, ENTER_KEY_CODE = 13;
 
+    $rootScope.isTyping = false;
     $scope.style = { body: {}, section: {}, timer: {} };
 
     $scope.keydown = function($event) {
 
       if (event.keyCode === ENTER_KEY_CODE) {
-        if ($rootScope.isTyping) {
+        if ($rootScope.isTypingComment) {
           event.preventDefault();
-        } else {
+        } else if (!$rootScope.isTyping) {
           $rootScope.$broadcast('new scramble', $scope.eventId);
         }
-      } else if (event.keyCode === SPACEBAR_KEY_CODE) {
+      } else if (event.keyCode === SPACE_BAR_KEY_CODE) {
         event.preventDefault();
       }
       $rootScope.$broadcast('keydown', $event);
@@ -1309,9 +1310,11 @@
       });
 
       $('.popover-input-comment').on('focus', function() {
-        $rootScope.isTyping = true;
+        $rootScope.isTypingComment = true;
       }).on('blur', function() {
-        $rootScope.isTyping = false;
+        $timeout(function() {
+          $rootScope.isTypingComment = false;
+        }, 1);
       }).on('keydown', function(event) {
         if (event.keyCode === ENTER_KEY_CODE) {
           ResultsService.comment(self.result, self.sessionId, self.index, $('.popover-input-comment')[0].value);
@@ -1419,12 +1422,14 @@
 
   'use strict';
 
-  function SettingsController($rootScope, $modalInstance, settings, MenuBarService) {
+  function SettingsController($scope, $rootScope, $modalInstance, settings, MenuBarService) {
 
     var self = this;
 
+    var ENTER_KEY_CODE = 13, ESCAPE_KEY_CODE = 27;
+
     self.settings = [
-      { id: 'input', description: 'Input', options: ['Timer', 'Keyboard', 'Stackmat'] },
+      { id: 'input', description: 'Input', options: ['Timer', 'Typing', 'Stackmat'] },
       { id: 'saveScrambles', description: 'Save Scrambles', options: ['Yes', 'No'] },
       { id: 'timerStartDelay', description: 'Timer Start Delay', options: [0, 100, 200, 500] },
       { id: 'timerStopDelay', description: 'Timer Stop Delay', options: [0, 100, 200, 500] },
@@ -1436,6 +1441,17 @@
     for (var i = 0; i < self.settings.length; i++) {
       self.settings[i].value = settings[self.settings[i].id];
     }
+
+    $scope.$on('keydown', function($event, event) {
+      switch(event.keyCode) {
+        case ENTER_KEY_CODE:
+          self.save();
+          break;
+        case ESCAPE_KEY_CODE:
+          self.close();
+          break;
+      }
+    });
 
     self.save = function() {
       for (var i = 0; i < self.settings.length; i++) {
@@ -1462,7 +1478,7 @@
 
   }
 
-  angular.module('menuBar').controller('SettingsController', ['$rootScope', '$modalInstance', 'settings', 'MenuBarService', SettingsController]);
+  angular.module('menuBar').controller('SettingsController', ['$scope', '$rootScope', '$modalInstance', 'settings', 'MenuBarService', SettingsController]);
 
 })();
 
@@ -1630,9 +1646,8 @@
 
   function TimerController($scope, $rootScope, $interval, $timeout, TimerService, ResultsService) {
 
-    var self = this, timer, state = 'reset', SPACE_BAR_KEY_CODE = 32;
-
-    self.time = self.settings.timerPrecision === 2 ? moment(0).format('s.SS') : moment(0).format('s.SSS');
+    var self = this, timer, state = 'reset';
+    var SPACE_BAR_KEY_CODE = 32, ENTER_KEY_CODE = 13;
 
     var STYLES = {
       BLACK: { 'color': '#000000' },
@@ -1640,47 +1655,77 @@
       GREEN: { 'color': '#2EB82E' }
     };
 
-    $scope.$on('refresh settings', function() {
+    if (self.settings.input === 'Timer') {
       self.time = self.settings.timerPrecision === 2 ? moment(0).format('s.SS') : moment(0).format('s.SSS');
+    } else if (self.settings.input === 'Typing') {
+      self.time = '';
+    }
+
+    $scope.$on('refresh settings', function () {
+      if (self.settings.input === 'Timer') {
+        self.time = self.settings.timerPrecision === 2 ? moment(0).format('s.SS') : moment(0).format('s.SSS');
+      } else if (self.settings.input === 'Typing') {
+        self.time = '';
+      }
     });
 
-    $scope.$on('keydown', function($event, event) {
-      if ((state === 'reset') && (event.keyCode === SPACE_BAR_KEY_CODE)) {
-        state = 'keydown';
-        self.time = self.settings.timerPrecision === 2 ? moment(0).format('s.SS') : moment(0).format('s.SSS');
-        self.timerStyle = STYLES.RED;
-        $timeout(function() {
-          if (state === 'keydown') {
-            state = 'ready';
-            self.timerStyle = STYLES.GREEN;
-            $rootScope.$broadcast('timer focus');
-          }
-        }, self.settings.timerStartDelay);
-      } else if (state === 'timing') {
-        state = 'stopped';
-        $interval.cancel(timer);
-        $rootScope.$broadcast('timer unfocus');
+    $scope.$on('keydown', function ($event, event) {
+
+      if (self.settings.input === 'Timer') {
+        if ((state === 'reset') && (event.keyCode === SPACE_BAR_KEY_CODE)) {
+          state = 'keydown';
+          self.time = self.settings.timerPrecision === 2 ? moment(0).format('s.SS') : moment(0).format('s.SSS');
+          self.timerStyle = STYLES.RED;
+          $timeout(function () {
+            if (state === 'keydown') {
+              state = 'ready';
+              self.timerStyle = STYLES.GREEN;
+              $rootScope.$broadcast('timer focus');
+            }
+          }, self.settings.timerStartDelay);
+        } else if (state === 'timing') {
+          state = 'stopped';
+          $interval.cancel(timer);
+          $rootScope.$broadcast('timer unfocus');
+          ResultsService.saveResult(self.results, self.time, self.scramble, self.sessionId, self.settings.resultsPrecision);
+          $rootScope.$broadcast('new scramble', self.eventId);
+        }
+      }
+
+    });
+
+    $scope.$on('keyup', function ($event, event) {
+
+      if (self.settings.input === 'Timer') {
+        self.timerStyle = STYLES.BLACK;
+        if ((state === 'ready') && (event.keyCode === SPACE_BAR_KEY_CODE)) {
+          state = 'timing';
+          TimerService.startTimer();
+          timer = $interval(function () {
+            self.time = TimerService.getTime(self.settings.timerPrecision);
+          }, self.settings.timerRefreshInterval);
+        } else if (state === 'keydown') {
+          state = 'reset';
+        } else if (state === 'stopped') {
+          $timeout(function () {
+            state = 'reset';
+          }, self.settings.timerStopDelay);
+        }
+      }
+
+    });
+
+    self.submitInput = function() {
+
+      if (self.time === '') {
+        $rootScope.$broadcast('new scramble', self.eventId);
+      } else if ($scope.input.text.$valid) {
         ResultsService.saveResult(self.results, self.time, self.scramble, self.sessionId, self.settings.resultsPrecision);
+        self.time = '';
         $rootScope.$broadcast('new scramble', self.eventId);
       }
-    });
 
-    $scope.$on('keyup', function($event, event) {
-      self.timerStyle = STYLES.BLACK;
-      if ((state === 'ready') && (event.keyCode === SPACE_BAR_KEY_CODE)) {
-        state = 'timing';
-        TimerService.startTimer();
-        timer = $interval(function() {
-          self.time = TimerService.getTime(self.settings.timerPrecision);
-        }, self.settings.timerRefreshInterval);
-      } else if (state === 'keydown') {
-        state = 'reset';
-      } else if (state === 'stopped') {
-        $timeout(function() {
-          state = 'reset';
-        }, self.settings.timerStopDelay);
-      }
-    });
+    };
 
   }
 
