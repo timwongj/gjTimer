@@ -9,7 +9,8 @@
       controller: 'StatisticsController',
       controllerAs: 'ctrl',
       scope: {
-        results: '='
+        results: '=',
+        settings: '='
       },
       bindToController: true
     };

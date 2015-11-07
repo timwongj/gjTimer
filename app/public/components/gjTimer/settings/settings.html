@@ -14,10 +14,31 @@
       </div>
     </div>
     <div class="setting">
+      <label class="label-setting">Save Scrambles</label>
+      <div class="btn-group">
+        <label class="btn btn-default btn-sm" ng-repeat="option in ctrl.options.saveScrambles"
+               ng-model="ctrl.settings.saveScrambles" uib-btn-radio="option" ng-bind="option"></label>
+      </div>
+    </div>
+    <div class="setting">
       <label class="label-setting">Timer Start Delay</label>
       <div class="btn-group">
         <label class="btn btn-default btn-sm" ng-repeat="option in ctrl.options.timerStartDelay"
                ng-model="ctrl.settings.timerStartDelay" uib-btn-radio="option" ng-bind="option"></label>
+      </div>
+    </div>
+    <div class="setting">
+      <label class="label-setting">Timer Stop Delay</label>
+      <div class="btn-group">
+        <label class="btn btn-default btn-sm" ng-repeat="option in ctrl.options.timerStopDelay"
+               ng-model="ctrl.settings.timerStopDelay" uib-btn-radio="option" ng-bind="option"></label>
+      </div>
+    </div>
+    <div class="setting">
+      <label class="label-setting">Timer Precision</label>
+      <div class="btn-group">
+        <label class="btn btn-default btn-sm" ng-repeat="option in ctrl.options.timerPrecision"
+               ng-model="ctrl.settings.timerPrecision" uib-btn-radio="option" ng-bind="option"></label>
       </div>
     </div>
     <div class="setting">
@@ -28,10 +49,10 @@
       </div>
     </div>
     <div class="setting">
-      <label class="label-setting">Timer Precision</label>
+      <label class="label-setting">Stats Precision</label>
       <div class="btn-group">
-        <label class="btn btn-default btn-sm" ng-repeat="option in ctrl.options.timerPrecision"
-               ng-model="ctrl.settings.timerPrecision" uib-btn-radio="option" ng-bind="option"></label>
+        <label class="btn btn-default btn-sm" ng-repeat="option in ctrl.options.statisticsPrecision"
+               ng-model="ctrl.settings.statisticsPrecision" uib-btn-radio="option" ng-bind="option"></label>
       </div>
     </div>
   </div>

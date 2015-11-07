@@ -713,10 +713,12 @@
     var NUMBER_OF_SESSIONS = 15;
 
     var DEFAULT_SETTINGS = {
-      input: 'timer',
-      timerStartDelay: 50,
-      timerStopDelay: 50,
+      input: 'Timer',
+      saveScrambles: true,
+      timerStartDelay: 0,
+      timerStopDelay: 100,
       resultsPrecision: 2,
+      statisticsPrecision: 2,
       timerPrecision: 3,
       timerRefreshInterval: 50
     };
@@ -1151,7 +1153,7 @@
 
   }
 
-  angular.module('results').controller('ResultsModalController', ['$modalInstance', 'results', 'ResultsModalService', ResultsModalController]);
+  angular.module('results').controller('ResultsModalController', ['$modalInstance', 'results', 'precision', 'ResultsModalService', ResultsModalController]);
 
 })();
 
@@ -1424,10 +1426,13 @@
     self.settings = settings;
 
     self.options = {
-      input: ['timer', 'keyboard', 'stackmat'],
-      timerStartDelay: [0, 50, 100],
+      input: ['Timer', 'Keyboard', 'Stackmat'],
+      saveScrambles: ['Yes', 'No'],
+      timerStartDelay: [0, 100, 200, 500],
+      timerStopDelay: [0, 100, 200, 500],
+      timerPrecision: [2, 3],
       resultsPrecision: [2, 3],
-      timerPrecision: [2, 3]
+      statisticsPrecision: [2, 3]
     };
 
     self.save = function() {
@@ -1467,7 +1472,8 @@
       controller: 'StatisticsController',
       controllerAs: 'ctrl',
       scope: {
-        results: '='
+        results: '=',
+        settings: '='
       },
       bindToController: true
     };
@@ -1488,7 +1494,7 @@
     $scope.$watchCollection(function() {
       return self.results;
     }, function() {
-      self.statistics = StatisticsService.getStatistics(self.results);
+      self.statistics = StatisticsService.getStatistics(self.results, self.settings.statisticsPrecision);
     });
 
     self.openModal = function(format, $index) {
@@ -1503,6 +1509,9 @@
         resolve: {
           results: function() {
             return self.results.slice(index, index + length);
+          },
+          precision: function() {
+            return self.settings.resultsPrecision;
           }
         }
       });
@@ -1536,8 +1545,8 @@
         solves: {
           attempted: rawTimes.length,
           solved: Calculator.countNonDNFs(rawTimes),
-          best: Calculator.convertTimeFromMillisecondsToString(Math.min.apply(null, rawTimes)),
-          worst: Calculator.convertTimeFromMillisecondsToString(Math.max.apply(null, rawTimes))
+          best: Calculator.convertTimeFromMillisecondsToString(Math.min.apply(null, rawTimes), precision),
+          worst: Calculator.convertTimeFromMillisecondsToString(Math.max.apply(null, rawTimes), precision)
         },
         sessionMean: Calculator.calculateSessionMeanAndStandardDeviationString(rawTimes, precision),
         sessionAvg: {

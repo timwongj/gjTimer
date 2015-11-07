@@ -9,10 +9,12 @@
     var NUMBER_OF_SESSIONS = 15;
 
     var DEFAULT_SETTINGS = {
-      input: 'timer',
-      timerStartDelay: 50,
-      timerStopDelay: 50,
+      input: 'Timer',
+      saveScrambles: true,
+      timerStartDelay: 0,
+      timerStopDelay: 100,
       resultsPrecision: 2,
+      statisticsPrecision: 2,
       timerPrecision: 3,
       timerRefreshInterval: 50
     };

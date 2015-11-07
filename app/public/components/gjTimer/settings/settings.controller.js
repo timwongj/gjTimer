@@ -9,10 +9,13 @@
     self.settings = settings;
 
     self.options = {
-      input: ['timer', 'keyboard', 'stackmat'],
-      timerStartDelay: [0, 50, 100],
+      input: ['Timer', 'Keyboard', 'Stackmat'],
+      saveScrambles: ['Yes', 'No'],
+      timerStartDelay: [0, 100, 200, 500],
+      timerStopDelay: [0, 100, 200, 500],
+      timerPrecision: [2, 3],
       resultsPrecision: [2, 3],
-      timerPrecision: [2, 3]
+      statisticsPrecision: [2, 3]
     };
 
     self.save = function() {
