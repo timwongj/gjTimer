@@ -6,7 +6,7 @@
 
     var self = this;
 
-    var timer, inspection, state = 'reset', penalty = '', comment = '', precision = self.settings.timerPrecision;
+    var timer, inspection, state = 'reset', penalty = '', comment = '', memo = '', precision = self.settings.timerPrecision;
 
     if (self.settings.input === 'Timer') {
       self.time = self.settings.inspection !== 'On' ? (precision === 2 ? '0.00' : '0.000') : '15';
@@ -104,6 +104,7 @@
 
       state = 'stopped';
       $interval.cancel(timer);
+      comment = TimerService.createCommentForBldMode(self.time, memo);
       ResultsService.saveResult(self.results, self.time, penalty, comment, self.scramble, self.sessionId, self.settings.resultsPrecision);
       $rootScope.$broadcast('new scramble', self.eventId);
 
@@ -158,7 +159,7 @@
 
       state = 'execution';
       self.timerStyle = Constants.STYLES.COLOR.BLACK;
-      comment = 'Memo: ' + self.time;
+      memo = self.time;
 
     };
 
@@ -176,6 +177,7 @@
         state = 'reset';
       }
       penalty = '';
+      memo = '';
       comment = '';
 
     };
