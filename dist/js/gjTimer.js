@@ -718,7 +718,7 @@
       timerStartDelay: 0,
       timerStopDelay: 100,
       resultsPrecision: 2,
-      statisticsPrecision: 2,
+      statisticsPrecision: 3,
       timerPrecision: 3,
       timerRefreshInterval: 50
     };
