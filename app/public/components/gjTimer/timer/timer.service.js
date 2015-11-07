@@ -18,11 +18,30 @@
     };
 
     /**
+     * Gets the inspection time.
+     * @returns {*}
+     */
+    self.getInspectionTime = function() {
+
+      return Math.ceil(((15000 + self.inspectionStartTime - Date.now()) / 1000));
+
+    };
+
+    /**
      * Starts the Timer.
      */
     self.startTimer = function() {
 
       self.startTime = Date.now();
+
+    };
+
+    /**
+     * Starts the inspection timer.
+     */
+    self.startInspection = function() {
+
+      self.inspectionStartTime = Date.now();
 
     };
 

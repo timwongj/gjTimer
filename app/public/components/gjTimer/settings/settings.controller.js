@@ -10,7 +10,8 @@
 
     self.settings = [
       { id: 'input', title: 'Input', options: ['Timer', 'Typing', 'Stackmat'] },
-      { id: 'inspection', title: 'Inspection', options: ['Yes', 'No'] },
+      { id: 'inspection', title: 'Inspection', options: ['On', 'Off'] },
+      { id: 'bldMode', title: 'BLD Mode', options: ['On', 'Off'] },
       { id: 'showScramble', title: 'Show Scramble', options: ['Yes', 'No'] },
       { id: 'saveScrambles', title: 'Save Scrambles', options: ['Yes', 'No'] },
       { id: 'timerStartDelay', title: 'Timer Start Delay', options: [0, 100, 200, 500] },

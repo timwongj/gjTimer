@@ -67,22 +67,24 @@
      * Saves the result in the format of 'Time in milliseconds'|'Scramble'|'Date in milliseconds'.
      * @param results
      * @param time
+     * @param penalty
+     * @param comment
      * @param scramble
      * @param sessionId
      * @param precision
      */
-    self.saveResult = function(results, time, scramble, sessionId, precision) {
+    self.saveResult = function(results, time, penalty, comment, scramble, sessionId, precision) {
 
       var timeMilliseconds = Calculator.convertTimeFromStringToMilliseconds(time);
       var timeStringWithPrecision = Calculator.convertTimeFromMillisecondsToString(timeMilliseconds, precision);
 
       var result = {
-        comment: '',
+        comment: comment,
         date: new Date(),
         detailedTime: timeStringWithPrecision,
         displayedTime: timeStringWithPrecision,
         index: results.length,
-        penalty: '',
+        penalty: penalty,
         rawTime: timeMilliseconds,
         scramble: scramble,
         time: timeMilliseconds
@@ -92,10 +94,24 @@
       rawTimes.push(Calculator.extractRawTimes([result])[0]);
       result = self.populateAverages(rawTimes, result, result.index, precision);
 
+      var timeString = Calculator.convertTimeFromStringToMilliseconds(time);
+      switch(penalty) {
+        case '+2':
+          result.displayedTime = Calculator.convertTimeFromMillisecondsToString(Calculator.convertTimeFromStringToMilliseconds(time) + 2000, precision) + '+';
+          result.detailedTime = result.displayedTime;
+          timeString += '+';
+          break;
+        case 'DNF':
+          result.displayedTime = 'DNF';
+          result.detailedTime = 'DNF(' + Calculator.convertTimeFromMillisecondsToString(Calculator.convertTimeFromStringToMilliseconds(time), precision) + ')';
+          timeString += '-';
+          break;
+      }
+
       results.push(result);
 
       var session = LocalStorage.getJSON(sessionId);
-      session.results.push(Calculator.convertTimeFromStringToMilliseconds(time) + '|' + scramble + '|' + Date.now());
+      session.results.push(timeString + '|' + scramble + '|' + Date.now());
       LocalStorage.setJSON(sessionId, session);
 
     };
