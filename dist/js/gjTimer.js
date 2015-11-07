@@ -714,7 +714,7 @@
 
     var DEFAULT_SETTINGS = {
       input: 'Timer',
-      saveScrambles: true,
+      saveScrambles: 'Yes',
       timerStartDelay: 0,
       timerStopDelay: 100,
       resultsPrecision: 2,
@@ -1423,20 +1423,25 @@
 
     var self = this;
 
-    self.settings = settings;
+    self.settings = [
+      { id: 'input', description: 'Input', options: ['Timer', 'Keyboard', 'Stackmat'] },
+      { id: 'saveScrambles', description: 'Save Scrambles', options: ['Yes', 'No'] },
+      { id: 'timerStartDelay', description: 'Timer Start Delay', options: [0, 100, 200, 500] },
+      { id: 'timerStopDelay', description: 'Timer Stop Delay', options: [0, 100, 200, 500] },
+      { id: 'timerPrecision', description: 'Timer Precision', options: [2, 3] },
+      { id: 'resultsPrecision', description: 'Results Precision', options: [2, 3] },
+      { id: 'statisticsPrecision', description: 'Stats Precision', options: [2, 3] },
+    ];
 
-    self.options = {
-      input: ['Timer', 'Keyboard', 'Stackmat'],
-      saveScrambles: ['Yes', 'No'],
-      timerStartDelay: [0, 100, 200, 500],
-      timerStopDelay: [0, 100, 200, 500],
-      timerPrecision: [2, 3],
-      resultsPrecision: [2, 3],
-      statisticsPrecision: [2, 3]
-    };
+    for (var i = 0; i < self.settings.length; i++) {
+      self.settings[i].value = settings[self.settings[i].id];
+    }
 
     self.save = function() {
-      MenuBarService.saveSettings(self.settings);
+      for (var i = 0; i < self.settings.length; i++) {
+        settings[self.settings[i].id] = self.settings[i].value;
+      }
+      MenuBarService.saveSettings(settings);
       $modalInstance.dismiss();
       $rootScope.$broadcast('refresh settings');
       $rootScope.$broadcast('refresh results');
