@@ -3,6 +3,7 @@
   'use strict';
 
   var Calculator,
+    Constants,
     rawTimes,
     trimmed,
     precision,
@@ -28,7 +29,8 @@
     beforeEach(inject(function($injector) {
 
       Calculator = $injector.get('Calculator');
-      DNF = Calculator.DNF;
+      Constants = $injector.get('Constants');
+      DNF = Constants.DNF;
 
     }));
 

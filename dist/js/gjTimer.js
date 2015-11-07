@@ -52,24 +52,20 @@
 
   'use strict';
 
-  function GjTimerController($scope, $rootScope) {
-
-    var COLOR_BACKGROUND_DEFAULT = '#FFFFFF'; // white
-    var COLOR_BACKGROUND_FOCUS = '#EEEEEE'; // gray
-    var SPACE_BAR_KEY_CODE = 32, ENTER_KEY_CODE = 13;
+  function GjTimerController($scope, $rootScope, Constants) {
 
     $rootScope.isTyping = false;
     $scope.style = { body: {}, section: {}, timer: {} };
 
     $scope.keydown = function($event) {
 
-      if (event.keyCode === ENTER_KEY_CODE) {
+      if (event.keyCode === Constants.KEY_CODES.ENTER) {
         if ($rootScope.isTypingComment) {
           event.preventDefault();
         } else if (!$rootScope.isTyping) {
           $rootScope.$broadcast('new scramble', $scope.eventId);
         }
-      } else if (event.keyCode === SPACE_BAR_KEY_CODE) {
+      } else if (event.keyCode === Constants.KEY_CODES.SPACE_BAR) {
         event.preventDefault();
       }
       $rootScope.$broadcast('keydown', $event);
@@ -84,7 +80,7 @@
 
     $scope.$on('timer focus', function() {
 
-      $scope.style.body = { 'background-color': COLOR_BACKGROUND_FOCUS };
+      $scope.style.body = Constants.STYLES.BACKGROUND_COLOR.GRAY;
       $scope.style.section = { 'display': 'none' };
       $scope.style.timer = { 'margin-top': '2.9375em' };
 
@@ -92,7 +88,7 @@
 
     $scope.$on('timer unfocus', function() {
 
-      $scope.style.body = { 'background-color': COLOR_BACKGROUND_DEFAULT };
+      $scope.style.body = Constants.STYLES.BACKGROUND_COLOR.WHITE;
       $scope.style.section = { 'display': 'block' };
       $scope.style.timer = {};
 
@@ -100,7 +96,7 @@
 
   }
 
-  angular.module('gjTimer').controller('gjTimerController', ['$scope', '$rootScope', GjTimerController]);
+  angular.module('gjTimer').controller('gjTimerController', ['$scope', '$rootScope', 'Constants', GjTimerController]);
 
 })();
 
@@ -130,11 +126,9 @@
 
   'use strict';
 
-  function Calculator() {
+  function Calculator(Constants) {
 
     var self = this;
-
-    self.DNF = 864000000; // needs to be a high number (set to 1 day)
 
     /**
      * Calculates the average of the results.
@@ -152,8 +146,8 @@
         times.splice(times.indexOf(Math.max.apply(null, times)), 1);
       }
 
-      if ((times.indexOf(self.DNF) >= 0) || times.length === 0) {
-        return self.DNF;
+      if ((times.indexOf(Constants.DNF) >= 0) || times.length === 0) {
+        return Constants.DNF;
       } else {
         return Number((times.reduce(function(pv, cv) { return pv + cv; }, 0) / times.length).toFixed());
       }
@@ -189,8 +183,8 @@
         times.splice(times.indexOf(Math.max.apply(null, times)), 1);
       }
 
-      if ((times.indexOf(self.DNF) >= 0) || times.length === 0) {
-        return self.DNF;
+      if ((times.indexOf(Constants.DNF) >= 0) || times.length === 0) {
+        return Constants.DNF;
       } else {
         var avg = self.calculateAverage(times, false);
         var squareDiffs = times.map(function(time) { return Math.pow(time - avg, 2); });
@@ -221,7 +215,7 @@
     self.calculateSessionMeanAndStandardDeviationString = function(rawTimes, precision) {
 
       // remove DNFs
-      var times = rawTimes.slice(0).filter(function(time) { return time !== self.DNF; });
+      var times = rawTimes.slice(0).filter(function(time) { return time !== Constants.DNF; });
 
       return {
         mean: self.calculateAverageString(times, false, precision),
@@ -240,7 +234,7 @@
      */
     self.calculateBestAverageAndStandardDeviationString = function(rawTimes, trimmed, n, precision) {
 
-      var currentAvg, bestAvg = self.DNF, index = -1;
+      var currentAvg, bestAvg = Constants.DNF, index = -1;
 
       for (var i = 0; i < rawTimes.length - n; i++) {
         currentAvg = self.calculateAverage(rawTimes.slice(i, i + n), trimmed);
@@ -281,7 +275,7 @@
      */
     self.countNonDNFs = function(rawTimes) {
 
-      return rawTimes.slice(0).filter(function(time) { return time !== self.DNF; }).length;
+      return rawTimes.slice(0).filter(function(time) { return time !== Constants.DNF; }).length;
 
     };
 
@@ -293,7 +287,7 @@
     self.convertTimeFromStringToMilliseconds = function(timeString) {
 
       if (timeString === 'DNF') {
-        return self.DNF;
+        return Constants.DNF;
       }
 
       var res = timeString.split(':');
@@ -305,7 +299,7 @@
       } else if (res.length === 3) {
         return Number(((parseFloat(res[0]) * 60 * 60 * 1000) + (parseFloat(res[1]) * 60 * 1000) + (parseFloat(res[2]) * 1000)).toFixed());
       } else {
-        return self.DNF;
+        return Constants.DNF;
       }
 
     };
@@ -318,28 +312,100 @@
      */
     self.convertTimeFromMillisecondsToString = function(timeMilliseconds, precision) {
 
-      if ((timeMilliseconds === self.DNF) || (timeMilliseconds < 0) || (timeMilliseconds === Infinity)) {
+      if ((timeMilliseconds === Constants.DNF) || (timeMilliseconds < 0) || (timeMilliseconds === Infinity)) {
         return 'DNF';
       }
 
-      var time = moment(timeMilliseconds);
-      var ms = precision === 2 ? 'SS' : 'SSS';
+      var ms, time = moment(timeMilliseconds);
+
+      switch(precision) {
+        case 0: ms = ''; break;
+        case 1: ms = '.S'; break;
+        case 2: ms = '.SS'; break;
+        case 3: ms = '.SSS'; break;
+        default: ms = '.SS'; break;
+      }
 
       if (timeMilliseconds < 10000) {
-        return time.format('s.' + ms);
+        return time.format('s' + ms);
       } else if (timeMilliseconds < 60000) {
-        return time.format('ss.' + ms);
+        return time.format('ss' + ms);
       } else if (timeMilliseconds < 3600000) {
-        return time.format('m:ss.' + ms);
+        return time.format('m:ss' + ms);
       } else {
-        return time.utc().format('H:mm:ss.' + ms);
+        return time.utc().format('H:mm:ss' + ms);
       }
 
     };
 
   }
 
-  angular.module('gjTimer.services').service('Calculator', Calculator);
+  angular.module('gjTimer.services').service('Calculator', ['Constants', Calculator]);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function Constants() {
+
+    var self = this;
+
+    self.KEY_CODES = {
+      ENTER: 13,
+      ESCAPE: 27,
+      SPACE_BAR: 32
+    };
+
+    self.COLORS = {
+      BLACK: '#000000',
+      RED: '#FF0000',
+      ORANGE: '#FFA500',
+      GREEN: '#2EB82E',
+      BLUE: '#0000FF',
+      GRAY: '#EEEEEE',
+      WHITE: '#FFFFFF'
+    };
+
+    self.STYLES = {
+      COLOR: {
+        BLACK: { 'color': self.COLORS.BLACK },
+        RED: { 'color': self.COLORS.RED },
+        ORANGE: { 'color': self.COLORS.ORANGE },
+        GREEN: { 'color': self.COLORS.GREEN },
+        BLUE: { 'color': self.COLORS.BLUE }
+      },
+      BACKGROUND_COLOR: {
+        GRAY: { 'background-color': self.COLORS.GRAY },
+        WHITE: { 'background-color': self.COLORS.WHITE }
+      }
+    };
+
+    self.SESSIONS = {
+      DEFAULT_NUMBER_OF_SESSIONS: 15
+    };
+
+    self.SETTINGS = {
+      DEFAULT_SETTINGS: {
+        input: 'Timer',
+        inspection: 'Off',
+        bldMode: 'Off',
+        timerStartDelay: 0,
+        timerPrecision: 3,
+        timerRefreshInterval: 50,
+        showScramble: 'Yes',
+        saveScrambles: 'Yes',
+        resultsPrecision: 2,
+        statisticsPrecision: 3
+      }
+    };
+
+    self.DNF = 864000000;
+
+  }
+
+  angular.module('gjTimer.services').service('Constants', Constants);
 
 })();
 
@@ -540,7 +606,9 @@
       templateUrl: 'dist/components/gjTimer/cub/cub.html',
       controller: 'CubController',
       controllerAs: 'ctrl',
-      scope: true,
+      scope: {
+        settings: '='
+      },
       bindToController: true
     };
   }
@@ -707,22 +775,9 @@
 
   'use strict';
 
-  function MenuBarService(LocalStorage) {
+  function MenuBarService(LocalStorage, Constants) {
 
     var self = this;
-
-    var NUMBER_OF_SESSIONS = 15;
-
-    var DEFAULT_SETTINGS = {
-      input: 'Timer',
-      saveScrambles: 'Yes',
-      timerStartDelay: 0,
-      timerStopDelay: 100,
-      resultsPrecision: 2,
-      statisticsPrecision: 3,
-      timerPrecision: 3,
-      timerRefreshInterval: 50
-    };
 
     /**
      * Gets settings from local storage or initializes it if it doesn't exist.
@@ -731,13 +786,13 @@
     self.initSettings = function() {
       var settings = LocalStorage.getJSON('settings');
       if (settings === null) {
-        LocalStorage.setJSON('settings', DEFAULT_SETTINGS);
-        return DEFAULT_SETTINGS;
+        LocalStorage.setJSON('settings', Constants.SETTINGS.DEFAULT_SETTINGS);
+        return Constants.SETTINGS.DEFAULT_SETTINGS;
       } else {
-        for (var key in DEFAULT_SETTINGS) {
-          if (DEFAULT_SETTINGS.hasOwnProperty(key)) {
+        for (var key in Constants.SETTINGS.DEFAULT_SETTINGS) {
+          if (Constants.SETTINGS.DEFAULT_SETTINGS.hasOwnProperty(key)) {
             if (!settings.hasOwnProperty(key)) {
-              settings[key] = DEFAULT_SETTINGS[key];
+              settings[key] = Constants.SETTINGS.DEFAULT_SETTINGS[key];
               LocalStorage.setJSON('settings', settings);
             }
           }
@@ -762,7 +817,7 @@
 
       var sessions = [];
 
-      for (var i = 1; i <= NUMBER_OF_SESSIONS; i++) {
+      for (var i = 1; i <= Constants.SESSIONS.DEFAULT_NUMBER_OF_SESSIONS; i++) {
         sessions.push('Session ' + i);
         var session = LocalStorage.getJSON('Session ' + i);
         if (session === null) {
@@ -852,7 +907,7 @@
 
   }
 
-  angular.module('menuBar').service('MenuBarService', ['LocalStorage', MenuBarService]);
+  angular.module('menuBar').service('MenuBarService', ['LocalStorage', 'Constants', MenuBarService]);
 
 })();
 
@@ -923,11 +978,11 @@
 
   'use strict';
 
-  function ResultsService(LocalStorage, Calculator) {
+  function ResultsService(LocalStorage, Calculator, Constants) {
 
     var self = this;
 
-    var DNF = Calculator.DNF;
+    var DNF = Constants.DNF;
 
     /**
      * Gets results for the session.
@@ -988,22 +1043,24 @@
      * Saves the result in the format of 'Time in milliseconds'|'Scramble'|'Date in milliseconds'.
      * @param results
      * @param time
+     * @param penalty
+     * @param comment
      * @param scramble
      * @param sessionId
      * @param precision
      */
-    self.saveResult = function(results, time, scramble, sessionId, precision) {
+    self.saveResult = function(results, time, penalty, comment, scramble, sessionId, precision) {
 
       var timeMilliseconds = Calculator.convertTimeFromStringToMilliseconds(time);
       var timeStringWithPrecision = Calculator.convertTimeFromMillisecondsToString(timeMilliseconds, precision);
 
       var result = {
-        comment: '',
+        comment: comment,
         date: new Date(),
         detailedTime: timeStringWithPrecision,
         displayedTime: timeStringWithPrecision,
         index: results.length,
-        penalty: '',
+        penalty: penalty,
         rawTime: timeMilliseconds,
         scramble: scramble,
         time: timeMilliseconds
@@ -1013,10 +1070,24 @@
       rawTimes.push(Calculator.extractRawTimes([result])[0]);
       result = self.populateAverages(rawTimes, result, result.index, precision);
 
+      var timeString = Calculator.convertTimeFromStringToMilliseconds(time);
+      switch(penalty) {
+        case '+2':
+          result.displayedTime = Calculator.convertTimeFromMillisecondsToString(Calculator.convertTimeFromStringToMilliseconds(time) + 2000, precision) + '+';
+          result.detailedTime = result.displayedTime;
+          timeString += '+';
+          break;
+        case 'DNF':
+          result.displayedTime = 'DNF';
+          result.detailedTime = 'DNF(' + Calculator.convertTimeFromMillisecondsToString(Calculator.convertTimeFromStringToMilliseconds(time), precision) + ')';
+          timeString += '-';
+          break;
+      }
+
       results.push(result);
 
       var session = LocalStorage.getJSON(sessionId);
-      session.results.push(Calculator.convertTimeFromStringToMilliseconds(time) + '|' + scramble + '|' + Date.now());
+      session.results.push(timeString + '|' + scramble + '|' + Date.now() + (comment !== '' ? '|' + comment : ''));
       LocalStorage.setJSON(sessionId, session);
 
     };
@@ -1061,6 +1132,7 @@
       switch(penalty) {
         case '':
           result.penalty = '';
+          result.rawTime = result.time;
           result.displayedTime = Calculator.convertTimeFromMillisecondsToString(result.time, precision);
           result.detailedTime = result.displayedTime;
           if ((pen === '+') || (pen === '-')) {
@@ -1069,6 +1141,7 @@
           break;
         case '+2':
           result.penalty = '+2';
+          result.rawTime = result.time + 2000;
           result.displayedTime = Calculator.convertTimeFromMillisecondsToString(result.time + 2000, precision) + '+';
           result.detailedTime = result.displayedTime;
           if ((pen === '+') || (pen === '-')) {
@@ -1079,6 +1152,7 @@
           break;
         case 'DNF':
           result.penalty = 'DNF';
+          result.rawTime = Constants.DNF;
           result.displayedTime = 'DNF';
           result.detailedTime = 'DNF(' + Calculator.convertTimeFromMillisecondsToString(result.time, precision) + ')';
           if ((pen === '+') || (pen === '-')) {
@@ -1132,7 +1206,7 @@
 
   }
 
-  angular.module('results').service('ResultsService', ['LocalStorage', 'Calculator', ResultsService]);
+  angular.module('results').service('ResultsService', ['LocalStorage', 'Calculator', 'Constants', ResultsService]);
 
 })();
 
@@ -1264,11 +1338,9 @@
 
   'use strict';
 
-  function ResultsPopoverController($scope, $rootScope, $timeout, ResultsService) {
+  function ResultsPopoverController($scope, $rootScope, $timeout, ResultsService, Constants) {
 
     var self = this;
-
-    var ENTER_KEY_CODE = 13;
 
     self.attachEvents = function (element) {
 
@@ -1286,18 +1358,21 @@
       $('.popover-btn-penalty-ok').on('click', function() {
         ResultsService.penalty(self.result, self.sessionId, self.index, '', self.precision);
         $scope.$apply();
+        $rootScope.$broadcast('refresh statistics');
         $(element).popover('hide');
       });
 
       $('.popover-btn-penalty-plus').on('click', function() {
         ResultsService.penalty(self.result, self.sessionId, self.index, '+2', self.precision);
         $scope.$apply();
+        $rootScope.$broadcast('refresh statistics');
         $(element).popover('hide');
       });
 
       $('.popover-btn-penalty-dnf').on('click', function() {
         ResultsService.penalty(self.result, self.sessionId, self.index, 'DNF', self.precision);
         $scope.$apply();
+        $rootScope.$broadcast('refresh statistics');
         $(element).popover('hide');
       });
 
@@ -1316,7 +1391,7 @@
           $rootScope.isTypingComment = false;
         }, 1);
       }).on('keydown', function(event) {
-        if (event.keyCode === ENTER_KEY_CODE) {
+        if (event.keyCode === Constants.KEY_CODES.ENTER) {
           ResultsService.comment(self.result, self.sessionId, self.index, $('.popover-input-comment')[0].value);
           $scope.$apply();
           $(element).popover('hide');
@@ -1327,7 +1402,7 @@
 
   }
 
-  angular.module('results').controller('ResultsPopoverController', ['$scope', '$rootScope', '$timeout', 'ResultsService', ResultsPopoverController]);
+  angular.module('results').controller('ResultsPopoverController', ['$scope', '$rootScope', '$timeout', 'ResultsService', 'Constants', ResultsPopoverController]);
 
 })();
 
@@ -1422,20 +1497,21 @@
 
   'use strict';
 
-  function SettingsController($scope, $rootScope, $modalInstance, settings, MenuBarService) {
+  function SettingsController($scope, $rootScope, $modalInstance, settings, MenuBarService, Constants) {
 
     var self = this;
 
-    var ENTER_KEY_CODE = 13, ESCAPE_KEY_CODE = 27;
-
     self.settings = [
-      { id: 'input', description: 'Input', options: ['Timer', 'Typing', 'Stackmat'] },
-      { id: 'saveScrambles', description: 'Save Scrambles', options: ['Yes', 'No'] },
-      { id: 'timerStartDelay', description: 'Timer Start Delay', options: [0, 100, 200, 500] },
-      { id: 'timerStopDelay', description: 'Timer Stop Delay', options: [0, 100, 200, 500] },
-      { id: 'timerPrecision', description: 'Timer Precision', options: [2, 3] },
-      { id: 'resultsPrecision', description: 'Results Precision', options: [2, 3] },
-      { id: 'statisticsPrecision', description: 'Stats Precision', options: [2, 3] },
+      { id: 'input', title: 'Input', options: ['Timer', 'Typing', 'Stackmat'] },
+      { id: 'inspection', title: 'Inspection', options: ['On', 'Off'] },
+      { id: 'bldMode', title: 'BLD Mode', options: ['On', 'Off'] },
+      { id: 'timerStartDelay', title: 'Timer Start Delay', options: [0, 100, 550, 1000] },
+      { id: 'timerPrecision', title: 'Timer Precision', options: [0, 1, 2, 3] },
+      { id: 'timerRefreshInterval', title: 'Timer Refresh', options: [50, 100, 500, 1000] },
+      { id: 'showScramble', title: 'Show Scramble', options: ['Yes', 'No'] },
+      { id: 'saveScrambles', title: 'Save Scrambles', options: ['Yes', 'No'] },
+      { id: 'resultsPrecision', title: 'Results Precision', options: [2, 3] },
+      { id: 'statisticsPrecision', title: 'Stats Precision', options: [2, 3] }
     ];
 
     for (var i = 0; i < self.settings.length; i++) {
@@ -1444,10 +1520,10 @@
 
     $scope.$on('keydown', function($event, event) {
       switch(event.keyCode) {
-        case ENTER_KEY_CODE:
+        case Constants.KEY_CODES.ENTER:
           self.save();
           break;
-        case ESCAPE_KEY_CODE:
+        case Constants.KEY_CODES.ESCAPE:
           self.close();
           break;
       }
@@ -1478,7 +1554,7 @@
 
   }
 
-  angular.module('menuBar').controller('SettingsController', ['$scope', '$rootScope', '$modalInstance', 'settings', 'MenuBarService', SettingsController]);
+  angular.module('menuBar').controller('SettingsController', ['$scope', '$rootScope', '$modalInstance', 'settings', 'MenuBarService', 'Constants', SettingsController]);
 
 })();
 
@@ -1515,6 +1591,10 @@
     $scope.$watchCollection(function() {
       return self.results;
     }, function() {
+      self.statistics = StatisticsService.getStatistics(self.results, self.settings.statisticsPrecision);
+    });
+
+    $scope.$on('refresh statistics', function() {
       self.statistics = StatisticsService.getStatistics(self.results, self.settings.statisticsPrecision);
     });
 
@@ -1644,52 +1724,47 @@
 
   'use strict';
 
-  function TimerController($scope, $rootScope, $interval, $timeout, TimerService, ResultsService) {
+  function TimerController($scope, $rootScope, $interval, $timeout, TimerService, ResultsService, Constants) {
 
-    var self = this, timer, state = 'reset';
-    var SPACE_BAR_KEY_CODE = 32, ENTER_KEY_CODE = 13;
+    var self = this;
 
-    var STYLES = {
-      BLACK: { 'color': '#000000' },
-      RED: { 'color': '#FF0000' },
-      GREEN: { 'color': '#2EB82E' }
-    };
+    var timer, inspection, state = 'reset', penalty = '', comment = '', precision = self.settings.timerPrecision;
 
     if (self.settings.input === 'Timer') {
-      self.time = self.settings.timerPrecision === 2 ? moment(0).format('s.SS') : moment(0).format('s.SSS');
+      self.time = self.settings.inspection !== 'On' ? (precision === 2 ? '0.00' : '0.000') : '15';
     } else if (self.settings.input === 'Typing') {
       self.time = '';
     }
 
     $scope.$on('refresh settings', function () {
+
       if (self.settings.input === 'Timer') {
-        self.time = self.settings.timerPrecision === 2 ? moment(0).format('s.SS') : moment(0).format('s.SSS');
+        self.time = self.settings.inspection !== 'On' ? (precision === 2 ? '0.00' : '0.000') : '15';
       } else if (self.settings.input === 'Typing') {
         self.time = '';
       }
+
     });
 
     $scope.$on('keydown', function ($event, event) {
 
       if (self.settings.input === 'Timer') {
-        if ((state === 'reset') && (event.keyCode === SPACE_BAR_KEY_CODE)) {
-          state = 'keydown';
-          self.time = self.settings.timerPrecision === 2 ? moment(0).format('s.SS') : moment(0).format('s.SSS');
-          self.timerStyle = STYLES.RED;
-          $timeout(function () {
-            if (state === 'keydown') {
-              state = 'ready';
-              self.timerStyle = STYLES.GREEN;
-              $rootScope.$broadcast('timer focus');
-            }
-          }, self.settings.timerStartDelay);
-        } else if (state === 'timing') {
-          state = 'stopped';
-          $interval.cancel(timer);
-          $rootScope.$broadcast('timer unfocus');
-          ResultsService.saveResult(self.results, self.time, self.scramble, self.sessionId, self.settings.resultsPrecision);
-          $rootScope.$broadcast('new scramble', self.eventId);
+        if (self.settings.inspection === 'On') {
+
+          if ((state === 'reset') && (event.keyCode === Constants.KEY_CODES.SPACE_BAR)) {
+            self.prepareInspection();
+          } else if ((state === 'inspecting') && (event.keyCode === Constants.KEY_CODES.SPACE_BAR)) {
+            self.prepareTimerWIthInspection();
+          }
+
+        } else if ((state === 'reset') && (event.keyCode === Constants.KEY_CODES.SPACE_BAR)) {
+          self.prepareTimer();
         }
+
+        if (state === 'timing') {
+          self.stopTimer();
+        }
+
       }
 
     });
@@ -1697,30 +1772,123 @@
     $scope.$on('keyup', function ($event, event) {
 
       if (self.settings.input === 'Timer') {
-        self.timerStyle = STYLES.BLACK;
-        if ((state === 'ready') && (event.keyCode === SPACE_BAR_KEY_CODE)) {
-          state = 'timing';
-          TimerService.startTimer();
-          timer = $interval(function () {
-            self.time = TimerService.getTime(self.settings.timerPrecision);
-          }, self.settings.timerRefreshInterval);
-        } else if (state === 'keydown') {
-          state = 'reset';
-        } else if (state === 'stopped') {
-          $timeout(function () {
-            state = 'reset';
-          }, self.settings.timerStopDelay);
+        if (self.settings.inspection === 'On') {
+
+          if ((state === 'pre inspection') && (event.keyCode === Constants.KEY_CODES.SPACE_BAR)) {
+            self.startInspection();
+          } else if ((state === 'pre timing') && (event.keyCode === Constants.KEY_CODES.SPACE_BAR)) {
+            self.stopInspection();
+            self.startTimer();
+          } else {
+            self.resetTimer();
+          }
+
+        } else if ((state === 'ready') && (event.keyCode === Constants.KEY_CODES.SPACE_BAR)) {
+          self.startTimer();
+        } else {
+          self.resetTimer();
         }
       }
 
     });
+
+    self.prepareTimer = function() {
+
+      state = 'keydown';
+      self.time = precision === 2 ? '0.00' : '0.000';
+      self.timerStyle = Constants.STYLES.COLOR.ORANGE;
+      $timeout(function () {
+        if (state === 'keydown') {
+          state = 'ready';
+          self.timerStyle = Constants.STYLES.COLOR.GREEN;
+          $rootScope.$broadcast('timer focus');
+        }
+      }, self.settings.timerStartDelay);
+
+    };
+
+    self.startTimer = function() {
+
+      state = 'timing';
+      self.timerStyle = Constants.STYLES.COLOR.BLACK;
+      TimerService.startTimer();
+      timer = $interval(function () {
+        self.time = TimerService.getTime(precision);
+      }, self.settings.timerRefreshInterval);
+
+    };
+
+    self.stopTimer = function() {
+
+      state = 'stopped';
+      $interval.cancel(timer);
+      ResultsService.saveResult(self.results, self.time, penalty, comment, self.scramble, self.sessionId, self.settings.resultsPrecision);
+      $rootScope.$broadcast('new scramble', self.eventId);
+
+    };
+
+    self.prepareInspection = function() {
+
+      state = 'pre inspection';
+      self.timerStyle = Constants.STYLES.COLOR.ORANGE;
+      self.time = '15';
+      $rootScope.$broadcast('timer focus');
+
+    };
+
+    self.startInspection = function() {
+
+      state = 'inspecting';
+      self.timerStyle = Constants.STYLES.COLOR.BLUE;
+      TimerService.startInspection();
+      inspection = $interval(function() {
+        var time = TimerService.getInspectionTime();
+        if (time > 0) {
+          self.time = time;
+        } else if (time > -2) {
+          if (self.timerStyle !== Constants.STYLES.COLOR.ORANGE) {
+            self.timerStyle = Constants.STYLES.COLOR.RED;
+          }
+          self.time = '+2';
+          penalty = '+2';
+        } else {
+          self.time = 'DNF';
+          penalty = 'DNF';
+        }
+      }, 1000);
+
+    };
+
+    self.prepareTimerWIthInspection = function() {
+
+      state = 'pre timing';
+      self.timerStyle = Constants.STYLES.COLOR.ORANGE;
+
+    };
+
+    self.stopInspection = function() {
+
+      $interval.cancel(inspection);
+
+    };
+
+    self.resetTimer = function() {
+
+      self.timerStyle = Constants.STYLES.COLOR.BLACK;
+      $rootScope.$broadcast('timer unfocus');
+      if ((state === 'keydown') || (state === 'stopped')) {
+        state = 'reset';
+      }
+      penalty = '';
+
+    };
 
     self.submitInput = function() {
 
       if (self.time === '') {
         $rootScope.$broadcast('new scramble', self.eventId);
       } else if ($scope.input.text.$valid) {
-        ResultsService.saveResult(self.results, self.time, self.scramble, self.sessionId, self.settings.resultsPrecision);
+        ResultsService.saveResult(self.results, self.time, penalty, comment, self.scramble, self.sessionId, self.settings.resultsPrecision);
         self.time = '';
         $rootScope.$broadcast('new scramble', self.eventId);
       }
@@ -1729,7 +1897,7 @@
 
   }
 
-  angular.module('timer').controller('TimerController', ['$scope', '$rootScope', '$interval', '$timeout', 'TimerService', 'ResultsService', TimerController]);
+  angular.module('timer').controller('TimerController', ['$scope', '$rootScope', '$interval', '$timeout', 'TimerService', 'ResultsService', 'Constants', TimerController]);
 
 })();
 
@@ -1753,11 +1921,30 @@
     };
 
     /**
+     * Gets the inspection time.
+     * @returns {*}
+     */
+    self.getInspectionTime = function() {
+
+      return Math.ceil(((15000 + self.inspectionStartTime - Date.now()) / 1000));
+
+    };
+
+    /**
      * Starts the Timer.
      */
     self.startTimer = function() {
 
       self.startTime = Date.now();
+
+    };
+
+    /**
+     * Starts the inspection timer.
+     */
+    self.startInspection = function() {
+
+      self.inspectionStartTime = Date.now();
 
     };
 

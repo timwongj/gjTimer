@@ -8,7 +8,9 @@
       templateUrl: 'dist/components/gjTimer/cub/cub.html',
       controller: 'CubController',
       controllerAs: 'ctrl',
-      scope: true,
+      scope: {
+        settings: '='
+      },
       bindToController: true
     };
   }
