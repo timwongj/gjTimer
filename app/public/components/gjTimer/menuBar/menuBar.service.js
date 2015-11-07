@@ -13,13 +13,13 @@
     self.initSettings = function() {
       var settings = LocalStorage.getJSON('settings');
       if (settings === null) {
-        LocalStorage.setJSON('settings', Constants.SETTINGS.DEFAULT_SETTINGS);
-        return Constants.SETTINGS.DEFAULT_SETTINGS;
+        LocalStorage.setJSON('settings', Constants.DEFAULT_SETTINGS);
+        return Constants.DEFAULT_SETTINGS;
       } else {
-        for (var key in Constants.SETTINGS.DEFAULT_SETTINGS) {
-          if (Constants.SETTINGS.DEFAULT_SETTINGS.hasOwnProperty(key)) {
+        for (var key in Constants.DEFAULT_SETTINGS) {
+          if (Constants.DEFAULT_SETTINGS.hasOwnProperty(key)) {
             if (!settings.hasOwnProperty(key)) {
-              settings[key] = Constants.SETTINGS.DEFAULT_SETTINGS[key];
+              settings[key] = Constants.DEFAULT_SETTINGS[key];
               LocalStorage.setJSON('settings', settings);
             }
           }

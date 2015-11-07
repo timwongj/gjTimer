@@ -386,7 +386,7 @@
         it('should call the calculateAverage function with each subset of rawTimes and trimmed', function() {
 
           Calculator.calculateBestAverageAndStandardDeviationString(rawTimes, trimmed, n, precision);
-          for (var i = 0; i < rawTimes.length - n; i++) {
+          for (var i = 0; i <= rawTimes.length - n; i++) {
             expect(Calculator.calculateAverage).toHaveBeenCalledWith(rawTimes.slice(i, i + n), trimmed);
           }
 

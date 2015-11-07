@@ -8,26 +8,16 @@
 
     var timer, inspection, state = 'reset', penalty = '', comment = '', memo = '', precision = self.settings.timerPrecision;
 
-    if (self.settings.input === 'Timer') {
-      self.time = self.settings.inspection !== 'On' ? (precision === 2 ? '0.00' : '0.000') : '15';
-    } else if (self.settings.input === 'Typing') {
-      self.time = '';
-    }
-
     $scope.$on('refresh settings', function () {
 
-      if (self.settings.input === 'Timer') {
-        self.time = self.settings.inspection !== 'On' ? (precision === 2 ? '0.00' : '0.000') : '15';
-      } else if (self.settings.input === 'Typing') {
-        self.time = '';
-      }
+      self.refreshSettings();
 
     });
 
     $scope.$on('keydown', function ($event, event) {
 
       if (self.settings.input === 'Timer') {
-        if (self.settings.inspection === 'On') {
+        if (self.settings.inspection) {
           if ((state === 'reset') && (event.keyCode === Constants.KEY_CODES.SPACE_BAR)) {
             self.prepareInspection();
           } else if ((state === 'inspecting') && (event.keyCode === Constants.KEY_CODES.SPACE_BAR)) {
@@ -47,7 +37,7 @@
     $scope.$on('keyup', function ($event, event) {
 
       if (self.settings.input === 'Timer') {
-        if (self.settings.inspection === 'On') {
+        if (self.settings.inspection) {
           if ((state === 'pre inspection') && (event.keyCode === Constants.KEY_CODES.SPACE_BAR)) {
             self.startInspection();
           } else if ((state === 'pre timing') && (event.keyCode === Constants.KEY_CODES.SPACE_BAR)) {
@@ -86,7 +76,7 @@
 
     self.startTimer = function() {
 
-      if ((self.settings.bldMode === 'On') && (self.settings.inspection !== 'On')) {
+      if (self.settings.bldMode && !self.settings.inspection) {
         state = 'memorizing';
         self.timerStyle = Constants.STYLES.COLOR.BLUE;
       } else {
@@ -104,8 +94,8 @@
 
       state = 'stopped';
       $interval.cancel(timer);
-      comment = TimerService.createCommentForBldMode(self.time, memo);
-      ResultsService.saveResult(self.results, self.time, penalty, comment, self.scramble, self.sessionId, self.settings.resultsPrecision);
+      comment = self.settings.bldMode ? TimerService.createCommentForBldMode(self.time, memo) : '';
+      ResultsService.saveResult(self.results, self.time, penalty, comment, self.scramble, self.sessionId, self.settings.resultsPrecision, self.settings.saveScramble);
       $rootScope.$broadcast('new scramble', self.eventId);
 
     };
@@ -187,12 +177,24 @@
       if (self.time === '') {
         $rootScope.$broadcast('new scramble', self.eventId);
       } else if ($scope.input.text.$valid) {
-        ResultsService.saveResult(self.results, self.time, penalty, comment, self.scramble, self.sessionId, self.settings.resultsPrecision);
+        ResultsService.saveResult(self.results, self.time, penalty, comment, self.scramble, self.sessionId, self.settings.resultsPrecision, self.settings.saveScramble);
         self.time = '';
         $rootScope.$broadcast('new scramble', self.eventId);
       }
 
     };
+
+    self.refreshSettings = function() {
+
+      if (self.settings.input === 'Timer') {
+        self.time = !self.settings.inspection ? (precision === 2 ? '0.00' : '0.000') : '15';
+      } else if (self.settings.input === 'Typing') {
+        self.time = '';
+      }
+
+    };
+
+    self.refreshSettings();
 
   }
 

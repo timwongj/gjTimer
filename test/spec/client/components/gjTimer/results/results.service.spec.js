@@ -13,6 +13,7 @@
     scramble,
     sessionId,
     precision,
+    saveScramble,
     session,
     now;
 
@@ -34,6 +35,7 @@
       penalty = '';
       comment = '';
       precision = 2;
+      saveScramble = true;
       now = 'now';
 
       spyOn(LocalStorage, 'getJSON').and.returnValue({ results: [] });
@@ -48,14 +50,14 @@
 
       it('should get the session from the LocalStorage service', function() {
 
-        ResultsService.saveResult(results, time, penalty, comment, scramble, sessionId, precision);
+        ResultsService.saveResult(results, time, penalty, comment, scramble, sessionId, precision, saveScramble);
         expect(LocalStorage.getJSON).toHaveBeenCalledWith(sessionId);
 
       });
 
       it('should call the convertTimeFromStringToMilliseconds function from the Calculator service with the time', function() {
 
-        ResultsService.saveResult(results, time, penalty, comment, scramble, sessionId, precision);
+        ResultsService.saveResult(results, time, penalty, comment, scramble, sessionId, precision, saveScramble);
         expect(Calculator.convertTimeFromStringToMilliseconds).toHaveBeenCalledWith(time);
 
       });
@@ -66,7 +68,7 @@
           results: [ '625|scramble|' + now ]
         };
 
-        ResultsService.saveResult(results, time, penalty, comment, scramble, sessionId, precision);
+        ResultsService.saveResult(results, time, penalty, comment, scramble, sessionId, precision, saveScramble);
         expect(LocalStorage.setJSON).toHaveBeenCalledWith(sessionId, session);
 
       });
@@ -78,7 +80,7 @@
           results: [ '625+|scramble|' + now ]
         };
 
-        ResultsService.saveResult(results, time, penalty, comment, scramble, sessionId, precision);
+        ResultsService.saveResult(results, time, penalty, comment, scramble, sessionId, precision, saveScramble);
         expect(LocalStorage.setJSON).toHaveBeenCalledWith(sessionId, session);
 
       });
@@ -90,7 +92,19 @@
           results: [ '625|scramble|' + now + '|yw' ]
         };
 
-        ResultsService.saveResult(results, time, penalty, comment, scramble, sessionId, precision);
+        ResultsService.saveResult(results, time, penalty, comment, scramble, sessionId, precision, saveScramble);
+        expect(LocalStorage.setJSON).toHaveBeenCalledWith(sessionId, session);
+
+      });
+
+      it('should not save the scramble if saveScramble is false', function() {
+
+        saveScramble = false;
+        session = {
+          results: [ '625||' + now ]
+        };
+
+        ResultsService.saveResult(results, time, penalty, comment, scramble, sessionId, precision, saveScramble);
         expect(LocalStorage.setJSON).toHaveBeenCalledWith(sessionId, session);
 
       });

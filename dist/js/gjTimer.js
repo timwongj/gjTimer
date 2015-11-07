@@ -236,7 +236,7 @@
 
       var currentAvg, bestAvg = Constants.DNF, index = -1;
 
-      for (var i = 0; i < rawTimes.length - n; i++) {
+      for (var i = 0; i <= rawTimes.length - n; i++) {
         currentAvg = self.calculateAverage(rawTimes.slice(i, i + n), trimmed);
         if (currentAvg < bestAvg) {
           bestAvg = currentAvg;
@@ -352,6 +352,8 @@
 
     var self = this;
 
+    self.DNF = 864000000;
+
     self.KEY_CODES = {
       ENTER: 13,
       ESCAPE: 27,
@@ -386,22 +388,92 @@
       DEFAULT_NUMBER_OF_SESSIONS: 15
     };
 
-    self.SETTINGS = {
-      DEFAULT_SETTINGS: {
-        input: 'Timer',
-        inspection: 'Off',
-        bldMode: 'Off',
-        timerStartDelay: 0,
-        timerPrecision: 3,
-        timerRefreshInterval: 50,
-        showScramble: 'Yes',
-        saveScrambles: 'Yes',
-        resultsPrecision: 2,
-        statisticsPrecision: 3
-      }
+    self.DEFAULT_SETTINGS = {
+      input: 'Timer',
+      inspection: false,
+      bldMode: false,
+      timerStartDelay: 0,
+      timerPrecision: 3,
+      timerRefreshInterval: 50,
+      showScramble: true,
+      saveScramble: true,
+      resultsPrecision: 2,
+      statisticsPrecision: 3
     };
 
-    self.DNF = 864000000;
+    self.SETTINGS = [
+      {
+        id: 'input',
+        title: 'Input',
+        options: [
+          { value: 'Timer', text: 'Timer' },
+          { value: 'Typing', text: 'Typing'},
+          { value: 'Stackmat', text: 'Stackmat' }
+        ]
+      }, {
+        id: 'inspection',
+        title: 'Inspection',
+        options: [
+          { value: true, text: 'On' },
+          { value: false, text: 'Off' }
+        ]
+      }, { id: 'bldMode',
+        title: 'BLD Mode',
+        options: [
+          { value: true, text: 'On' },
+          { value: false, text: 'Off' }
+        ]
+      }, { id: 'timerStartDelay',
+        title: 'Timer Start Delay',
+        options: [
+          { value: 0, text: '0' },
+          { value: 100, text: '0.1' },
+          { value: 500, text: '0.5' },
+          { value: 1000, text: '1' }
+        ]
+      }, { id: 'timerPrecision',
+        title: 'Timer Precision',
+        options: [
+          { value: 0, text: '0' },
+          { value: 1, text: '0.1' },
+          { value: 2, text: '0.01' },
+          { value: 3, text: '0.001' }
+        ]
+      }, { id: 'timerRefreshInterval',
+        title: 'Timer Refresh',
+        options: [
+          { value: 50, text: '0.05' },
+          { value: 100, text: '0.1' },
+          { value: 500, text: '0.5' },
+          { value: 1000, text: '1' }
+        ]
+      }, { id: 'showScramble',
+        title: 'Show Scramble',
+        options: [
+          { value: true, text: 'Yes' },
+          { value: false, text: 'No' }
+        ]
+      }, { id: 'saveScramble',
+        title: 'Save Scramble',
+        options: [
+          { value: true, text: 'Yes' },
+          { value: false, text: 'No' }
+        ]
+      }, { id: 'resultsPrecision',
+        title: 'Results Precision',
+        options: [
+          { value: 2, text: '0.01' },
+          { value: 3, text: '0.001' }
+        ]
+      }, {
+        id: 'statisticsPrecision',
+        title: 'Stats Precision',
+        options: [
+          { value: 2, text: '0.01' },
+          { value: 3, text: '0.001' }
+        ]
+      }
+    ];
 
   }
 
@@ -786,13 +858,13 @@
     self.initSettings = function() {
       var settings = LocalStorage.getJSON('settings');
       if (settings === null) {
-        LocalStorage.setJSON('settings', Constants.SETTINGS.DEFAULT_SETTINGS);
-        return Constants.SETTINGS.DEFAULT_SETTINGS;
+        LocalStorage.setJSON('settings', Constants.DEFAULT_SETTINGS);
+        return Constants.DEFAULT_SETTINGS;
       } else {
-        for (var key in Constants.SETTINGS.DEFAULT_SETTINGS) {
-          if (Constants.SETTINGS.DEFAULT_SETTINGS.hasOwnProperty(key)) {
+        for (var key in Constants.DEFAULT_SETTINGS) {
+          if (Constants.DEFAULT_SETTINGS.hasOwnProperty(key)) {
             if (!settings.hasOwnProperty(key)) {
-              settings[key] = Constants.SETTINGS.DEFAULT_SETTINGS[key];
+              settings[key] = Constants.DEFAULT_SETTINGS[key];
               LocalStorage.setJSON('settings', settings);
             }
           }
@@ -1048,8 +1120,9 @@
      * @param scramble
      * @param sessionId
      * @param precision
+     * @param saveScramble
      */
-    self.saveResult = function(results, time, penalty, comment, scramble, sessionId, precision) {
+    self.saveResult = function(results, time, penalty, comment, scramble, sessionId, precision, saveScramble) {
 
       var timeMilliseconds = Calculator.convertTimeFromStringToMilliseconds(time);
       var timeStringWithPrecision = Calculator.convertTimeFromMillisecondsToString(timeMilliseconds, precision);
@@ -1087,7 +1160,7 @@
       results.push(result);
 
       var session = LocalStorage.getJSON(sessionId);
-      session.results.push(timeString + '|' + scramble + '|' + Date.now() + (comment !== '' ? '|' + comment : ''));
+      session.results.push(timeString + '|' + (saveScramble ? scramble : '') + '|' + Date.now() + (comment !== '' ? '|' + comment : ''));
       LocalStorage.setJSON(sessionId, session);
 
     };
@@ -1501,18 +1574,7 @@
 
     var self = this;
 
-    self.settings = [
-      { id: 'input', title: 'Input', options: ['Timer', 'Typing', 'Stackmat'] },
-      { id: 'inspection', title: 'Inspection', options: ['On', 'Off'] },
-      { id: 'bldMode', title: 'BLD Mode', options: ['On', 'Off'] },
-      { id: 'timerStartDelay', title: 'Timer Start Delay', options: [0, 100, 550, 1000] },
-      { id: 'timerPrecision', title: 'Timer Precision', options: [0, 1, 2, 3] },
-      { id: 'timerRefreshInterval', title: 'Timer Refresh', options: [50, 100, 500, 1000] },
-      { id: 'showScramble', title: 'Show Scramble', options: ['Yes', 'No'] },
-      { id: 'saveScrambles', title: 'Save Scrambles', options: ['Yes', 'No'] },
-      { id: 'resultsPrecision', title: 'Results Precision', options: [2, 3] },
-      { id: 'statisticsPrecision', title: 'Stats Precision', options: [2, 3] }
-    ];
+    self.settings = Constants.SETTINGS;
 
     for (var i = 0; i < self.settings.length; i++) {
       self.settings[i].value = settings[self.settings[i].id];
@@ -1730,26 +1792,16 @@
 
     var timer, inspection, state = 'reset', penalty = '', comment = '', memo = '', precision = self.settings.timerPrecision;
 
-    if (self.settings.input === 'Timer') {
-      self.time = self.settings.inspection !== 'On' ? (precision === 2 ? '0.00' : '0.000') : '15';
-    } else if (self.settings.input === 'Typing') {
-      self.time = '';
-    }
-
     $scope.$on('refresh settings', function () {
 
-      if (self.settings.input === 'Timer') {
-        self.time = self.settings.inspection !== 'On' ? (precision === 2 ? '0.00' : '0.000') : '15';
-      } else if (self.settings.input === 'Typing') {
-        self.time = '';
-      }
+      self.refreshSettings();
 
     });
 
     $scope.$on('keydown', function ($event, event) {
 
       if (self.settings.input === 'Timer') {
-        if (self.settings.inspection === 'On') {
+        if (self.settings.inspection) {
           if ((state === 'reset') && (event.keyCode === Constants.KEY_CODES.SPACE_BAR)) {
             self.prepareInspection();
           } else if ((state === 'inspecting') && (event.keyCode === Constants.KEY_CODES.SPACE_BAR)) {
@@ -1769,7 +1821,7 @@
     $scope.$on('keyup', function ($event, event) {
 
       if (self.settings.input === 'Timer') {
-        if (self.settings.inspection === 'On') {
+        if (self.settings.inspection) {
           if ((state === 'pre inspection') && (event.keyCode === Constants.KEY_CODES.SPACE_BAR)) {
             self.startInspection();
           } else if ((state === 'pre timing') && (event.keyCode === Constants.KEY_CODES.SPACE_BAR)) {
@@ -1808,7 +1860,7 @@
 
     self.startTimer = function() {
 
-      if ((self.settings.bldMode === 'On') && (self.settings.inspection !== 'On')) {
+      if (self.settings.bldMode && !self.settings.inspection) {
         state = 'memorizing';
         self.timerStyle = Constants.STYLES.COLOR.BLUE;
       } else {
@@ -1826,8 +1878,8 @@
 
       state = 'stopped';
       $interval.cancel(timer);
-      comment = TimerService.createCommentForBldMode(self.time, memo);
-      ResultsService.saveResult(self.results, self.time, penalty, comment, self.scramble, self.sessionId, self.settings.resultsPrecision);
+      comment = self.settings.bldMode ? TimerService.createCommentForBldMode(self.time, memo) : '';
+      ResultsService.saveResult(self.results, self.time, penalty, comment, self.scramble, self.sessionId, self.settings.resultsPrecision, self.settings.saveScramble);
       $rootScope.$broadcast('new scramble', self.eventId);
 
     };
@@ -1909,12 +1961,24 @@
       if (self.time === '') {
         $rootScope.$broadcast('new scramble', self.eventId);
       } else if ($scope.input.text.$valid) {
-        ResultsService.saveResult(self.results, self.time, penalty, comment, self.scramble, self.sessionId, self.settings.resultsPrecision);
+        ResultsService.saveResult(self.results, self.time, penalty, comment, self.scramble, self.sessionId, self.settings.resultsPrecision, self.settings.saveScramble);
         self.time = '';
         $rootScope.$broadcast('new scramble', self.eventId);
       }
 
     };
+
+    self.refreshSettings = function() {
+
+      if (self.settings.input === 'Timer') {
+        self.time = !self.settings.inspection ? (precision === 2 ? '0.00' : '0.000') : '15';
+      } else if (self.settings.input === 'Typing') {
+        self.time = '';
+      }
+
+    };
+
+    self.refreshSettings();
 
   }
 
