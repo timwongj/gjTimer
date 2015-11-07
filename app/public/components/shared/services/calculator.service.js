@@ -112,7 +112,7 @@
 
       var currentAvg, bestAvg = Constants.DNF, index = -1;
 
-      for (var i = 0; i < rawTimes.length - n; i++) {
+      for (var i = 0; i <= rawTimes.length - n; i++) {
         currentAvg = self.calculateAverage(rawTimes.slice(i, i + n), trimmed);
         if (currentAvg < bestAvg) {
           bestAvg = currentAvg;

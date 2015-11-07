@@ -72,8 +72,9 @@
      * @param scramble
      * @param sessionId
      * @param precision
+     * @param saveScramble
      */
-    self.saveResult = function(results, time, penalty, comment, scramble, sessionId, precision) {
+    self.saveResult = function(results, time, penalty, comment, scramble, sessionId, precision, saveScramble) {
 
       var timeMilliseconds = Calculator.convertTimeFromStringToMilliseconds(time);
       var timeStringWithPrecision = Calculator.convertTimeFromMillisecondsToString(timeMilliseconds, precision);
@@ -111,7 +112,7 @@
       results.push(result);
 
       var session = LocalStorage.getJSON(sessionId);
-      session.results.push(timeString + '|' + scramble + '|' + Date.now() + (comment !== '' ? '|' + comment : ''));
+      session.results.push(timeString + '|' + (saveScramble ? scramble : '') + '|' + Date.now() + (comment !== '' ? '|' + comment : ''));
       LocalStorage.setJSON(sessionId, session);
 
     };

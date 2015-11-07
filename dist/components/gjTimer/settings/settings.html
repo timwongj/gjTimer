@@ -10,7 +10,7 @@
       <label class="label-setting" ng-bind="setting.title"></label>
       <div class="btn-group">
         <label class="btn btn-default btn-sm" ng-repeat="option in setting.options track by $index"
-               ng-model="setting.value" uib-btn-radio="option" ng-bind="option"></label>
+               ng-model="setting.value" uib-btn-radio="option.value" ng-bind="option.text"></label>
       </div>
     </div>
   </div>
