@@ -9,26 +9,26 @@
   <link rel="shortcut icon" type="image/x-icon" href="dist/img/cubeLogo.png"/>
   <title>gjTimer</title>
 </head>
-<body ng-app="gjTimerApp" ng-controller="gjTimerController" ng-keydown="keydown($event)" ng-keyup="keyup($event)" ng-style="style.body">
+<body ng-app="gjTimerApp" ng-controller="gjTimerController" ng-keydown="keydown($event)" ng-keyup="keyup($event)" ng-style="settings.backgroundColor">
   <div class="container-fluid">
     <div ng-style="style.section">
       <menu-bar event-id="eventId" results="results" session-id="sessionId" settings="settings"></menu-bar>
     </div>
     <div class="row">
       <div class="col-md-6 col-sm-12 col-md-push-3 section" ng-style="style.timer">
-        <div class="jumbotron jumbotron-timer">
+        <div class="jumbotron jumbotron-timer" ng-style="settings.panelColor">
           <scramble event-id="eventId" scramble="scramble"></scramble>
           <timer event-id="eventId" results="results" scramble="scramble" session-id="sessionId" settings="settings"></timer>
           <cub settings="settings"></cub>
         </div>
       </div>
       <div class="col-md-3 col-sm-6 col-md-pull-6 section" ng-style="style.section">
-        <div class="jumbotron jumbotron-results">
+        <div class="jumbotron jumbotron-results" ng-style="settings.panelColor">
           <results results="results" session-id="sessionId" settings="settings"></results>
         </div>
       </div>
       <div class="col-md-3 col-sm-6 section" ng-style="style.section">
-        <div class="jumbotron jumbotron-statistics">
+        <div class="jumbotron jumbotron-statistics" ng-style="settings.panelColor">
           <statistics results="results" settings="settings"></statistics>
         </div>
       </div>

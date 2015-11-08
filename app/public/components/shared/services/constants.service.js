@@ -42,17 +42,32 @@
       DEFAULT_NUMBER_OF_SESSIONS: 15
     };
 
+    var colorOptions = [
+      { value: { 'background-color': '#FFFFFF'} }, // white
+      { value: { 'background-color': '#EEEEEE'} }, // grey
+      { value: { 'background-color': '#FFE5EE'} }, // pink
+      { value: { 'background-color': '#FFCCCC'} }, // red
+      { value: { 'background-color': '#FFE8D2'} }, // orange
+      { value: { 'background-color': '#FFFFCC'} }, // yellow
+      { value: { 'background-color': '#D7FFD7'} }, // green
+      { value: { 'background-color': '#E5F5FF'} }, // blue
+      { value: { 'background-color': '#FFE5FF'} }, // purple
+      { value: { 'background-color': '#F1E3D4'} } // brown
+    ];
+
     self.DEFAULT_SETTINGS = {
       input: 'Timer',
       inspection: false,
       bldMode: false,
-      timerStartDelay: 0,
       timerPrecision: 3,
+      timerStartDelay: 0,
       timerRefreshInterval: 50,
       showScramble: true,
       saveScramble: true,
       resultsPrecision: 2,
-      statisticsPrecision: 3
+      statisticsPrecision: 3,
+      panelColor: { 'background-color': '#EEEEEE'},
+      backgroundColor: { 'background-color': '#FFFFFF'}
     };
 
     self.SETTINGS = [
@@ -61,8 +76,7 @@
         title: 'Input',
         options: [
           { value: 'Timer', text: 'Timer' },
-          { value: 'Typing', text: 'Typing'},
-          { value: 'Stackmat', text: 'Stackmat' }
+          { value: 'Typing', text: 'Typing'}
         ]
       }, {
         id: 'inspection',
@@ -77,14 +91,6 @@
           { value: true, text: 'On' },
           { value: false, text: 'Off' }
         ]
-      }, { id: 'timerStartDelay',
-        title: 'Timer Start Delay',
-        options: [
-          { value: 0, text: '0' },
-          { value: 100, text: '0.1' },
-          { value: 500, text: '0.5' },
-          { value: 1000, text: '1' }
-        ]
       }, { id: 'timerPrecision',
         title: 'Timer Precision',
         options: [
@@ -92,6 +98,14 @@
           { value: 1, text: '0.1' },
           { value: 2, text: '0.01' },
           { value: 3, text: '0.001' }
+        ]
+      }, { id: 'timerStartDelay',
+        title: 'Timer Start Delay',
+        options: [
+          { value: 0, text: '0' },
+          { value: 100, text: '0.1' },
+          { value: 500, text: '0.5' },
+          { value: 1000, text: '1' }
         ]
       }, { id: 'timerRefreshInterval',
         title: 'Timer Refresh',
@@ -126,6 +140,14 @@
           { value: 2, text: '0.01' },
           { value: 3, text: '0.001' }
         ]
+      }, {
+        id: 'panelColor',
+        title: 'Panel Color',
+        options: colorOptions
+      }, {
+        id: 'backgroundColor',
+        title: 'Background Color',
+        options: colorOptions
       }
     ];
 

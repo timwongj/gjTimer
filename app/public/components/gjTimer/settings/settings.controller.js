@@ -7,7 +7,6 @@
     var self = this;
 
     self.settings = Constants.SETTINGS;
-
     for (var i = 0; i < self.settings.length; i++) {
       self.settings[i].value = settings[self.settings[i].id];
     }
@@ -33,12 +32,11 @@
       $rootScope.$broadcast('refresh results');
     };
 
-    self.resetAll = function() {
-      if (confirm('Are you sure you want to reset everything?')) {
-        MenuBarService.resetAll();
-        $modalInstance.dismiss();
+    self.resetSettings = function() {
+      if (confirm('Are you sure you want to reset all settings?')) {
+        settings = MenuBarService.resetSettings();
         $rootScope.$broadcast('refresh settings');
-        $rootScope.$broadcast('refresh results');
+        $modalInstance.dismiss();
       }
     };
 

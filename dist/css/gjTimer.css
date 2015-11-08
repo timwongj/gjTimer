@@ -6,17 +6,13 @@
     padding: .375em;
   }
 }
-.jumbotron-timer,
-.jumbotron-results,
-.jumbotron-statistics {
+.jumbotron {
   margin-bottom: 0;
   border-radius: 0 !important;
-  background-color: #eeeeee;
+  background-color: #FFFFFF;
 }
 @media (min-width: 62em) {
-  .jumbotron-timer,
-  .jumbotron-results,
-  .jumbotron-statistics {
+  .jumbotron {
     height: calc(100vh - 4em);
     border-radius: 2px !important;
   }
@@ -170,6 +166,22 @@
 }
 #settings .btn-group {
   margin: 0 .125em;
+}
+#settings .color-list {
+  margin: 0;
+  padding: 0;
+  display: inline-flex;
+  list-style-type: none;
+}
+#settings .color-list-item {
+  margin: 0;
+}
+#settings .color-option {
+  height: 1em;
+  width: 1em;
+  margin: .25em;
+  padding: 0;
+  border: 0.125em solid black;
 }
 #statistics {
   margin: .125em;

@@ -5,7 +5,7 @@
   function GjTimerController($scope, $rootScope, Constants) {
 
     $rootScope.isTyping = false;
-    $scope.style = { body: {}, section: {}, timer: {} };
+    $scope.style = {};
 
     $scope.keydown = function($event) {
 
@@ -30,7 +30,8 @@
 
     $scope.$on('timer focus', function() {
 
-      $scope.style.body = Constants.STYLES.BACKGROUND_COLOR.GRAY;
+      $scope.style.body = $scope.settings.backgroundColor;
+      $scope.settings.backgroundColor = $scope.settings.panelColor;
       $scope.style.section = { 'display': 'none' };
       $scope.style.timer = { 'margin-top': '2.9375em' };
 
@@ -38,7 +39,9 @@
 
     $scope.$on('timer unfocus', function() {
 
-      $scope.style.body = Constants.STYLES.BACKGROUND_COLOR.WHITE;
+      if ($scope.style.body) {
+        $scope.settings.backgroundColor = $scope.style.body;
+      }
       $scope.style.section = { 'display': 'block' };
       $scope.style.timer = {};
 

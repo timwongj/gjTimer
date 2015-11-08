@@ -1,37 +1,35 @@
 <div id="results">
-  <div class="jumbotron jumbotron-results">
-    <table class="table-hover">
-      <thead>
-      <tr>
-        <th class="index">#</th>
-        <th class="time">Time</th>
-        <th class="avg">Avg 5</th>
-        <th class="avg">Avg 12</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr ng-repeat="result in ctrl.results | reverse">
-        <td class="index">
-          <div ng-bind="ctrl.results.length - $index"></div>
-        </td>
-        <td class="time">
-          <results-popover index="ctrl.results.length - $index - 1"
-                           precision="ctrl.settings.resultsPrecision"
-                           result="result" results="ctrl.results"
-                           session-id="ctrl.sessionId">
-            <div ng-bind="result.displayedTime"></div>
-          </results-popover>
-        </td>
-        <td class="avg">
-          <div ng-bind="result.avg5"
-               ng-click="ctrl.openModal(ctrl.results.length - $index, 5)"></div>
-        </td>
-        <td class="avg">
-          <div ng-bind="result.avg12"
-               ng-click="ctrl.openModal(ctrl.results.length - $index, 12)"></div>
-        </td>
-      </tr>
-      </tbody>
-    </table>
-  </div>
+  <table class="table-hover">
+    <thead>
+    <tr>
+      <th class="index">#</th>
+      <th class="time">Time</th>
+      <th class="avg">Avg 5</th>
+      <th class="avg">Avg 12</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="result in ctrl.results | reverse">
+      <td class="index">
+        <div ng-bind="ctrl.results.length - $index"></div>
+      </td>
+      <td class="time">
+        <results-popover index="ctrl.results.length - $index - 1"
+                         precision="ctrl.settings.resultsPrecision"
+                         result="result" results="ctrl.results"
+                         session-id="ctrl.sessionId">
+          <div ng-bind="result.displayedTime"></div>
+        </results-popover>
+      </td>
+      <td class="avg">
+        <div ng-bind="result.avg5"
+             ng-click="ctrl.openModal(ctrl.results.length - $index, 5)"></div>
+      </td>
+      <td class="avg">
+        <div ng-bind="result.avg12"
+             ng-click="ctrl.openModal(ctrl.results.length - $index, 12)"></div>
+      </td>
+    </tr>
+    </tbody>
+  </table>
 </div>
