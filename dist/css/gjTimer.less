@@ -2,9 +2,11 @@
 @screen-md-min: 62em;
 @screen-lg-min: 75em;
 
-@color-jumbotron: #eee;
 @height-section-md: calc(~"100vh - 4em");
 
+body {
+  background-color: #FFFFFF;
+}
 
 .section {
   padding: .375em 0;
@@ -13,14 +15,14 @@
   }
 }
 
-.jumbotron-timer, .jumbotron-results, .jumbotron-statistics {
+.jumbotron {
   margin-bottom: 0;
   border-radius: 0 !important;
-  background-color: @color-jumbotron;
   @media (min-width: @screen-md-min) {
     height: @height-section-md;
     border-radius: 2px !important;
   }
+  background: rgba(255, 255, 255, 0);
 }
 
 .jumbotron-timer {
