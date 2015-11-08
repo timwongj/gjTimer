@@ -392,8 +392,8 @@
       input: 'Timer',
       inspection: false,
       bldMode: false,
-      timerStartDelay: 0,
       timerPrecision: 3,
+      timerStartDelay: 0,
       timerRefreshInterval: 50,
       showScramble: true,
       saveScramble: true,
@@ -407,8 +407,7 @@
         title: 'Input',
         options: [
           { value: 'Timer', text: 'Timer' },
-          { value: 'Typing', text: 'Typing'},
-          { value: 'Stackmat', text: 'Stackmat' }
+          { value: 'Typing', text: 'Typing'}
         ]
       }, {
         id: 'inspection',
@@ -423,14 +422,6 @@
           { value: true, text: 'On' },
           { value: false, text: 'Off' }
         ]
-      }, { id: 'timerStartDelay',
-        title: 'Timer Start Delay',
-        options: [
-          { value: 0, text: '0' },
-          { value: 100, text: '0.1' },
-          { value: 500, text: '0.5' },
-          { value: 1000, text: '1' }
-        ]
       }, { id: 'timerPrecision',
         title: 'Timer Precision',
         options: [
@@ -438,6 +429,14 @@
           { value: 1, text: '0.1' },
           { value: 2, text: '0.01' },
           { value: 3, text: '0.001' }
+        ]
+      }, { id: 'timerStartDelay',
+        title: 'Timer Start Delay',
+        options: [
+          { value: 0, text: '0' },
+          { value: 100, text: '0.1' },
+          { value: 500, text: '0.5' },
+          { value: 1000, text: '1' }
         ]
       }, { id: 'timerRefreshInterval',
         title: 'Timer Refresh',
