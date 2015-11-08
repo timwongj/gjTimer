@@ -42,6 +42,19 @@
       DEFAULT_NUMBER_OF_SESSIONS: 15
     };
 
+    var colorOptions = [
+      { value: { 'background-color': '#FFFFFF'} }, // white
+      { value: { 'background-color': '#EEEEEE'} }, // grey
+      { value: { 'background-color': '#FFE5EE'} }, // pink
+      { value: { 'background-color': '#FFCCCC'} }, // red
+      { value: { 'background-color': '#FFE8D2'} }, // orange
+      { value: { 'background-color': '#FFFFCC'} }, // yellow
+      { value: { 'background-color': '#D7FFD7'} }, // green
+      { value: { 'background-color': '#E5F5FF'} }, // blue
+      { value: { 'background-color': '#FFE5FF'} }, // purple
+      { value: { 'background-color': '#F1E3D4'} } // brown
+    ];
+
     self.DEFAULT_SETTINGS = {
       input: 'Timer',
       inspection: false,
@@ -52,7 +65,9 @@
       showScramble: true,
       saveScramble: true,
       resultsPrecision: 2,
-      statisticsPrecision: 3
+      statisticsPrecision: 3,
+      panelColor: { 'background-color': '#EEEEEE'},
+      backgroundColor: { 'background-color': '#FFFFFF'}
     };
 
     self.SETTINGS = [
@@ -125,6 +140,14 @@
           { value: 2, text: '0.01' },
           { value: 3, text: '0.001' }
         ]
+      }, {
+        id: 'panelColor',
+        title: 'Panel Color',
+        options: colorOptions
+      }, {
+        id: 'backgroundColor',
+        title: 'Background Color',
+        options: colorOptions
       }
     ];
 

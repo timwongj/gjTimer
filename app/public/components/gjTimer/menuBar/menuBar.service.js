@@ -37,6 +37,15 @@
     };
 
     /**
+     * Reset settings.
+     * @returns {*}
+     */
+    self.resetSettings = function() {
+      LocalStorage.setJSON('settings', Constants.DEFAULT_SETTINGS);
+      return Constants.DEFAULT_SETTINGS;
+    };
+
+    /**
      * Initializes sessions in local storage if they do not exist.
      * @returns [String] - sessionId
      */

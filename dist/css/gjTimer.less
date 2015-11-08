@@ -4,10 +4,6 @@
 
 @height-section-md: calc(~"100vh - 4em");
 
-body {
-  background-color: #FFFFFF;
-}
-
 .section {
   padding: .375em 0;
   @media (min-width: @screen-sm-min) {
@@ -18,11 +14,11 @@ body {
 .jumbotron {
   margin-bottom: 0;
   border-radius: 0 !important;
+  background-color: #FFFFFF;
   @media (min-width: @screen-md-min) {
     height: @height-section-md;
     border-radius: 2px !important;
   }
-  background: rgba(255, 255, 255, 0);
 }
 
 .jumbotron-timer {
@@ -228,6 +224,25 @@ body {
 
   .btn-group {
     margin: 0 .125em;
+  }
+
+  .color-list {
+    margin: 0;
+    padding: 0;
+    display: inline-flex;
+    list-style-type: none;
+  }
+
+  .color-list-item {
+    margin: 0;
+  }
+
+  .color-option {
+    height: 1em;
+    width: 1em;
+    margin: .25em;
+    padding: 0;
+    border: 0.125em solid black;
   }
 
 }

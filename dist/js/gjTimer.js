@@ -55,7 +55,7 @@
   function GjTimerController($scope, $rootScope, Constants) {
 
     $rootScope.isTyping = false;
-    $scope.style = { body: {}, section: {}, timer: {} };
+    $scope.style = {};
 
     $scope.keydown = function($event) {
 
@@ -80,7 +80,8 @@
 
     $scope.$on('timer focus', function() {
 
-      $scope.style.body = Constants.STYLES.BACKGROUND_COLOR.GRAY;
+      $scope.style.body = $scope.settings.backgroundColor;
+      $scope.settings.backgroundColor = $scope.settings.panelColor;
       $scope.style.section = { 'display': 'none' };
       $scope.style.timer = { 'margin-top': '2.9375em' };
 
@@ -88,7 +89,9 @@
 
     $scope.$on('timer unfocus', function() {
 
-      $scope.style.body = Constants.STYLES.BACKGROUND_COLOR.WHITE;
+      if ($scope.style.body) {
+        $scope.settings.backgroundColor = $scope.style.body;
+      }
       $scope.style.section = { 'display': 'block' };
       $scope.style.timer = {};
 
@@ -388,6 +391,19 @@
       DEFAULT_NUMBER_OF_SESSIONS: 15
     };
 
+    var colorOptions = [
+      { value: { 'background-color': '#FFFFFF'} }, // white
+      { value: { 'background-color': '#EEEEEE'} }, // grey
+      { value: { 'background-color': '#FFE5EE'} }, // pink
+      { value: { 'background-color': '#FFCCCC'} }, // red
+      { value: { 'background-color': '#FFE8D2'} }, // orange
+      { value: { 'background-color': '#FFFFCC'} }, // yellow
+      { value: { 'background-color': '#D7FFD7'} }, // green
+      { value: { 'background-color': '#E5F5FF'} }, // blue
+      { value: { 'background-color': '#FFE5FF'} }, // purple
+      { value: { 'background-color': '#F1E3D4'} } // brown
+    ];
+
     self.DEFAULT_SETTINGS = {
       input: 'Timer',
       inspection: false,
@@ -398,7 +414,9 @@
       showScramble: true,
       saveScramble: true,
       resultsPrecision: 2,
-      statisticsPrecision: 3
+      statisticsPrecision: 3,
+      panelColor: { 'background-color': '#EEEEEE'},
+      backgroundColor: { 'background-color': '#FFFFFF'}
     };
 
     self.SETTINGS = [
@@ -471,6 +489,14 @@
           { value: 2, text: '0.01' },
           { value: 3, text: '0.001' }
         ]
+      }, {
+        id: 'panelColor',
+        title: 'Panel Color',
+        options: colorOptions
+      }, {
+        id: 'backgroundColor',
+        title: 'Background Color',
+        options: colorOptions
       }
     ];
 
@@ -878,6 +904,15 @@
      */
     self.saveSettings = function(settings) {
       LocalStorage.setJSON('settings', settings);
+    };
+
+    /**
+     * Reset settings.
+     * @returns {*}
+     */
+    self.resetSettings = function() {
+      LocalStorage.setJSON('settings', Constants.DEFAULT_SETTINGS);
+      return Constants.DEFAULT_SETTINGS;
     };
 
     /**
@@ -1574,7 +1609,6 @@
     var self = this;
 
     self.settings = Constants.SETTINGS;
-
     for (var i = 0; i < self.settings.length; i++) {
       self.settings[i].value = settings[self.settings[i].id];
     }
@@ -1600,12 +1634,11 @@
       $rootScope.$broadcast('refresh results');
     };
 
-    self.resetAll = function() {
-      if (confirm('Are you sure you want to reset everything?')) {
-        MenuBarService.resetAll();
-        $modalInstance.dismiss();
+    self.resetSettings = function() {
+      if (confirm('Are you sure you want to reset all settings?')) {
+        settings = MenuBarService.resetSettings();
         $rootScope.$broadcast('refresh settings');
-        $rootScope.$broadcast('refresh results');
+        $modalInstance.dismiss();
       }
     };
 
