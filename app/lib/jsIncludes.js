@@ -10,14 +10,10 @@ module.exports = (function() {
     // jquery
     'bower_components/jquery/dist/jquery.min.js',
 
-    // bootstrap
-    'bower_components/bootstrap/dist/js/bootstrap.min.js',
-
     // angular
     'bower_components/angular/angular.min.js',
 
     // angular-ui
-    'bower_components/angular-bootstrap/ui-bootstrap.min.js',
     'bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js',
 
     // moment
