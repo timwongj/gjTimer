@@ -22,7 +22,7 @@
         <span>|</span>
         <ul class="color-list">
           <li class="color-list-item" ng-repeat="option in setting.options track by $index">
-            <button class="color-option" ng-style="option.value" ng-click="setting.value=option.value"></button>
+            <button class="color-option" ng-style="option.value" ng-click="setting.value=option.value" onclick="this.blur()"></button>
           </li>
         </ul>
       </div>

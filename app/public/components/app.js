@@ -6,7 +6,12 @@
 
   }
 
-  function Run() {
+  function Run($http, $templateCache) {
+
+    $http.get('dist/components/gjTimer/resultsPopover/resultsPopover.html')
+      .success(function(template) {
+        $templateCache.put('resultsPopover.html', template);
+      });
 
   }
 
@@ -19,6 +24,6 @@
     'gjTimer'
   ]);
 
-  angular.module('gjTimerApp').config(Config).run(Run);
+  angular.module('gjTimerApp').config(Config).run(['$http', '$templateCache', Run]);
 
 })();
