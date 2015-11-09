@@ -1362,13 +1362,15 @@
 
       var rawTimes = Calculator.extractRawTimes(results);
 
-      results[rawTimes.indexOf(Math.min.apply(null, rawTimes))].min = true;
-      results[rawTimes.indexOf(Math.max.apply(null, rawTimes))].max = true;
+      if(rawTimes.length !== 3) {
+        results[rawTimes.indexOf(Math.min.apply(null, rawTimes))].min = true;
+        results[rawTimes.indexOf(Math.max.apply(null, rawTimes))].max = true;
+      }
 
       return {
         results: results,
-        avg: Calculator.calculateAverageString(rawTimes, true, precision),
-        stDev: Calculator.calculateStandardDeviationString(rawTimes, true, precision)
+        avg: Calculator.calculateAverageString(rawTimes, rawTimes.length !== 3, precision),
+        stDev: Calculator.calculateStandardDeviationString(rawTimes, rawTimes.length !== 3, precision)
       };
 
     };
