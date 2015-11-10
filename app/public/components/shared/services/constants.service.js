@@ -111,9 +111,7 @@
         title: 'Timer Refresh',
         options: [
           { value: 50, text: '0.05' },
-          { value: 100, text: '0.1' },
-          { value: 500, text: '0.5' },
-          { value: 1000, text: '1' }
+          { value: 100, text: '0.1' }
         ]
       }, { id: 'showScramble',
         title: 'Show Scramble',

@@ -10,6 +10,9 @@ module.exports = (function() {
     // jquery
     'bower_components/jquery/dist/jquery.min.js',
 
+    // bootstrap
+    'bower_components/bootstrap/dist/js/bootstrap.min.js',
+
     // angular
     'bower_components/angular/angular.min.js',
 
