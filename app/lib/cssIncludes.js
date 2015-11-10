@@ -12,6 +12,7 @@ module.exports = (function() {
 
   exports.gjTimerLess = [
     'app/public/less/gjTimer.less',
+    'app/public/less/charts.less',
     'app/public/less/cub.less',
     'app/public/less/menuBar.less',
     'app/public/less/results.less',

@@ -22,8 +22,13 @@ module.exports = (function() {
     // moment
     'bower_components/moment/min/moment.min.js',
 
-    // jsss
+    // Chart.js
+    'bower_components/Chart.js/Chart.min.js',
+
+    // raphael
     'bower_components/jsss/lib/raphael-min.js',
+
+    // jsss
     'bower_components/jsss/scramble_222.js',
     'bower_components/jsss/scramble_333.js',
     'bower_components/jsss/scramble_clock.js',
@@ -50,6 +55,11 @@ module.exports = (function() {
     'app/public/components/shared/services/events.service.js',
     'app/public/components/shared/services/localStorage.service.js',
 
+    // Charts
+    'app/public/components/gjTimer/charts/charts.directive.js',
+    'app/public/components/gjTimer/charts/charts.controller.js',
+    'app/public/components/gjTimer/charts/charts.service.js',
+    
     // Cub
     'app/public/components/gjTimer/cub/cub.directive.js',
     'app/public/components/gjTimer/cub/cub.controller.js',

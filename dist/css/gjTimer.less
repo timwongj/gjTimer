@@ -21,18 +21,13 @@
   }
 }
 
-.jumbotron-timer {
+.jumbotron-timer, .jumbotron-statistics {
   padding: .5em !important;
   overflow-y: auto;
 }
 
 .jumbotron-results {
   padding: 0 !important;
-  overflow-y: hidden;
-}
-
-.jumbotron-statistics {
-  padding: .5em !important;
   overflow-y: hidden;
 }
 
@@ -46,6 +41,13 @@
 
 .modal-content {
   border-radius: 3px;
+}
+#charts {
+
+  margin: .125em;
+  padding: .125em;
+  height: 15em;
+
 }
 #cub {
 
@@ -247,19 +249,10 @@
 
 }
 
-@height-statistics-sm: 22.0625em;
-
 #statistics {
 
   margin: .125em;
   padding: .125em;
-
-  @media screen and (min-width: @screen-sm-min) {
-    height: @height-statistics-sm
-  }
-  @media screen and (min-width: @screen-md-min) {
-    height: auto;
-  }
 
   .stat {
     white-space: nowrap;

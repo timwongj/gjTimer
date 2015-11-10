@@ -19,6 +19,6 @@
    * All gjTimer components should be pulled in here as dependencies.
    * This module is pulled into the main app.js 'gjTimerApp' module.
    */
-  angular.module('gjTimer', ['gjTimer.services', 'gjTimer.filters', 'cub', 'menuBar', 'results', 'scramble', 'statistics', 'timer']);
+  angular.module('gjTimer', ['gjTimer.services', 'gjTimer.filters', 'charts', 'cub', 'menuBar', 'results', 'scramble', 'statistics', 'timer']);
 
 })();
