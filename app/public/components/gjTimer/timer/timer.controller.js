@@ -93,6 +93,7 @@
     self.stopTimer = function() {
 
       state = 'stopped';
+      self.time = TimerService.getTime(precision);
       $interval.cancel(timer);
       comment = self.settings.bldMode ? TimerService.createCommentForBldMode(self.time, memo) : '';
       ResultsService.saveResult(self.results, self.time, penalty, comment, self.scramble, self.sessionId, self.settings.resultsPrecision, self.settings.saveScramble);
