@@ -6,7 +6,7 @@
 
     var self = this;
 
-    var results;
+    var lineChart, barChart;
 
     $scope.$watchCollection(function() {
       return self.results;
@@ -22,11 +22,16 @@
 
     self.refreshData = function() {
 
-      results = ChartsService.getLineChartData(self.results);
+      lineChart = ChartsService.getLineChartData(self.results);
 
-      self.labels = results.labels;
-      self.series = results.series;
-      self.data = results.data;
+      self.lineChartSeries = lineChart.series;
+      self.lineChartLabels = lineChart.labels;
+      self.lineChartData = lineChart.data;
+
+      barChart = ChartsService.getBarChartData(self.results);
+
+      self.barChartLabels = barChart.labels;
+      self.barChartData = barChart.data;
 
     };
 

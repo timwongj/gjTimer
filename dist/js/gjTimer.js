@@ -733,7 +733,7 @@
 
     var self = this;
 
-    var results;
+    var lineChart, barChart;
 
     $scope.$watchCollection(function() {
       return self.results;
@@ -749,11 +749,16 @@
 
     self.refreshData = function() {
 
-      results = ChartsService.getLineChartData(self.results);
+      lineChart = ChartsService.getLineChartData(self.results);
 
-      self.labels = results.labels;
-      self.series = results.series;
-      self.data = results.data;
+      self.lineChartSeries = lineChart.series;
+      self.lineChartLabels = lineChart.labels;
+      self.lineChartData = lineChart.data;
+
+      barChart = ChartsService.getBarChartData(self.results);
+
+      self.barChartLabels = barChart.labels;
+      self.barChartData = barChart.data;
 
     };
 
@@ -799,13 +804,48 @@
     };
 
     /**
+     * Convert results to bar chart data
+     * @param results
+     * @returns {{labels: Array, data: *[]}}
+     */
+    self.getBarChartData = function(results) {
+
+      var rawTimes, flooredTime, distribution = {}, labels = [], data = [];
+
+      rawTimes = Calculator.extractRawTimes(results);
+
+      for (var i = 0; i < rawTimes.length; i++) {
+        if (rawTimes[i] !== Constants.DNF) {
+          flooredTime = Math.floor(rawTimes[i] / 1000);
+          if (!distribution.hasOwnProperty(flooredTime)) {
+            distribution[flooredTime] = 1;
+          } else {
+            distribution[flooredTime] += 1;
+          }
+        }
+      }
+
+      for (var key in distribution) {
+        if (distribution.hasOwnProperty(key)) {
+          labels.push(key);
+          data.push(distribution[key]);
+        }
+      }
+
+      return {
+        labels: labels,
+        data: [data]
+      };
+
+    };
+
+    /**
      * Set chart defaults.
      */
     self.setChartDefaults = function() {
 
       Chart.defaults.global.animation = false;
       Chart.defaults.global.colours = ['#4D5360', '#46BFBD', '#FDB45C'];
-      Chart.defaults.global.showScale = false;
       Chart.defaults.global.tooltipCornerRadius = 2;
       Chart.defaults.global.tooltipFontSize = 12;
       Chart.defaults.global.tooltipTitleFontSize = 12;
