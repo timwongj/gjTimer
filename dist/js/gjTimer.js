@@ -738,7 +738,7 @@
 
       lineChart =  ChartsService.addLineChartData(lineChart, result);
       barChart = ChartsService.addBarChartData(barChart, result);
-      self.updateCharts();
+      updateCharts();
 
     });
 
@@ -746,11 +746,11 @@
 
       lineChart = ChartsService.initLineChartData(results);
       barChart = ChartsService.initBarChartData(results);
-      self.updateCharts();
+      updateCharts();
 
     });
 
-    self.updateCharts = function() {
+    function updateCharts() {
 
       self.lineChartSeries = lineChart.series;
       self.lineChartLabels = lineChart.labels;
@@ -759,9 +759,9 @@
       self.barChartLabels = barChart.labels;
       self.barChartData = barChart.data;
 
-    };
+    }
 
-    self.updateCharts();
+    updateCharts();
 
   }
 
