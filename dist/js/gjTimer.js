@@ -834,7 +834,7 @@
 
       for (var key in distribution) {
         if (distribution.hasOwnProperty(key)) {
-          labels.push(key);
+          labels.push(Calculator.convertTimeFromMillisecondsToString(key * 1000, 0));
           data.push(distribution[key]);
         }
       }
@@ -881,7 +881,7 @@
       rawTime = Calculator.extractRawTimes([result])[0];
 
       if (rawTime !== Constants.DNF) {
-        flooredTime = Math.floor(rawTime / 1000);
+        flooredTime = Calculator.convertTimeFromMillisecondsToString(rawTime, 0);
         for (var i = 0; i < barChart.labels.length; i++) {
           distribution[barChart.labels[i]] = barChart.data[0][i];
         }
@@ -919,7 +919,7 @@
       Chart.defaults.Line.bezierCurve = false;
       Chart.defaults.Line.datasetStrokeWidth = 1;
       Chart.defaults.Line.pointDotRadius = 0;
-      Chart.defaults.Line.pointHitDetectionRadius = 1;
+      Chart.defaults.Line.pointHitDetectionRadius = 10;
 
     };
 
