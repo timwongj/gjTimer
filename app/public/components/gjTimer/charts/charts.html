@@ -1,3 +1,8 @@
-<div id="charts">
-  <canvas id="lineChart"></canvas>
+<div id="charts" ng-if="ctrl.settings.showCharts">
+  <canvas id="line" class="chart chart-line"
+          chart-data="ctrl.data"
+          chart-labels="ctrl.labels"
+          chart-series="ctrl.series"
+          chart-click="ctrl.onClick" >
+  </canvas>
 </div>

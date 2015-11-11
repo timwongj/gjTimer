@@ -19,7 +19,7 @@
     // main angular modules
 
     // third-party (non-Angular modules)
-    'ui.bootstrap',
+    'ui.bootstrap', 'chart.js',
     // gjTimer
     'gjTimer'
   ]);
@@ -417,6 +417,7 @@
       timerStartDelay: 0,
       timerRefreshInterval: 50,
       showScramble: true,
+      showCharts: true,
       saveScramble: true,
       resultsPrecision: 2,
       statisticsPrecision: 3,
@@ -469,6 +470,12 @@
         ]
       }, { id: 'showScramble',
         title: 'Show Scramble',
+        options: [
+          { value: true, text: 'Yes' },
+          { value: false, text: 'No' }
+        ]
+      }, { id: 'showCharts',
+        title: 'Show Charts',
         options: [
           { value: true, text: 'Yes' },
           { value: false, text: 'No' }
@@ -726,10 +733,7 @@
 
     var self = this;
 
-    var ctx, options, data, newData, lineChart, dataLength;
-
-    ctx = document.getElementById("lineChart").getContext("2d");
-    options = ChartsService.getLineChartOptions();
+    var results;
 
     $scope.$watchCollection(function() {
       return self.results;
@@ -741,30 +745,17 @@
       self.refreshData();
     });
 
-    $(window).resize(function() {
-      self.refreshCanvas();
-    });
+    ChartsService.setChartDefaults();
 
     self.refreshData = function() {
-      data = ChartsService.getLineChartData(self.results.slice(self.results.length - dataLength, self.results.length));
-      for (var i = 0; i < data.datasets.length; i++) {
-        for (var j = 0; j < data.datasets[i].data.length; j++) {
-          lineChart.datasets[i].points[j].value = data.datasets[i].data[j];
-          lineChart.datasets[i].points[j].label = data.labels[j];
-        }
-      }
-      lineChart.update();
-    };
 
-    self.refreshCanvas = function() {
-      $('#lineChart').width($('#charts').width());
-      $('#lineChart').height($('#charts').height());
-      dataLength = Number($('#charts').width().toFixed()) / 25;
-      data = ChartsService.getLineChartData(self.results.slice(self.results.length - dataLength, self.results.length));
-      lineChart = new Chart(ctx).Line(data, options);
-    };
+      results = ChartsService.getLineChartData(self.results);
 
-    self.refreshCanvas();
+      self.labels = results.labels;
+      self.series = results.series;
+      self.data = results.data;
+
+    };
 
   }
 
@@ -776,91 +767,59 @@
 
   'use strict';
 
-  function ChartsService(Calculator) {
+  function ChartsService(Calculator, Constants) {
 
     var self = this;
 
     /**
      * Convert results to line chart data
      * @param results
-     * @returns {{indices: Array, singles: Array, avg5: Array, avg12: Array}}
+     * @returns {{series: string[], labels: Array, data: *[]}}
      */
     self.getLineChartData = function(results) {
 
-      var data = { indices: [], singles: [], avg5: [], avg12: [] };
+      var labels = [], data = [ [], [], []], single, avg5, avg12;
 
       for (var i = 0; i < results.length; i++) {
-        data.indices.push(results[i].index);
-        data.singles.push(results[i].rawTime / 1000);
-        data.avg5.push(Calculator.convertTimeFromStringToMilliseconds(results[i].avg5) / 1000);
-        data.avg12.push(Calculator.convertTimeFromStringToMilliseconds(results[i].avg12) / 1000);
+        labels.push(results[i].index + 1);
+        single = results[i].rawTime;
+        avg5 = Calculator.convertTimeFromStringToMilliseconds(results[i].avg5);
+        avg12 = Calculator.convertTimeFromStringToMilliseconds(results[i].avg12);
+        data[0].push(single !== Constants.DNF ? Number((single / 1000).toFixed(2)) : null);
+        data[1].push(avg5 !== Constants.DNF ? avg5 / 1000 : null);
+        data[2].push(avg12 !== Constants.DNF ? avg12 / 1000 : null);
       }
 
       return {
-        labels: data.indices,
-        datasets: [
-          {
-            label: 'Single',
-            fillColor: "rgba(150,150,150,0.2)",
-            strokeColor: "rgba(150,150,150,1)",
-            pointColor: "rgba(150,150,150,1)",
-            pointStrokeColor: "#fff",
-            pointHighlightFill: "#fff",
-            pointHighlightStroke: "rgba(150,150,150,1)",
-            data: data.singles
-          }, {
-            label: 'Avg 5',
-            fillColor: "rgba(151,187,205,0.2)",
-            strokeColor: "rgba(151,187,205,1)",
-            pointColor: "rgba(151,187,205,1)",
-            pointStrokeColor: "#fff",
-            pointHighlightFill: "#fff",
-            pointHighlightStroke: "rgba(151,187,205,1)",
-            data: data.avg5
-          }, {
-            label: 'Avg 12',
-            fillColor: "rgba(190,145,195,0.2)",
-            strokeColor: "rgba(190,145,195,1)",
-            pointColor: "rgba(190,145,195,1)",
-            pointStrokeColor: "#fff",
-            pointHighlightFill: "#fff",
-            pointHighlightStroke: "rgba(190,145,195,1)",
-            data: data.avg12
-          }
-        ]
+        series: ['Time', 'Avg 5', 'Avg 12'],
+        labels: labels,
+        data: data
       };
 
     };
 
     /**
-     * Get Line Chart Options
-     * @returns {{scaleShowGridLines: boolean, scaleGridLineColor: string, scaleGridLineWidth: number, scaleShowHorizontalLines: boolean, scaleShowVerticalLines: boolean, bezierCurve: boolean, bezierCurveTension: number, pointDot: boolean, pointDotRadius: number, pointDotStrokeWidth: number, pointHitDetectionRadius: number, datasetStroke: boolean, datasetStrokeWidth: number, datasetFill: boolean, legendTemplate: string}}
+     * Set chart defaults.
      */
-    self.getLineChartOptions = function() {
+    self.setChartDefaults = function() {
 
-      return {
-        animation: false,
-        scaleShowGridLines : true,
-        scaleGridLineColor : "rgba(0,0,0,.05)",
-        scaleGridLineWidth : 1,
-        scaleShowHorizontalLines: true,
-        scaleShowVerticalLines: true,
-        bezierCurve : false,
-        pointDot : true,
-        pointDotRadius : 4,
-        pointDotStrokeWidth : 1,
-        pointHitDetectionRadius : 20,
-        datasetStroke : true,
-        datasetStrokeWidth : 2,
-        datasetFill : true,
-        legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].strokeColor%>\"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>"
-      };
+      Chart.defaults.global.animation = false;
+      Chart.defaults.global.colours = ['#4D5360', '#46BFBD', '#FDB45C'];
+      Chart.defaults.global.showScale = false;
+      Chart.defaults.global.tooltipCornerRadius = 2;
+      Chart.defaults.global.tooltipFontSize = 12;
+      Chart.defaults.global.tooltipTitleFontSize = 12;
+      Chart.defaults.Line.bezierCurve = false;
+      Chart.defaults.Line.datasetStrokeWidth = 1;
+      Chart.defaults.Line.pointDotRadius = 0;
+      Chart.defaults.Line.pointHitDetectionRadius = 1;
 
     };
 
+
   }
 
-  angular.module('charts').service('ChartsService', ['Calculator', ChartsService]);
+  angular.module('charts').service('ChartsService', ['Calculator', 'Constants', ChartsService]);
 
 })();
 

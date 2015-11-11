@@ -63,6 +63,7 @@
       timerStartDelay: 0,
       timerRefreshInterval: 50,
       showScramble: true,
+      showCharts: true,
       saveScramble: true,
       resultsPrecision: 2,
       statisticsPrecision: 3,
@@ -115,6 +116,12 @@
         ]
       }, { id: 'showScramble',
         title: 'Show Scramble',
+        options: [
+          { value: true, text: 'Yes' },
+          { value: false, text: 'No' }
+        ]
+      }, { id: 'showCharts',
+        title: 'Show Charts',
         options: [
           { value: true, text: 'Yes' },
           { value: false, text: 'No' }

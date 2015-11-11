@@ -22,8 +22,9 @@ module.exports = (function() {
     // moment
     'bower_components/moment/min/moment.min.js',
 
-    // Chart.js
+    // angular-chart.js
     'bower_components/Chart.js/Chart.min.js',
+    'bower_components/angular-chart.js/dist/angular-chart.min.js',
 
     // raphael
     'bower_components/jsss/lib/raphael-min.js',

@@ -23,6 +23,6 @@
     "jquery": "~2.1.4",
     "moment": "~2.10.6",
     "jsss": "https://github.com/cubing/jsss.git",
-    "Chart.js": "~1.0.2"
+    "angular-chart.js": "~0.8.5"
   }
 }
