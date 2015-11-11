@@ -86,7 +86,7 @@
       TimerService.startTimer();
       timer = $interval(function () {
         self.time = TimerService.getTime(precision);
-      }, self.settings.timerRefreshInterval);
+      }, Constants.timerRefreshInterval);
 
     };
 
