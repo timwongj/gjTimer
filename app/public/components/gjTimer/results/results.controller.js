@@ -2,7 +2,7 @@
 
   'use strict';
 
-  function ResultsController($scope, $uibModal, ResultsService) {
+  function ResultsController($scope, $rootScope, $uibModal, ResultsService) {
 
     var self = this;
 
@@ -10,6 +10,7 @@
 
     $scope.$on('refresh results', function($event, sessionId) {
       self.results = ResultsService.getResults(sessionId || self.sessionId, self.settings.resultsPrecision);
+      $rootScope.$broadcast('refresh charts', self.results);
     });
 
     self.openModal = function(index, numberOfResults) {
@@ -34,6 +35,6 @@
 
   }
 
-  angular.module('results').controller('ResultsController', ['$scope', '$uibModal', 'ResultsService', ResultsController]);
+  angular.module('results').controller('ResultsController', ['$scope', '$rootScope', '$uibModal', 'ResultsService', ResultsController]);
 
 })();

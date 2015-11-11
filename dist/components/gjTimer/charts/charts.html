@@ -1,4 +1,4 @@
-<div id="charts" ng-if="ctrl.settings.showCharts">
+<div id="charts" ng-if="ctrl.settings.showCharts && ctrl.results.length > 0">
   <canvas id="line"
           class="chart chart-line"
           chart-data="ctrl.lineChartData"

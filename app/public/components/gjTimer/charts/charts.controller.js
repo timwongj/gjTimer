@@ -21,10 +21,10 @@
 
     });
 
-    $scope.$on('refresh results', function() {
+    $scope.$on('refresh charts', function($event, results) {
 
-      lineChart = ChartsService.initLineChartData(self.results);
-      barChart = ChartsService.initBarChartData(self.results);
+      lineChart = ChartsService.initLineChartData(results);
+      barChart = ChartsService.initBarChartData(results);
       self.updateCharts();
 
     });
