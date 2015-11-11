@@ -22,21 +22,21 @@
       $('.popover-btn-penalty-ok').on('click', function() {
         ResultsService.penalty(self.result, self.sessionId, self.index, '', self.precision);
         $scope.$apply();
-        $rootScope.$broadcast('refresh statistics');
+        $rootScope.$broadcast('refresh results');
         $(element).popover('hide');
       });
 
       $('.popover-btn-penalty-plus').on('click', function() {
         ResultsService.penalty(self.result, self.sessionId, self.index, '+2', self.precision);
         $scope.$apply();
-        $rootScope.$broadcast('refresh statistics');
+        $rootScope.$broadcast('refresh results');
         $(element).popover('hide');
       });
 
       $('.popover-btn-penalty-dnf').on('click', function() {
         ResultsService.penalty(self.result, self.sessionId, self.index, 'DNF', self.precision);
         $scope.$apply();
-        $rootScope.$broadcast('refresh statistics');
+        $rootScope.$broadcast('refresh results');
         $(element).popover('hide');
       });
 
@@ -44,6 +44,7 @@
         if (confirm('Are you sure you want to delete this time?')) {
           ResultsService.remove(self.results, self.sessionId, self.index);
           $scope.$apply();
+          $rootScope.$broadcast('refresh results');
           $(element).popover('hide');
         }
       });
