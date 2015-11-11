@@ -19,7 +19,7 @@
     // main angular modules
 
     // third-party (non-Angular modules)
-    'ui.bootstrap',
+    'ui.bootstrap', 'chart.js',
     // gjTimer
     'gjTimer'
   ]);
@@ -49,7 +49,7 @@
    * All gjTimer components should be pulled in here as dependencies.
    * This module is pulled into the main app.js 'gjTimerApp' module.
    */
-  angular.module('gjTimer', ['gjTimer.services', 'gjTimer.filters', 'cub', 'menuBar', 'results', 'scramble', 'statistics', 'timer']);
+  angular.module('gjTimer', ['gjTimer.services', 'gjTimer.filters', 'charts', 'cub', 'menuBar', 'results', 'scramble', 'statistics', 'timer']);
 
 })();
 
@@ -417,6 +417,7 @@
       timerStartDelay: 0,
       timerRefreshInterval: 50,
       showScramble: true,
+      showCharts: true,
       saveScramble: true,
       resultsPrecision: 2,
       statisticsPrecision: 3,
@@ -469,6 +470,12 @@
         ]
       }, { id: 'showScramble',
         title: 'Show Scramble',
+        options: [
+          { value: true, text: 'Yes' },
+          { value: false, text: 'No' }
+        ]
+      }, { id: 'showCharts',
+        title: 'Show Charts',
         options: [
           { value: true, text: 'Yes' },
           { value: false, text: 'No' }
@@ -693,6 +700,166 @@
   }
 
   angular.module('gjTimer.services').service('LocalStorage', LocalStorage);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function chartsDirective() {
+    return {
+      restrict: 'E',
+      templateUrl: 'dist/components/gjTimer/charts/charts.html',
+      controller: 'ChartsController',
+      controllerAs: 'ctrl',
+      scope: {
+        results: '=',
+        settings: '='
+      },
+      bindToController: true
+    };
+  }
+
+  angular.module('charts', []).directive('charts', chartsDirective);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function ChartsController($scope, ChartsService) {
+
+    var self = this;
+
+    var lineChart, barChart;
+
+    $scope.$watchCollection(function() {
+      return self.results;
+    }, function() {
+      self.refreshData();
+    });
+
+    $scope.$on('refresh statistics', function() {
+      self.refreshData();
+    });
+
+    ChartsService.setChartDefaults();
+
+    self.refreshData = function() {
+
+      lineChart = ChartsService.getLineChartData(self.results);
+
+      self.lineChartSeries = lineChart.series;
+      self.lineChartLabels = lineChart.labels;
+      self.lineChartData = lineChart.data;
+
+      barChart = ChartsService.getBarChartData(self.results);
+
+      self.barChartLabels = barChart.labels;
+      self.barChartData = barChart.data;
+
+    };
+
+  }
+
+  angular.module('charts').controller('ChartsController', ['$scope', 'ChartsService', ChartsController]);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function ChartsService(Calculator, Constants) {
+
+    var self = this;
+
+    /**
+     * Convert results to line chart data
+     * @param results
+     * @returns {{series: string[], labels: Array, data: *[]}}
+     */
+    self.getLineChartData = function(results) {
+
+      var labels = [], data = [ [], [], []], single, avg5, avg12;
+
+      for (var i = 0; i < results.length; i++) {
+        labels.push(results[i].index + 1);
+        single = results[i].rawTime;
+        avg5 = Calculator.convertTimeFromStringToMilliseconds(results[i].avg5);
+        avg12 = Calculator.convertTimeFromStringToMilliseconds(results[i].avg12);
+        data[0].push(single !== Constants.DNF ? Number((single / 1000).toFixed(2)) : null);
+        data[1].push(avg5 !== Constants.DNF ? avg5 / 1000 : null);
+        data[2].push(avg12 !== Constants.DNF ? avg12 / 1000 : null);
+      }
+
+      return {
+        series: ['Time', 'Avg 5', 'Avg 12'],
+        labels: labels,
+        data: data
+      };
+
+    };
+
+    /**
+     * Convert results to bar chart data
+     * @param results
+     * @returns {{labels: Array, data: *[]}}
+     */
+    self.getBarChartData = function(results) {
+
+      var rawTimes, flooredTime, distribution = {}, labels = [], data = [];
+
+      rawTimes = Calculator.extractRawTimes(results);
+
+      for (var i = 0; i < rawTimes.length; i++) {
+        if (rawTimes[i] !== Constants.DNF) {
+          flooredTime = Math.floor(rawTimes[i] / 1000);
+          if (!distribution.hasOwnProperty(flooredTime)) {
+            distribution[flooredTime] = 1;
+          } else {
+            distribution[flooredTime] += 1;
+          }
+        }
+      }
+
+      for (var key in distribution) {
+        if (distribution.hasOwnProperty(key)) {
+          labels.push(key);
+          data.push(distribution[key]);
+        }
+      }
+
+      return {
+        labels: labels,
+        data: [data]
+      };
+
+    };
+
+    /**
+     * Set chart defaults.
+     */
+    self.setChartDefaults = function() {
+
+      Chart.defaults.global.animation = false;
+      Chart.defaults.global.colours = ['#4D5360', '#46BFBD', '#FDB45C'];
+      Chart.defaults.global.tooltipCornerRadius = 2;
+      Chart.defaults.global.tooltipFontSize = 12;
+      Chart.defaults.global.tooltipTitleFontSize = 12;
+      Chart.defaults.Line.bezierCurve = false;
+      Chart.defaults.Line.datasetStrokeWidth = 1;
+      Chart.defaults.Line.pointDotRadius = 0;
+      Chart.defaults.Line.pointHitDetectionRadius = 1;
+
+    };
+
+
+  }
+
+  angular.module('charts').service('ChartsService', ['Calculator', 'Constants', ChartsService]);
 
 })();
 

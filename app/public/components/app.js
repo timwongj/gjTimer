@@ -19,7 +19,7 @@
     // main angular modules
 
     // third-party (non-Angular modules)
-    'ui.bootstrap',
+    'ui.bootstrap', 'chart.js',
     // gjTimer
     'gjTimer'
   ]);

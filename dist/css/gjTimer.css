@@ -17,16 +17,13 @@
     border-radius: 2px !important;
   }
 }
-.jumbotron-timer {
+.jumbotron-timer,
+.jumbotron-statistics {
   padding: .5em !important;
   overflow-y: auto;
 }
 .jumbotron-results {
   padding: 0 !important;
-  overflow-y: hidden;
-}
-.jumbotron-statistics {
-  padding: .5em !important;
   overflow-y: hidden;
 }
 .btn {
@@ -37,6 +34,10 @@
 }
 .modal-content {
   border-radius: 3px;
+}
+#charts {
+  margin: .125em;
+  padding: .125em;
 }
 #cub {
   margin: .25em;
@@ -186,16 +187,6 @@
 #statistics {
   margin: .125em;
   padding: .125em;
-}
-@media screen and (min-width: 48em) {
-  #statistics {
-    height: 22.0625em;
-  }
-}
-@media screen and (min-width: 62em) {
-  #statistics {
-    height: auto;
-  }
 }
 #statistics .stat {
   white-space: nowrap;
