@@ -6,7 +6,7 @@
 
     var self = this;
 
-    var timer, inspection, state = 'reset', penalty = '', comment = '', memo = '', precision = self.settings.timerPrecision;
+    var timer, inspection, state = 'reset', penalty = '', comment = '', memo = '', result, precision = self.settings.timerPrecision;
 
     $scope.$on('refresh settings', function () {
 
@@ -96,7 +96,8 @@
       self.time = TimerService.getTime(precision);
       $interval.cancel(timer);
       comment = self.settings.bldMode ? TimerService.createCommentForBldMode(self.time, memo) : '';
-      ResultsService.saveResult(self.results, self.time, penalty, comment, self.scramble, self.sessionId, self.settings.resultsPrecision, self.settings.saveScramble);
+      result = ResultsService.saveResult(self.results, self.time, penalty, comment, self.scramble, self.sessionId, self.settings.resultsPrecision, self.settings.saveScramble);
+      $rootScope.$broadcast('new result', result);
       $rootScope.$broadcast('new scramble', self.eventId);
 
     };
@@ -178,9 +179,10 @@
       if (self.time === '') {
         $rootScope.$broadcast('new scramble', self.eventId);
       } else if ($scope.input.text.$valid) {
-        ResultsService.saveResult(self.results, self.time, penalty, comment, self.scramble, self.sessionId, self.settings.resultsPrecision, self.settings.saveScramble);
-        self.time = '';
+        result = ResultsService.saveResult(self.results, self.time, penalty, comment, self.scramble, self.sessionId, self.settings.resultsPrecision, self.settings.saveScramble);
+        $rootScope.$broadcast('new result', result);
         $rootScope.$broadcast('new scramble', self.eventId);
+        self.time = '';
       }
 
     };

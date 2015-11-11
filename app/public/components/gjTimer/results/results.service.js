@@ -73,6 +73,7 @@
      * @param sessionId
      * @param precision
      * @param saveScramble
+     * @returns {{comment: *, date: Date, detailedTime: string, displayedTime: string, index: *, penalty: *, rawTime: number, scramble: *, time: number}}
      */
     self.saveResult = function(results, time, penalty, comment, scramble, sessionId, precision, saveScramble) {
 
@@ -115,6 +116,8 @@
       session.results.push(timeString + '|' + (saveScramble ? scramble : '') + '|' + Date.now() + (comment !== '' ? '|' + comment : ''));
       LocalStorage.setJSON(sessionId, session);
 
+      return result;
+
     };
 
     /**
@@ -151,6 +154,7 @@
      * @param precision
      */
     self.penalty = function(result, sessionId, index, penalty, precision) {
+
       var session = LocalStorage.getJSON(sessionId);
       var res = session.results[index];
       var pen = res.substring(res.indexOf('|') - 1, res.indexOf('|'));
@@ -189,6 +193,7 @@
       }
       session.results[index] = res;
       LocalStorage.setJSON(sessionId, session);
+
     };
 
     /**
@@ -198,10 +203,12 @@
      * @param index
      */
     self.remove = function(results, sessionId, index) {
+
       results.splice(index, 1);
       var session = LocalStorage.getJSON(sessionId);
       session.results.splice(index, 1);
       LocalStorage.setJSON(sessionId, session);
+
     };
 
     /**
@@ -212,6 +219,7 @@
      * @param comment
      */
     self.comment = function(result, sessionId, index, comment) {
+
       result.comment = comment;
       var session = LocalStorage.getJSON(sessionId);
       var res = session.results[index].split('|');
@@ -227,6 +235,7 @@
         session.results[index] = res.join('|');
       }
       LocalStorage.setJSON(sessionId, session);
+
     };
 
   }

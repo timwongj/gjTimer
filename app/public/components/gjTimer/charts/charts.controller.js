@@ -8,32 +8,39 @@
 
     var lineChart, barChart;
 
-    $scope.$watchCollection(function() {
-      return self.results;
-    }, function() {
-      self.refreshData();
-    });
-
-    $scope.$on('refresh statistics', function() {
-      self.refreshData();
-    });
-
     ChartsService.setChartDefaults();
 
-    self.refreshData = function() {
+    lineChart = ChartsService.initLineChartData(self.results);
+    barChart = ChartsService.initBarChartData(self.results);
 
-      lineChart = ChartsService.getLineChartData(self.results);
+    $scope.$on('new result', function($event, result) {
+
+      lineChart =  ChartsService.addLineChartData(lineChart, result);
+      barChart = ChartsService.addBarChartData(barChart, result);
+      self.updateCharts();
+
+    });
+
+    $scope.$on('refresh results', function() {
+
+      lineChart = ChartsService.initLineChartData(self.results);
+      barChart = ChartsService.initBarChartData(self.results);
+      self.updateCharts();
+
+    });
+
+    self.updateCharts = function() {
 
       self.lineChartSeries = lineChart.series;
       self.lineChartLabels = lineChart.labels;
       self.lineChartData = lineChart.data;
 
-      barChart = ChartsService.getBarChartData(self.results);
-
       self.barChartLabels = barChart.labels;
       self.barChartData = barChart.data;
 
     };
+
+    self.updateCharts();
 
   }
 

@@ -12,10 +12,6 @@
       self.statistics = StatisticsService.getStatistics(self.results, self.settings.statisticsPrecision);
     });
 
-    $scope.$on('refresh statistics', function() {
-      self.statistics = StatisticsService.getStatistics(self.results, self.settings.statisticsPrecision);
-    });
-
     self.openModal = function(format, $index) {
       var length = self.statistics.averages[$index].length;
       var index = format === 'best' ? self.statistics.averages[$index].best.index : self.results.length - length;
