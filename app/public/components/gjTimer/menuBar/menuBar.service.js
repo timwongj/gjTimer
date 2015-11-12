@@ -51,11 +51,11 @@
      */
     self.initSessions = function() {
 
-      var sessions = [];
+      var session, sessions = [];
 
       for (var i = 1; i <= Constants.SESSIONS.DEFAULT_NUMBER_OF_SESSIONS; i++) {
         sessions.push('Session ' + i);
-        var session = LocalStorage.getJSON('Session ' + i);
+        session = LocalStorage.getJSON('Session ' + i);
         if (session === null) {
           LocalStorage.setJSON('Session ' + i, { sessionId: 'Session ' + i , eventId: '333', results: [] });
         }

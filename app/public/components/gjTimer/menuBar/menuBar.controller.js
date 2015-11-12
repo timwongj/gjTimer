@@ -14,6 +14,7 @@
     self.sessionId = self.session.sessionId;
     self.eventId = self.session.eventId;
 
+    // show glyphicons instead of text on reset and settings buttons if window size is less than 500px
     self.showDetails = window.innerWidth > 500;
     $(window).resize(function(){
       self.showDetails = window.innerWidth > 500;
