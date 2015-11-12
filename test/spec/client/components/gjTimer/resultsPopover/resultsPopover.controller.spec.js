@@ -4,7 +4,7 @@
 
   describe('The resultsPopover controller', function() {
 
-    beforeEach(module('results'));
+    beforeEach(module('gjTimer'));
 
     beforeEach(inject(function($injector) {
 

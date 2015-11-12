@@ -38,7 +38,7 @@
       saveScramble = true;
       now = 'now';
 
-      spyOn(LocalStorage, 'getJSON').and.returnValue({ results: [] });
+      spyOn(LocalStorage, 'getJSON');
       spyOn(LocalStorage, 'setJSON');
       spyOn(Calculator, 'convertTimeFromMillisecondsToString').and.returnValue(time);
       spyOn(Calculator, 'convertTimeFromStringToMilliseconds').and.returnValue(Number(time) * 100);
@@ -46,7 +46,30 @@
 
     }));
 
+    describe('getResults function', function() {
+
+      beforeEach(function() {
+
+        LocalStorage.getJSON.and.returnValue({ results: [] });
+
+      });
+
+      it('should get the rawResults from the LocalStorage service', function() {
+
+        ResultsService.getResults(sessionId, precision);
+        expect(LocalStorage.getJSON).toHaveBeenCalledWith(sessionId);
+
+      });
+
+    });
+
     describe('saveResult function', function() {
+
+      beforeEach(function() {
+
+        LocalStorage.getJSON.and.returnValue({ results: [] });
+
+      });
 
       it('should get the session from the LocalStorage service', function() {
 
@@ -108,6 +131,22 @@
         expect(LocalStorage.setJSON).toHaveBeenCalledWith(sessionId, session);
 
       });
+
+    });
+
+    describe('populateAverages function', function() {
+
+    });
+
+    describe('penalty function', function() {
+
+    });
+
+    describe('remove function', function() {
+
+    });
+
+    describe('comment function', function() {
 
     });
 
