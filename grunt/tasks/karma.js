@@ -18,7 +18,22 @@
           frameworks: ['jasmine'],
           singleRun: true,
           browsers: ['PhantomJS'],
-          files: files
+          files: files,
+          reporters: ['progress', 'coverage'],
+          preprocessors: {
+            'app/public/components/**/*.js': ['coverage']
+          },
+          coverageReporter: {
+            dir: './coverage',
+            reporters: [
+              { type: 'html', subdir: 'report-html' }
+            ]
+          },
+          plugins: [
+            'karma-phantomjs-launcher',
+            'karma-jasmine',
+            'karma-coverage'
+          ]
         }
       }
     });
