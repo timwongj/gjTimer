@@ -362,7 +362,9 @@
 
     self.DNF = 864000000;
 
-    self.timerRefreshInterval = 50;
+    self.TIMER_REFRESH_INTERVAL = 50;
+
+    self.NUM_RESULTS_DISPLAYED = 50;
 
     self.KEY_CODES = {
       ENTER: 13,
@@ -1343,15 +1345,26 @@
 
   'use strict';
 
-  function ResultsController($scope, $rootScope, $uibModal, ResultsService) {
+  function ResultsController($scope, $rootScope, $uibModal, ResultsService, Constants) {
 
     var self = this;
 
-    self.refreshResults = function(sessionId) {
+    self.NUM_RESULTS_DISPLAYED = Constants.NUM_RESULTS_DISPLAYED;
+
+    refreshResults();
+
+    $scope.$on('refresh results', function($event, sessionId) {
+
+      refreshResults(sessionId);
+
+    });
+
+    function refreshResults(sessionId) {
 
       self.loaded = false;
       ResultsService.getResultsAsync(sessionId || self.sessionId, self.settings.resultsPrecision)
         .then(function(results) {
+          self.NUM_RESULTS_DISPLAYED = Constants.NUM_RESULTS_DISPLAYED;
           self.loaded = true;
           self.results = results;
           self.loaded = true;
@@ -1359,15 +1372,7 @@
           $rootScope.$broadcast('refresh charts', results);
         });
 
-    };
-
-    self.refreshResults();
-
-    $scope.$on('refresh results', function($event, sessionId) {
-
-      self.refreshResults(sessionId);
-
-    });
+    }
 
     self.openModal = function(index, numberOfResults) {
 
@@ -1393,7 +1398,7 @@
 
   }
 
-  angular.module('results').controller('ResultsController', ['$scope', '$rootScope', '$uibModal', 'ResultsService', ResultsController]);
+  angular.module('results').controller('ResultsController', ['$scope', '$rootScope', '$uibModal', 'ResultsService', 'Constants', ResultsController]);
 
 })();
 
@@ -1417,13 +1422,13 @@
       return LocalStorage.getJSONAsync(sessionId)
         .then(function(session) {
 
-          var results = [], rawResults = session.results;
+          var results = [], result, res, pen, rawResults = session.results;
 
           for (var i = 0; i < rawResults.length; i++) {
 
-            var res = rawResults[i].split('|');
+            res = rawResults[i].split('|');
 
-            var result = {
+            result = {
               index: i,
               scramble: res[1],
               date: new Date(Number(res[2])),
@@ -1431,13 +1436,14 @@
             };
 
             // deal with penalty if it exists
-            if (res[0].substring(res[0].length - 1, res[0].length) === '+') {
+            pen = res[0].substring(res[0].length - 1, res[0].length);
+            if (pen === '+') {
               result.time = Number(res[0].substring(0, res[0].length - 1));
               result.penalty = '+2';
               result.rawTime = Number((result.time + 2000).toFixed());
               result.displayedTime = Calculator.convertTimeFromMillisecondsToString(Number(res[0].substring(0, res[0].length - 1)) + 2000, precision) + '+';
               result.detailedTime = result.displayedTime;
-            } else if (res[0].substring(res[0].length - 1, res[0].length) === '-') {
+            } else if (pen === '-') {
               result.time = Number(res[0].substring(0, res[0].length - 1));
               result.penalty = 'DNF';
               result.rawTime = DNF;
@@ -2296,7 +2302,7 @@
       TimerService.startTimer();
       timer = $interval(function () {
         self.time = TimerService.getTime(precision);
-      }, Constants.timerRefreshInterval);
+      }, Constants.TIMER_REFRESH_INTERVAL);
 
     };
 

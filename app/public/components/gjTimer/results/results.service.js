@@ -18,13 +18,13 @@
       return LocalStorage.getJSONAsync(sessionId)
         .then(function(session) {
 
-          var results = [], rawResults = session.results;
+          var results = [], result, res, pen, rawResults = session.results;
 
           for (var i = 0; i < rawResults.length; i++) {
 
-            var res = rawResults[i].split('|');
+            res = rawResults[i].split('|');
 
-            var result = {
+            result = {
               index: i,
               scramble: res[1],
               date: new Date(Number(res[2])),
@@ -32,13 +32,14 @@
             };
 
             // deal with penalty if it exists
-            if (res[0].substring(res[0].length - 1, res[0].length) === '+') {
+            pen = res[0].substring(res[0].length - 1, res[0].length);
+            if (pen === '+') {
               result.time = Number(res[0].substring(0, res[0].length - 1));
               result.penalty = '+2';
               result.rawTime = Number((result.time + 2000).toFixed());
               result.displayedTime = Calculator.convertTimeFromMillisecondsToString(Number(res[0].substring(0, res[0].length - 1)) + 2000, precision) + '+';
               result.detailedTime = result.displayedTime;
-            } else if (res[0].substring(res[0].length - 1, res[0].length) === '-') {
+            } else if (pen === '-') {
               result.time = Number(res[0].substring(0, res[0].length - 1));
               result.penalty = 'DNF';
               result.rawTime = DNF;

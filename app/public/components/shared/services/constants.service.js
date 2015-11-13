@@ -8,7 +8,9 @@
 
     self.DNF = 864000000;
 
-    self.timerRefreshInterval = 50;
+    self.TIMER_REFRESH_INTERVAL = 50;
+
+    self.NUM_RESULTS_DISPLAYED = 50;
 
     self.KEY_CODES = {
       ENTER: 13,

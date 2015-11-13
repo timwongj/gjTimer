@@ -2,15 +2,26 @@
 
   'use strict';
 
-  function ResultsController($scope, $rootScope, $uibModal, ResultsService) {
+  function ResultsController($scope, $rootScope, $uibModal, ResultsService, Constants) {
 
     var self = this;
 
-    self.refreshResults = function(sessionId) {
+    self.NUM_RESULTS_DISPLAYED = Constants.NUM_RESULTS_DISPLAYED;
+
+    refreshResults();
+
+    $scope.$on('refresh results', function($event, sessionId) {
+
+      refreshResults(sessionId);
+
+    });
+
+    function refreshResults(sessionId) {
 
       self.loaded = false;
       ResultsService.getResultsAsync(sessionId || self.sessionId, self.settings.resultsPrecision)
         .then(function(results) {
+          self.NUM_RESULTS_DISPLAYED = Constants.NUM_RESULTS_DISPLAYED;
           self.loaded = true;
           self.results = results;
           self.loaded = true;
@@ -18,15 +29,7 @@
           $rootScope.$broadcast('refresh charts', results);
         });
 
-    };
-
-    self.refreshResults();
-
-    $scope.$on('refresh results', function($event, sessionId) {
-
-      self.refreshResults(sessionId);
-
-    });
+    }
 
     self.openModal = function(index, numberOfResults) {
 
@@ -52,6 +55,6 @@
 
   }
 
-  angular.module('results').controller('ResultsController', ['$scope', '$rootScope', '$uibModal', 'ResultsService', ResultsController]);
+  angular.module('results').controller('ResultsController', ['$scope', '$rootScope', '$uibModal', 'ResultsService', 'Constants', ResultsController]);
 
 })();

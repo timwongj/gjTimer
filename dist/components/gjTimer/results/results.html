@@ -10,9 +10,9 @@
     </tr>
     </thead>
     <tbody>
-    <tr ng-repeat="result in ctrl.results | reverse">
+    <tr ng-repeat="result in ctrl.results | reverse" ng-if="result.index >= ctrl.results.length - ctrl.NUM_RESULTS_DISPLAYED">
       <td class="index">
-        <div ng-bind="ctrl.results.length - $index"></div>
+        <div ng-bind="result.index + 1"></div>
       </td>
       <td class="time">
         <results-popover index="ctrl.results.length - $index - 1"
@@ -29,6 +29,11 @@
       <td class="avg">
         <div ng-bind="result.avg12"
              ng-click="ctrl.openModal(ctrl.results.length - $index, 12)"></div>
+      </td>
+    </tr>
+    <tr ng-if="ctrl.NUM_RESULTS_DISPLAYED < ctrl.results.length">
+      <td colspan="4" style="text-align: center;">
+        <a ng-click="ctrl.NUM_RESULTS_DISPLAYED = ctrl.NUM_RESULTS_DISPLAYED + 50">Load More...</a>
       </td>
     </tr>
     </tbody>
