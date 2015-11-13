@@ -19,6 +19,9 @@ module.exports = (function() {
     // angular-ui
     'bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js',
 
+    // angular-spinkit
+    'bower_components/angular-spinkit/build/angular-spinkit.min.js',
+
     // moment
     'bower_components/moment/min/moment.min.js',
 

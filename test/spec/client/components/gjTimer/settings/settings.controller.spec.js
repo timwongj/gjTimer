@@ -4,7 +4,7 @@
 
   describe('The settings controller', function() {
 
-    beforeEach(module('settings'));
+    beforeEach(module('gjTimer'));
 
     beforeEach(inject(function($injector) {
 

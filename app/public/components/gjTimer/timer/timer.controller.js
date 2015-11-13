@@ -86,7 +86,7 @@
       TimerService.startTimer();
       timer = $interval(function () {
         self.time = TimerService.getTime(precision);
-      }, self.settings.timerRefreshInterval);
+      }, Constants.TIMER_REFRESH_INTERVAL);
 
     };
 
@@ -96,8 +96,11 @@
       self.time = TimerService.getTime(precision);
       $interval.cancel(timer);
       comment = self.settings.bldMode ? TimerService.createCommentForBldMode(self.time, memo) : '';
-      result = ResultsService.saveResult(self.results, self.time, penalty, comment, self.scramble, self.sessionId, self.settings.resultsPrecision, self.settings.saveScramble);
-      $rootScope.$broadcast('new result', result);
+      ResultsService.saveResultAsync(self.results, self.time, penalty, comment, self.scramble, self.sessionId, self.settings.resultsPrecision, self.settings.saveScramble)
+        .then(function(result) {
+          $rootScope.$broadcast('new result', result);
+          $rootScope.$broadcast('refresh statistics', self.results);
+        });
       $rootScope.$broadcast('new scramble', self.eventId);
 
     };
@@ -179,10 +182,13 @@
       if (self.time === '') {
         $rootScope.$broadcast('new scramble', self.eventId);
       } else if ($scope.input.text.$valid) {
-        result = ResultsService.saveResult(self.results, self.time, penalty, comment, self.scramble, self.sessionId, self.settings.resultsPrecision, self.settings.saveScramble);
-        $rootScope.$broadcast('new result', result);
+        ResultsService.saveResultAsync(self.results, self.time, penalty, comment, self.scramble, self.sessionId, self.settings.resultsPrecision, self.settings.saveScramble)
+          .then(function(result) {
+            $rootScope.$broadcast('new result', result);
+            $rootScope.$broadcast('refresh statistics', self.results);
+            self.time = '';
+          });
         $rootScope.$broadcast('new scramble', self.eventId);
-        self.time = '';
       }
 
     };

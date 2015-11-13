@@ -12,25 +12,21 @@
 
   describe('The cub controller', function() {
 
-    beforeEach(module('cub'));
+    beforeEach(module('gjTimer'));
 
     beforeEach(inject(function($injector) {
-
       $rootScope = $injector.get('$rootScope');
       $scope = $rootScope.$new();
       $controller = $injector.get('$controller');
+      CubService = $injector.get('CubService');
 
       eventId = '333';
       state = 'state';
 
-      CubService = {
-        drawScramble: function(event, state) {
-          return event + state;
-        }
-      };
-
       spyOn($rootScope, '$broadcast').and.callThrough();
-      spyOn(CubService, 'drawScramble').and.callThrough();
+      spyOn(CubService, 'drawScramble').and.callFake(function(event, state) {
+        return event + state;
+      });
 
       CubController = $controller('CubController', {
         $scope: $scope,
@@ -38,19 +34,14 @@
       });
 
       $scope.$digest();
-
     }));
 
 
     describe('draw scramble event', function() {
-
       it('should call the drawScramble function from the CubService with the eventId and state', function() {
-
         $rootScope.$broadcast('draw scramble', eventId, state);
         expect(CubService.drawScramble).toHaveBeenCalledWith(eventId, state);
-
       });
-
     });
 
   });

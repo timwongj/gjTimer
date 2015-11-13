@@ -19,7 +19,7 @@
     // main angular modules
 
     // third-party (non-Angular modules)
-    'ui.bootstrap', 'chart.js',
+    'angular-spinkit', 'ui.bootstrap', 'chart.js',
     // gjTimer
     'gjTimer'
   ]);
@@ -360,7 +360,13 @@
 
     var self = this;
 
+    self.DEFAULT_NUMBER_OF_SESSIONS = 15;
+
+    self.NUM_RESULTS_DISPLAYED = 50;
+
     self.DNF = 864000000;
+
+    self.TIMER_REFRESH_INTERVAL = 50;
 
     self.KEY_CODES = {
       ENTER: 13,
@@ -392,10 +398,6 @@
       }
     };
 
-    self.SESSIONS = {
-      DEFAULT_NUMBER_OF_SESSIONS: 15
-    };
-
     var colorOptions = [
       { value: { 'background-color': '#FFFFFF'} }, // white
       { value: { 'background-color': '#EEEEEE'} }, // grey
@@ -415,7 +417,6 @@
       bldMode: false,
       timerPrecision: 3,
       timerStartDelay: 0,
-      timerRefreshInterval: 50,
       showScramble: true,
       showCharts: true,
       saveScramble: true,
@@ -458,15 +459,8 @@
         title: 'Timer Start Delay',
         options: [
           { value: 0, text: '0' },
-          { value: 100, text: '0.1' },
-          { value: 500, text: '0.5' },
-          { value: 1000, text: '1' }
-        ]
-      }, { id: 'timerRefreshInterval',
-        title: 'Timer Refresh',
-        options: [
-          { value: 50, text: '0.05' },
-          { value: 100, text: '0.1' }
+          { value: 300, text: '0.3' },
+          { value: 550, text: '0.55' }
         ]
       }, { id: 'showScramble',
         title: 'Show Scramble',
@@ -628,7 +622,7 @@
 
   'use strict';
 
-  function LocalStorage() {
+  function LocalStorage($q, $timeout) {
 
     var self = this;
 
@@ -650,7 +644,7 @@
       try {
         localStorage.setItem(key, value);
         return true;
-      } catch(e) {
+      } catch(err) {
         return false;
       }
     };
@@ -670,6 +664,30 @@
     };
 
     /**
+     * Get a localStorage value as JSON given a key asynchronously.
+     * @param key
+     * @returns {null}
+     */
+    self.getJSONAsync = function(key) {
+
+      return $q(function(resolve) {
+
+        $timeout(function() {
+
+          var value = localStorage.getItem(key);
+          if (value !== null) {
+            resolve(JSON.parse(value));
+          } else {
+            resolve(null);
+          }
+
+        }, 0);
+
+      });
+
+    };
+
+    /**
      * Set a localStorage (key, value) pair as a JSON string in local storage with error handling.
      * @param key
      * @param value
@@ -679,27 +697,52 @@
       try {
         localStorage.setItem(key, JSON.stringify(value));
         return true;
-      } catch(e) {
+      } catch(err) {
         return false;
       }
     };
 
     /**
-     * Clears localStorage
+     * Set a localStorage (key, value) pair as a JSON string in local storage with error handling asynchronously.
+     * @param key
+     * @param value
+     * @returns {boolean}
+     */
+    self.setJSONAsync = function(key, value) {
+
+      return $q(function(resolve, reject) {
+
+        $timeout(function() {
+
+          try {
+            localStorage.setItem(key, JSON.stringify(value));
+            resolve();
+          } catch(err) {
+            reject(err);
+          }
+
+        }, 0);
+
+      });
+
+    };
+
+    /**
+     * Clears localStorage.
      * @returns {boolean}
      */
     self.clear = function() {
       try {
         localStorage.clear();
         return true;
-      } catch(e) {
+      } catch(err) {
         return false;
       }
     };
 
   }
 
-  angular.module('gjTimer.services').service('LocalStorage', LocalStorage);
+  angular.module('gjTimer.services').service('LocalStorage', ['$q', '$timeout', LocalStorage]);
 
 })();
 
@@ -737,26 +780,29 @@
 
     ChartsService.setChartDefaults();
 
-    lineChart = ChartsService.initLineChartData(self.results);
-    barChart = ChartsService.initBarChartData(self.results);
+    $scope.$on('refresh results', function() {
+      self.loaded = false;
+    });
+
+    $scope.$on('refresh charts', function($event, results) {
+
+      self.loaded = false;
+      lineChart = ChartsService.initLineChartData(results);
+      barChart = ChartsService.initBarChartData(results);
+      updateCharts();
+      self.loaded = true;
+
+    });
 
     $scope.$on('new result', function($event, result) {
 
       lineChart =  ChartsService.addLineChartData(lineChart, result);
       barChart = ChartsService.addBarChartData(barChart, result);
-      self.updateCharts();
+      updateCharts();
 
     });
 
-    $scope.$on('refresh results', function() {
-
-      lineChart = ChartsService.initLineChartData(self.results);
-      barChart = ChartsService.initBarChartData(self.results);
-      self.updateCharts();
-
-    });
-
-    self.updateCharts = function() {
+    function updateCharts() {
 
       self.lineChartSeries = lineChart.series;
       self.lineChartLabels = lineChart.labels;
@@ -765,9 +811,7 @@
       self.barChartLabels = barChart.labels;
       self.barChartData = barChart.data;
 
-    };
-
-    self.updateCharts();
+    }
 
   }
 
@@ -834,7 +878,7 @@
 
       for (var key in distribution) {
         if (distribution.hasOwnProperty(key)) {
-          labels.push(key);
+          labels.push(Calculator.convertTimeFromMillisecondsToString(key * 1000, 0));
           data.push(distribution[key]);
         }
       }
@@ -876,33 +920,29 @@
      */
     self.addBarChartData = function(barChart, result) {
 
-      var rawTime, flooredTime, distribution = {}, labels = [], data = [];
+      var rawTime, flooredTime, index;
 
       rawTime = Calculator.extractRawTimes([result])[0];
 
       if (rawTime !== Constants.DNF) {
-        flooredTime = Math.floor(rawTime / 1000);
-        for (var i = 0; i < barChart.labels.length; i++) {
-          distribution[barChart.labels[i]] = barChart.data[0][i];
-        }
-        if (!distribution.hasOwnProperty(flooredTime)) {
-          distribution[flooredTime] = 1;
+        flooredTime = Calculator.convertTimeFromMillisecondsToString(rawTime, 0);
+        index = barChart.labels.indexOf(flooredTime);
+        if (index < 0) {
+          for (var i = 0; i < barChart.labels.length; i++) {
+            if (rawTime < Calculator.convertTimeFromStringToMilliseconds(barChart.labels[i])) {
+              barChart.labels.splice(i, 0, flooredTime);
+              barChart.data[0].splice(i, 0, 1);
+              return barChart;
+            }
+          }
+          barChart.labels.push(flooredTime);
+          barChart.data[0].push(1);
+          return barChart;
         } else {
-          distribution[flooredTime] += 1;
+          barChart.data[0][index] += 1;
+          return barChart;
         }
       }
-
-      for (var key in distribution) {
-        if (distribution.hasOwnProperty(key)) {
-          labels.push(key);
-          data.push(distribution[key]);
-        }
-      }
-
-      return {
-        labels: labels,
-        data: [data]
-      };
 
     };
 
@@ -919,7 +959,7 @@
       Chart.defaults.Line.bezierCurve = false;
       Chart.defaults.Line.datasetStrokeWidth = 1;
       Chart.defaults.Line.pointDotRadius = 0;
-      Chart.defaults.Line.pointHitDetectionRadius = 1;
+      Chart.defaults.Line.pointHitDetectionRadius = 10;
 
     };
 
@@ -1034,45 +1074,39 @@
 
   'use strict';
 
-  function MenuBarController($scope, $rootScope, $timeout, $uibModal, MenuBarService, Events) {
+  function MenuBarController($scope, $rootScope, $uibModal, MenuBarService, Events) {
 
     var self = this;
 
-    self.settings = MenuBarService.initSettings();
+    self.eventId = MenuBarService.initEvent();
+    self.sessionId = MenuBarService.initSession();
     self.sessions = MenuBarService.initSessions();
-    self.session = MenuBarService.initSession();
+    self.settings = MenuBarService.initSettings();
     self.events = Events.getEvents();
-    self.event = { eventId: self.session.eventId, event: Events.getEvent(self.session.eventId) };
-    self.sessionId = self.session.sessionId;
-    self.eventId = self.session.eventId;
+    self.event = { eventId: self.eventId, event: Events.getEvent(self.eventId) };
 
+    // show glyphicons instead of text on reset and settings buttons if window size is less than 500px
     self.showDetails = window.innerWidth > 500;
     $(window).resize(function(){
       self.showDetails = window.innerWidth > 500;
       $scope.$apply();
     });
 
-    // TODO - find a better solution to waiting for controllers to initialize before broadcasting
-    // The cutoff for successful broadcast is ~15-20ms, so 50 should be sufficient for now.
-    $timeout(function() {
-      $rootScope.$broadcast('new scramble', self.eventId);
-    }, 50);
-
     self.changeSession = function(sessionId) {
-      self.session = MenuBarService.changeSession(sessionId);
       self.sessionId = sessionId;
-      self.eventId = self.session.eventId;
-      $rootScope.$broadcast('refresh results', sessionId);
-      if (self.event.eventId !== self.session.eventId) {
-        $rootScope.$broadcast('new scramble', self.eventId);
+      var eventId = MenuBarService.changeSession(sessionId);
+      if (eventId !== self.eventId) {
+        $rootScope.$broadcast('new scramble', eventId);
       }
+      self.eventId = eventId;
+      $rootScope.$broadcast('refresh results', sessionId);
       self.event = { eventId: self.eventId, event: Events.getEvent(self.eventId) };
     };
 
     self.changeEvent = function(event) {
-      self.eventId = MenuBarService.changeEvent(self.sessionId, Events.getEventId(event));
-      self.session.eventId = self.eventId;
+      self.eventId = Events.getEventId(event);
       self.event = { eventId: self.eventId, event: Events.getEvent(self.eventId) };
+      MenuBarService.changeEvent(self.sessionId, self.eventId);
       $rootScope.$broadcast('new scramble', self.eventId);
     };
 
@@ -1093,15 +1127,14 @@
 
     self.resetSession = function() {
       if (confirm('Are you sure you want to reset ' + self.sessionId + '?')) {
-        MenuBarService.resetSession(self.sessionId);
-        self.session.results = [];
         self.results = [];
+        MenuBarService.resetSessionAsync(self.sessionId);
       }
     };
 
   }
 
-  angular.module('menuBar').controller('MenuBarController', ['$scope', '$rootScope', '$timeout', '$uibModal', 'MenuBarService', 'Events', MenuBarController]);
+  angular.module('menuBar').controller('MenuBarController', ['$scope', '$rootScope', '$uibModal', 'MenuBarService', 'Events', MenuBarController]);
 
 })();
 
@@ -1158,13 +1191,13 @@
      */
     self.initSessions = function() {
 
-      var sessions = [];
+      var session, sessions = [];
 
-      for (var i = 1; i <= Constants.SESSIONS.DEFAULT_NUMBER_OF_SESSIONS; i++) {
+      for (var i = 1; i <= Constants.DEFAULT_NUMBER_OF_SESSIONS; i++) {
         sessions.push('Session ' + i);
-        var session = LocalStorage.getJSON('Session ' + i);
+        session = LocalStorage.getJSON('Session ' + i);
         if (session === null) {
-          LocalStorage.setJSON('Session ' + i, { sessionId: 'Session ' + i , eventId: '333', results: [] });
+          LocalStorage.setJSON('Session ' + i, { results: [] });
         }
       }
 
@@ -1174,55 +1207,62 @@
 
     /**
      * Initializes or gets session number from local storage.
-     * @returns {object} - session
+     * @returns {string}
      */
     self.initSession = function() {
 
-      var sessionId;
+      var sessionId = LocalStorage.get('sessionId');
 
-      if (LocalStorage.get('sessionId') !== null) {
-        sessionId = LocalStorage.get('sessionId');
+      if (sessionId) {
+        return sessionId;
       } else {
-        sessionId = 'Session 1';
         LocalStorage.set('sessionId', 'Session 1');
+        return 'Session 1';
       }
 
-      return LocalStorage.getJSON(sessionId);
-
     };
 
     /**
-     * Gets session data from local storage.
-     * @param sessionId
-     * @returns {object} session
+     * Initializes or gets the eventId from local storage.
+     * @returns {string}
      */
-    self.getSession = function(sessionId) {
+    self.initEvent = function() {
 
-      return LocalStorage.getJSON(sessionId);
+      var eventId = LocalStorage.get('eventId');
+      if (eventId) {
+        return eventId;
+      } else {
+        LocalStorage.set('eventId', '333');
+        return '333';
+      }
 
     };
 
     /**
-     * Saves the new session in local storage and returns the new session.
+     * Saves the new sessionId and returns the new eventId.
      * @param sessionId
-     * @returns {object} session
+     * @returns {string} - eventId
      */
     self.changeSession = function(sessionId) {
 
       LocalStorage.set('sessionId', sessionId);
-      return LocalStorage.getJSON(sessionId);
-
-    };
-
-    /**
-     * Resets the session in local storage by clearing the results list.
-     * @param sessionId
-     */
-    self.resetSession = function(sessionId) {
-
-      var session = LocalStorage.getJSON(sessionId);
-      session.results = [];
-      LocalStorage.setJSON(sessionId, session);
+      var events = LocalStorage.getJSON('events');
+      if (events) {
+        if (events.hasOwnProperty(sessionId)) {
+          return events[sessionId];
+        } else {
+          events[sessionId] = '333';
+          LocalStorage.setJSON('events', events);
+          return '333';
+        }
+      } else {
+        events = {};
+        for (var i = 1; i < Constants.DEFAULT_NUMBER_OF_SESSIONS; i++) {
+          events['Session ' + i] = '333';
+        }
+        LocalStorage.setJSON('events', events);
+        return '333';
+      }
 
     };
 
@@ -1234,10 +1274,32 @@
      */
     self.changeEvent = function(sessionId, eventId) {
 
-      var session = LocalStorage.getJSON(sessionId);
-      session.eventId = eventId;
-      LocalStorage.setJSON(sessionId, session);
-      return session.eventId;
+      var events = LocalStorage.getJSON('events');
+
+      if (!events) {
+        events = {};
+        for (var i = 1; i < Constants.DEFAULT_NUMBER_OF_SESSIONS; i++) {
+          events['Session ' + i] = '333';
+        }
+      }
+
+      events[sessionId] = eventId;
+      LocalStorage.setJSON('events', events);
+      LocalStorage.set('eventId', eventId);
+
+    };
+
+    /**
+     * Resets the session in local storage by clearing the results list.
+     * @param sessionId
+     */
+    self.resetSessionAsync = function(sessionId) {
+
+      return LocalStorage.getJSONAsync(sessionId)
+        .then(function(session) {
+          session.results = [];
+          return LocalStorage.setJSONAsync(sessionId, session);
+        });
 
     };
 
@@ -1281,17 +1343,37 @@
 
   'use strict';
 
-  function ResultsController($scope, $uibModal, ResultsService) {
+  function ResultsController($scope, $rootScope, $uibModal, ResultsService, Constants) {
 
     var self = this;
 
-    self.results = ResultsService.getResults(self.sessionId, self.settings.resultsPrecision);
+    self.NUM_RESULTS_DISPLAYED = Constants.NUM_RESULTS_DISPLAYED;
+
+    refreshResults();
 
     $scope.$on('refresh results', function($event, sessionId) {
-      self.results = ResultsService.getResults(sessionId || self.sessionId, self.settings.resultsPrecision);
+
+      refreshResults(sessionId);
+
     });
 
+    function refreshResults(sessionId) {
+
+      self.loaded = false;
+      ResultsService.getResultsAsync(sessionId || self.sessionId, self.settings.resultsPrecision)
+        .then(function(results) {
+          self.NUM_RESULTS_DISPLAYED = Constants.NUM_RESULTS_DISPLAYED;
+          self.loaded = true;
+          self.results = results;
+          self.loaded = true;
+          $rootScope.$broadcast('refresh statistics', results);
+          $rootScope.$broadcast('refresh charts', results);
+        });
+
+    }
+
     self.openModal = function(index, numberOfResults) {
+
       if (index >= numberOfResults) {
         $uibModal.open({
           animation: true,
@@ -1309,11 +1391,12 @@
           }
         });
       }
+
     };
 
   }
 
-  angular.module('results').controller('ResultsController', ['$scope', '$uibModal', 'ResultsService', ResultsController]);
+  angular.module('results').controller('ResultsController', ['$scope', '$rootScope', '$uibModal', 'ResultsService', 'Constants', ResultsController]);
 
 })();
 
@@ -1321,7 +1404,7 @@
 
   'use strict';
 
-  function ResultsService(LocalStorage, Calculator, Constants) {
+  function ResultsService($q, $timeout, LocalStorage, Calculator, Constants) {
 
     var self = this;
 
@@ -1332,53 +1415,59 @@
      * @param sessionId
      * @param precision
      */
-    self.getResults = function(sessionId, precision) {
+    self.getResultsAsync = function(sessionId, precision) {
 
-      var results = [], rawResults = LocalStorage.getJSON(sessionId).results;
+      return LocalStorage.getJSONAsync(sessionId)
+        .then(function(session) {
 
-      for (var i = 0; i < rawResults.length; i++) {
+          var results = [], result, res, pen, rawResults = session.results;
 
-        var res = rawResults[i].split('|');
+          for (var i = 0; i < rawResults.length; i++) {
 
-        var result = {
-          index: i,
-          scramble: res[1],
-          date: new Date(Number(res[2])),
-          comment: res[3] ? res[3] : ''
-        };
+            res = rawResults[i].split('|');
 
-        // deal with penalty if it exists
-        if (res[0].substring(res[0].length - 1, res[0].length) === '+') {
-          result.time = Number(res[0].substring(0, res[0].length - 1));
-          result.penalty = '+2';
-          result.rawTime = Number((result.time + 2000).toFixed());
-          result.displayedTime = Calculator.convertTimeFromMillisecondsToString(Number(res[0].substring(0, res[0].length - 1)) + 2000, precision) + '+';
-          result.detailedTime = result.displayedTime;
-        } else if (res[0].substring(res[0].length - 1, res[0].length) === '-') {
-          result.time = Number(res[0].substring(0, res[0].length - 1));
-          result.penalty = 'DNF';
-          result.rawTime = DNF;
-          result.displayedTime = 'DNF';
-          result.detailedTime = 'DNF(' + Calculator.convertTimeFromMillisecondsToString(Number(res[0].substring(0, res[0].length - 1)), precision) + ')';
-        } else {
-          result.time = Number(res[0]);
-          result.penalty = '';
-          result.rawTime = result.time;
-          result.displayedTime = Calculator.convertTimeFromMillisecondsToString(Number(res[0]), precision);
-          result.detailedTime = result.displayedTime;
-        }
+            result = {
+              index: i,
+              scramble: res[1],
+              date: new Date(Number(res[2])),
+              comment: res[3] ? res[3] : ''
+            };
 
-        results.push(result);
-        
-      }
+            // deal with penalty if it exists
+            pen = res[0].substring(res[0].length - 1, res[0].length);
+            if (pen === '+') {
+              result.time = Number(res[0].substring(0, res[0].length - 1));
+              result.penalty = '+2';
+              result.rawTime = Number((result.time + 2000).toFixed());
+              result.displayedTime = Calculator.convertTimeFromMillisecondsToString(Number(res[0].substring(0, res[0].length - 1)) + 2000, precision) + '+';
+              result.detailedTime = result.displayedTime;
+            } else if (pen === '-') {
+              result.time = Number(res[0].substring(0, res[0].length - 1));
+              result.penalty = 'DNF';
+              result.rawTime = DNF;
+              result.displayedTime = 'DNF';
+              result.detailedTime = 'DNF(' + Calculator.convertTimeFromMillisecondsToString(Number(res[0].substring(0, res[0].length - 1)), precision) + ')';
+            } else {
+              result.time = Number(res[0]);
+              result.penalty = '';
+              result.rawTime = result.time;
+              result.displayedTime = Calculator.convertTimeFromMillisecondsToString(Number(res[0]), precision);
+              result.detailedTime = result.displayedTime;
+            }
 
-      var rawTimes = Calculator.extractRawTimes(results);
+            results.push(result);
 
-      for (var j = 0; j < results.length; j++) {
-        results[j] = self.populateAverages(rawTimes, results[j], j, precision);
-      }
+          }
 
-      return results;
+          var rawTimes = Calculator.extractRawTimes(results);
+
+          for (var j = 0; j < results.length; j++) {
+            results[j] = populateAverages(rawTimes, results[j], j, precision);
+          }
+
+          return results;
+
+        });
 
     };
 
@@ -1394,48 +1483,183 @@
      * @param saveScramble
      * @returns {{comment: *, date: Date, detailedTime: string, displayedTime: string, index: *, penalty: *, rawTime: number, scramble: *, time: number}}
      */
-    self.saveResult = function(results, time, penalty, comment, scramble, sessionId, precision, saveScramble) {
+    self.saveResultAsync = function(results, time, penalty, comment, scramble, sessionId, precision, saveScramble) {
 
-      var timeMilliseconds = Calculator.convertTimeFromStringToMilliseconds(time);
-      var timeStringWithPrecision = Calculator.convertTimeFromMillisecondsToString(timeMilliseconds, precision);
+      return $q(function(resolve, reject) {
 
-      var result = {
-        comment: comment,
-        date: new Date(),
-        detailedTime: timeStringWithPrecision,
-        displayedTime: timeStringWithPrecision,
-        index: results.length,
-        penalty: penalty,
-        rawTime: timeMilliseconds,
-        scramble: scramble,
-        time: timeMilliseconds
-      };
+        $timeout(function() {
 
-      var rawTimes = Calculator.extractRawTimes(results);
-      rawTimes.push(Calculator.extractRawTimes([result])[0]);
-      result = self.populateAverages(rawTimes, result, result.index, precision);
+          var timeMilliseconds = Calculator.convertTimeFromStringToMilliseconds(time);
+          var timeStringWithPrecision = Calculator.convertTimeFromMillisecondsToString(timeMilliseconds, precision);
 
-      var timeString = Calculator.convertTimeFromStringToMilliseconds(time);
-      switch(penalty) {
-        case '+2':
-          result.displayedTime = Calculator.convertTimeFromMillisecondsToString(Calculator.convertTimeFromStringToMilliseconds(time) + 2000, precision) + '+';
-          result.detailedTime = result.displayedTime;
-          timeString += '+';
-          break;
-        case 'DNF':
-          result.displayedTime = 'DNF';
-          result.detailedTime = 'DNF(' + Calculator.convertTimeFromMillisecondsToString(Calculator.convertTimeFromStringToMilliseconds(time), precision) + ')';
-          timeString += '-';
-          break;
-      }
+          var result = {
+            comment: comment,
+            date: new Date(),
+            detailedTime: timeStringWithPrecision,
+            displayedTime: timeStringWithPrecision,
+            index: results.length,
+            penalty: penalty,
+            rawTime: timeMilliseconds,
+            scramble: scramble,
+            time: timeMilliseconds
+          };
 
-      results.push(result);
+          var rawTimes = Calculator.extractRawTimes(results);
+          rawTimes.push(Calculator.extractRawTimes([result])[0]);
+          result = populateAverages(rawTimes, result, result.index, precision);
 
-      var session = LocalStorage.getJSON(sessionId);
-      session.results.push(timeString + '|' + (saveScramble ? scramble : '') + '|' + Date.now() + (comment !== '' ? '|' + comment : ''));
-      LocalStorage.setJSON(sessionId, session);
+          var timeString = Calculator.convertTimeFromStringToMilliseconds(time);
+          switch(penalty) {
+            case '+2':
+              result.displayedTime = Calculator.convertTimeFromMillisecondsToString(Calculator.convertTimeFromStringToMilliseconds(time) + 2000, precision) + '+';
+              result.detailedTime = result.displayedTime;
+              timeString += '+';
+              break;
+            case 'DNF':
+              result.displayedTime = 'DNF';
+              result.detailedTime = 'DNF(' + Calculator.convertTimeFromMillisecondsToString(Calculator.convertTimeFromStringToMilliseconds(time), precision) + ')';
+              timeString += '-';
+              break;
+          }
 
-      return result;
+          results.push(result);
+
+          LocalStorage.getJSONAsync(sessionId)
+            .then(function(session) {
+              session.results.push(timeString + '|' + (saveScramble ? scramble : '') + '|' + Date.now() + (comment !== '' ? '|' + comment : ''));
+              LocalStorage.setJSONAsync(sessionId, session)
+                .catch(function(err) {
+                  reject(err);
+                });
+            });
+
+          resolve(result);
+
+        }, 0);
+
+      });
+
+    };
+
+    /**
+     * Changes the penalty for a solve.
+     * @param result
+     * @param sessionId
+     * @param index
+     * @param penalty
+     * @param precision
+     */
+    self.penaltyAsync = function(result, sessionId, index, penalty, precision) {
+
+      return LocalStorage.getJSONAsync(sessionId)
+        .then(function(session) {
+
+          var res = session.results[index];
+          var pen = res.substring(res.indexOf('|') - 1, res.indexOf('|'));
+
+          switch(penalty) {
+            case '':
+              result.penalty = '';
+              result.rawTime = result.time;
+              result.displayedTime = Calculator.convertTimeFromMillisecondsToString(result.time, precision);
+              result.detailedTime = result.displayedTime;
+              if ((pen === '+') || (pen === '-')) {
+                res = res.substring(0, res.indexOf('|') - 1) + res.substring(res.indexOf('|'), res.length);
+              }
+              break;
+            case '+2':
+              result.penalty = '+2';
+              result.rawTime = result.time + 2000;
+              result.displayedTime = Calculator.convertTimeFromMillisecondsToString(result.time + 2000, precision) + '+';
+              result.detailedTime = result.displayedTime;
+              if ((pen === '+') || (pen === '-')) {
+                res = res.substring(0, res.indexOf('|') - 1) + '+' + res.substring(res.indexOf('|'), res.length);
+              } else {
+                res = res.substring(0, res.indexOf('|')) + '+' + res.substring(res.indexOf('|'), res.length);
+              }
+              break;
+            case 'DNF':
+              result.penalty = 'DNF';
+              result.rawTime = Constants.DNF;
+              result.displayedTime = 'DNF';
+              result.detailedTime = 'DNF(' + Calculator.convertTimeFromMillisecondsToString(result.time, precision) + ')';
+              if ((pen === '+') || (pen === '-')) {
+                res = res.substring(0, res.indexOf('|') - 1) + '-' + res.substring(res.indexOf('|'), res.length);
+              } else {
+                res = res.substring(0, res.indexOf('|')) + '-' + res.substring(res.indexOf('|'), res.length);
+              }
+              break;
+          }
+
+          session.results[index] = res;
+
+          LocalStorage.setJSONAsync(sessionId, session)
+            .catch(function(err) {
+              reject(err);
+            });
+
+        });
+
+    };
+
+    /**
+     * Removes a solve.
+     * @param results
+     * @param sessionId
+     * @param index
+     */
+    self.removeAsync = function(results, sessionId, index) {
+
+      results.splice(index, 1);
+
+      return LocalStorage.getJSONAsync(sessionId)
+        .then(function(session) {
+
+          session.results.splice(index, 1);
+
+          LocalStorage.setJSONAsync(sessionId, session)
+            .catch(function(err) {
+              reject(err);
+            });
+
+        });
+
+    };
+
+    /**
+     * Adds or edits a comment for a solve.
+     * @param result
+     * @param sessionId
+     * @param index
+     * @param comment
+     */
+    self.commentAsync = function(result, sessionId, index, comment) {
+
+      result.comment = comment;
+
+      return LocalStorage.getJSONAsync(sessionId)
+        .then(function(session) {
+
+          var res = session.results[index].split('|');
+
+          if (comment !== '') {
+            if (res[3]) {
+              res[3] = comment;
+              session.results[index] = res.join('|');
+            } else {
+              session.results[index] = session.results[index] + '|' + comment;
+            }
+          } else if (res[3]) {
+            res.splice(3, 1);
+            session.results[index] = res.join('|');
+          }
+
+          LocalStorage.setJSONAsync(sessionId, session)
+            .catch(function(err) {
+              reject(err);
+            });
+
+        });
 
     };
 
@@ -1445,8 +1669,9 @@
      * @param result
      * @param index
      * @param precision
+     * @returns {*}
      */
-    self.populateAverages = function(rawTimes, result, index, precision) {
+    function populateAverages(rawTimes, result, index, precision) {
 
       if (index >= 4) {
         result.avg5 = Calculator.calculateAverageString(rawTimes.slice(index - 4, index + 1), true, precision);
@@ -1462,104 +1687,11 @@
 
       return result;
 
-    };
-
-    /**
-     * Changes the penalty for a solve.
-     * @param result
-     * @param sessionId
-     * @param index
-     * @param penalty
-     * @param precision
-     */
-    self.penalty = function(result, sessionId, index, penalty, precision) {
-
-      var session = LocalStorage.getJSON(sessionId);
-      var res = session.results[index];
-      var pen = res.substring(res.indexOf('|') - 1, res.indexOf('|'));
-      switch(penalty) {
-        case '':
-          result.penalty = '';
-          result.rawTime = result.time;
-          result.displayedTime = Calculator.convertTimeFromMillisecondsToString(result.time, precision);
-          result.detailedTime = result.displayedTime;
-          if ((pen === '+') || (pen === '-')) {
-            res = res.substring(0, res.indexOf('|') - 1) + res.substring(res.indexOf('|'), res.length);
-          }
-          break;
-        case '+2':
-          result.penalty = '+2';
-          result.rawTime = result.time + 2000;
-          result.displayedTime = Calculator.convertTimeFromMillisecondsToString(result.time + 2000, precision) + '+';
-          result.detailedTime = result.displayedTime;
-          if ((pen === '+') || (pen === '-')) {
-            res = res.substring(0, res.indexOf('|') - 1) + '+' + res.substring(res.indexOf('|'), res.length);
-          } else {
-            res = res.substring(0, res.indexOf('|')) + '+' + res.substring(res.indexOf('|'), res.length);
-          }
-          break;
-        case 'DNF':
-          result.penalty = 'DNF';
-          result.rawTime = Constants.DNF;
-          result.displayedTime = 'DNF';
-          result.detailedTime = 'DNF(' + Calculator.convertTimeFromMillisecondsToString(result.time, precision) + ')';
-          if ((pen === '+') || (pen === '-')) {
-            res = res.substring(0, res.indexOf('|') - 1) + '-' + res.substring(res.indexOf('|'), res.length);
-          } else {
-            res = res.substring(0, res.indexOf('|')) + '-' + res.substring(res.indexOf('|'), res.length);
-          }
-          break;
-      }
-      session.results[index] = res;
-      LocalStorage.setJSON(sessionId, session);
-
-    };
-
-    /**
-     * Removes a solve.
-     * @param results
-     * @param sessionId
-     * @param index
-     */
-    self.remove = function(results, sessionId, index) {
-
-      results.splice(index, 1);
-      var session = LocalStorage.getJSON(sessionId);
-      session.results.splice(index, 1);
-      LocalStorage.setJSON(sessionId, session);
-
-    };
-
-    /**
-     * Adds or edits a comment for a solve.
-     * @param result
-     * @param sessionId
-     * @param index
-     * @param comment
-     */
-    self.comment = function(result, sessionId, index, comment) {
-
-      result.comment = comment;
-      var session = LocalStorage.getJSON(sessionId);
-      var res = session.results[index].split('|');
-      if (comment !== '') {
-        if (res[3]) {
-          res[3] = comment;
-          session.results[index] = res.join('|');
-        } else {
-          session.results[index] = session.results[index] + '|' + comment;
-        }
-      } else if (res[3]) {
-        res.splice(3, 1);
-        session.results[index] = res.join('|');
-      }
-      LocalStorage.setJSON(sessionId, session);
-
-    };
+    }
 
   }
 
-  angular.module('results').service('ResultsService', ['LocalStorage', 'Calculator', 'Constants', ResultsService]);
+  angular.module('results').service('ResultsService', ['$q', '$timeout', 'LocalStorage', 'Calculator', 'Constants', ResultsService]);
 
 })();
 
@@ -1695,31 +1827,35 @@
       });
 
       $('.popover-btn-penalty-ok').on('click', function() {
-        ResultsService.penalty(self.result, self.sessionId, self.index, '', self.precision);
-        $scope.$apply();
-        $rootScope.$broadcast('refresh results');
+        ResultsService.penaltyAsync(self.result, self.sessionId, self.index, '', self.precision)
+          .then(function() {
+            $rootScope.$broadcast('refresh results');
+          });
         $(element).popover('hide');
       });
 
       $('.popover-btn-penalty-plus').on('click', function() {
-        ResultsService.penalty(self.result, self.sessionId, self.index, '+2', self.precision);
-        $scope.$apply();
-        $rootScope.$broadcast('refresh results');
+        ResultsService.penaltyAsync(self.result, self.sessionId, self.index, '+2', self.precision)
+          .then(function() {
+            $rootScope.$broadcast('refresh results');
+          });
         $(element).popover('hide');
       });
 
       $('.popover-btn-penalty-dnf').on('click', function() {
-        ResultsService.penalty(self.result, self.sessionId, self.index, 'DNF', self.precision);
-        $scope.$apply();
-        $rootScope.$broadcast('refresh results');
+        ResultsService.penaltyAsync(self.result, self.sessionId, self.index, 'DNF', self.precision)
+          .then(function() {
+            $rootScope.$broadcast('refresh results');
+          });
         $(element).popover('hide');
       });
 
       $('.popover-btn-remove').on('click', function() {
         if (confirm('Are you sure you want to delete this time?')) {
-          ResultsService.remove(self.results, self.sessionId, self.index);
-          $scope.$apply();
-          $rootScope.$broadcast('refresh results');
+          ResultsService.removeAsync(self.results, self.sessionId, self.index)
+            .then(function() {
+              $rootScope.$broadcast('refresh results');
+            });
           $(element).popover('hide');
         }
       });
@@ -1732,8 +1868,7 @@
         }, 1);
       }).on('keydown', function(event) {
         if (event.keyCode === Constants.KEY_CODES.ENTER) {
-          ResultsService.comment(self.result, self.sessionId, self.index, $('.popover-input-comment')[0].value);
-          $scope.$apply();
+          ResultsService.commentAsync(self.result, self.sessionId, self.index, $('.popover-input-comment')[0].value);
           $(element).popover('hide');
         }
       })[0].value = self.result.comment;
@@ -1776,14 +1911,25 @@
 
     var self = this;
 
+    newScramble(self.eventId);
+
     $scope.$on('new scramble', function($event, eventId) {
 
-      self.scramble = ScrambleService.getNewScramble(eventId);
-      self.displayedScramble = $sce.trustAsHtml(self.scramble);
-      self.scrambleStyle = Events.getEventStyle(eventId);
-      $rootScope.$broadcast('draw scramble', eventId, ScrambleService.getScrambleState());
+      newScramble(eventId);
 
     });
+
+    function newScramble(eventId) {
+
+      ScrambleService.getNewScrambleAsync(eventId)
+        .then(function(scramble) {
+          self.scramble = scramble;
+          self.displayedScramble = $sce.trustAsHtml(self.scramble);
+          self.scrambleStyle = Events.getEventStyle(eventId);
+          $rootScope.$broadcast('draw scramble', eventId, ScrambleService.getScrambleState());
+        });
+
+    }
 
   }
 
@@ -1795,7 +1941,7 @@
 
   'use strict';
 
-  function ScrambleService() {
+  function ScrambleService($q, $timeout) {
 
     var self = this;
 
@@ -1815,21 +1961,29 @@
      * @param eventId
      * @returns {string}
      */
-    self.getNewScramble = function(eventId) {
+    self.getNewScrambleAsync = function(eventId) {
 
-      self.scramble = scramblers[eventId].getRandomScramble();
+      return $q(function(resolve) {
 
-      if (self.scramble.scramble_string.substring(self.scramble.scramble_string.length - 1, self.scramble.scramble_string.length) === ' ') {
-        return self.scramble.scramble_string.substring(0, self.scramble.scramble_string.length - 1);
-      } else {
-        return self.scramble.scramble_string;
-      }
+        $timeout(function() {
+
+          self.scramble = scramblers[eventId].getRandomScramble();
+
+          if (self.scramble.scramble_string.substring(self.scramble.scramble_string.length - 1, self.scramble.scramble_string.length) === ' ') {
+            resolve(self.scramble.scramble_string.substring(0, self.scramble.scramble_string.length - 1));
+          } else {
+            resolve(self.scramble.scramble_string);
+          }
+
+        }, 0);
+
+      });
 
     };
 
   }
 
-  angular.module('scramble').service('ScrambleService', ScrambleService);
+  angular.module('scramble').service('ScrambleService', ['$q', '$timeout', ScrambleService]);
 
 })();
 
@@ -1915,10 +2069,17 @@
 
     var self = this;
 
-    $scope.$watchCollection(function() {
-      return self.results;
-    }, function() {
-      self.statistics = StatisticsService.getStatistics(self.results, self.settings.statisticsPrecision);
+    $scope.$on('refresh results', function() {
+      self.loaded = false;
+    });
+
+    $scope.$on('refresh statistics', function($event, results) {
+      self.loaded = false;
+      StatisticsService.getStatisticsAsync(results, self.settings.statisticsPrecision)
+        .then(function(statistics) {
+          self.statistics = statistics;
+          self.loaded = true;
+        });
     });
 
     self.openModal = function(format, $index) {
@@ -1951,7 +2112,7 @@
 
   'use strict';
 
-  function StatisticsService(Calculator) {
+  function StatisticsService($q, $timeout, Calculator) {
 
     var self = this;
 
@@ -1961,60 +2122,68 @@
      * @param precision
      * @returns {{solves: {attempted: number, solved: number, best: string, worst: string}, sessionMean: ({mean, stDev}|string), sessionAvg: {avg: string, stDev: string}, averages: Array}}
      */
-    self.getStatistics = function(results, precision) {
+    self.getStatisticsAsync = function(results, precision) {
 
-      var rawTimes = Calculator.extractRawTimes(results);
+      return $q(function(resolve) {
 
-      var statistics = {
-        solves: {
-          attempted: rawTimes.length,
-          solved: Calculator.countNonDNFs(rawTimes),
-          best: Calculator.convertTimeFromMillisecondsToString(Math.min.apply(null, rawTimes), precision),
-          worst: Calculator.convertTimeFromMillisecondsToString(Math.max.apply(null, rawTimes), precision)
-        },
-        sessionMean: Calculator.calculateSessionMeanAndStandardDeviationString(rawTimes, precision),
-        sessionAvg: {
-          avg: Calculator.calculateAverageString(rawTimes, true, precision),
-          stDev: Calculator.calculateStandardDeviationString(rawTimes, true, precision)
-        },
-        averages: []
-      };
+        $timeout(function() {
 
-      if (rawTimes.length >= 3) {
-        statistics.averages.push({
-          type: 'm',
-          length: 3,
-          current: {
-            avg: Calculator.calculateAverageString(rawTimes.slice(rawTimes.length - 3, rawTimes.length), false, precision),
-            stDev: Calculator.calculateStandardDeviationString(rawTimes.slice(rawTimes.length - 3, rawTimes.length), false, precision)
-          },
-          best: Calculator.calculateBestAverageAndStandardDeviationString(rawTimes, false, 3, precision)
-        });
-      }
+          var rawTimes = Calculator.extractRawTimes(results);
 
-      var typesOfAverages = [5, 12, 50, 100];
-
-      for (var i = 0; i < typesOfAverages.length; i++) {
-        if (rawTimes.length >= typesOfAverages[i]) {
-          statistics.averages.push({
-            type: 'a',
-            length: typesOfAverages[i],
-            current: {
-              avg: Calculator.calculateAverageString(rawTimes.slice(rawTimes.length - typesOfAverages[i], rawTimes.length), true, precision),
-              stDev: Calculator.calculateStandardDeviationString(rawTimes.slice(rawTimes.length - typesOfAverages[i], rawTimes.length), true, precision)
+          var statistics = {
+            solves: {
+              attempted: rawTimes.length,
+              solved: Calculator.countNonDNFs(rawTimes),
+              best: Calculator.convertTimeFromMillisecondsToString(Math.min.apply(null, rawTimes), precision),
+              worst: Calculator.convertTimeFromMillisecondsToString(Math.max.apply(null, rawTimes), precision)
             },
-            best: Calculator.calculateBestAverageAndStandardDeviationString(rawTimes, true, typesOfAverages[i], precision)
-          });
-        }
-      }
+            sessionMean: Calculator.calculateSessionMeanAndStandardDeviationString(rawTimes, precision),
+            sessionAvg: {
+              avg: Calculator.calculateAverageString(rawTimes, true, precision),
+              stDev: Calculator.calculateStandardDeviationString(rawTimes, true, precision)
+            },
+            averages: []
+          };
 
-      return statistics;
+          if (rawTimes.length >= 3) {
+            statistics.averages.push({
+              type: 'm',
+              length: 3,
+              current: {
+                avg: Calculator.calculateAverageString(rawTimes.slice(rawTimes.length - 3, rawTimes.length), false, precision),
+                stDev: Calculator.calculateStandardDeviationString(rawTimes.slice(rawTimes.length - 3, rawTimes.length), false, precision)
+              },
+              best: Calculator.calculateBestAverageAndStandardDeviationString(rawTimes, false, 3, precision)
+            });
+          }
+
+          var typesOfAverages = [5, 12, 50, 100];
+
+          for (var i = 0; i < typesOfAverages.length; i++) {
+            if (rawTimes.length >= typesOfAverages[i]) {
+              statistics.averages.push({
+                type: 'a',
+                length: typesOfAverages[i],
+                current: {
+                  avg: Calculator.calculateAverageString(rawTimes.slice(rawTimes.length - typesOfAverages[i], rawTimes.length), true, precision),
+                  stDev: Calculator.calculateStandardDeviationString(rawTimes.slice(rawTimes.length - typesOfAverages[i], rawTimes.length), true, precision)
+                },
+                best: Calculator.calculateBestAverageAndStandardDeviationString(rawTimes, true, typesOfAverages[i], precision)
+              });
+            }
+          }
+
+          resolve(statistics);
+
+        }, 0);
+
+      });
 
     };
     
   }
 
-  angular.module('statistics').service('StatisticsService', ['Calculator', StatisticsService]);
+  angular.module('statistics').service('StatisticsService', ['$q', '$timeout', 'Calculator', StatisticsService]);
 
 })();
 
@@ -2131,7 +2300,7 @@
       TimerService.startTimer();
       timer = $interval(function () {
         self.time = TimerService.getTime(precision);
-      }, self.settings.timerRefreshInterval);
+      }, Constants.TIMER_REFRESH_INTERVAL);
 
     };
 
@@ -2141,8 +2310,11 @@
       self.time = TimerService.getTime(precision);
       $interval.cancel(timer);
       comment = self.settings.bldMode ? TimerService.createCommentForBldMode(self.time, memo) : '';
-      result = ResultsService.saveResult(self.results, self.time, penalty, comment, self.scramble, self.sessionId, self.settings.resultsPrecision, self.settings.saveScramble);
-      $rootScope.$broadcast('new result', result);
+      ResultsService.saveResultAsync(self.results, self.time, penalty, comment, self.scramble, self.sessionId, self.settings.resultsPrecision, self.settings.saveScramble)
+        .then(function(result) {
+          $rootScope.$broadcast('new result', result);
+          $rootScope.$broadcast('refresh statistics', self.results);
+        });
       $rootScope.$broadcast('new scramble', self.eventId);
 
     };
@@ -2224,10 +2396,13 @@
       if (self.time === '') {
         $rootScope.$broadcast('new scramble', self.eventId);
       } else if ($scope.input.text.$valid) {
-        result = ResultsService.saveResult(self.results, self.time, penalty, comment, self.scramble, self.sessionId, self.settings.resultsPrecision, self.settings.saveScramble);
-        $rootScope.$broadcast('new result', result);
+        ResultsService.saveResultAsync(self.results, self.time, penalty, comment, self.scramble, self.sessionId, self.settings.resultsPrecision, self.settings.saveScramble)
+          .then(function(result) {
+            $rootScope.$broadcast('new result', result);
+            $rootScope.$broadcast('refresh statistics', self.results);
+            self.time = '';
+          });
         $rootScope.$broadcast('new scramble', self.eventId);
-        self.time = '';
       }
 
     };

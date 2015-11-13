@@ -2,45 +2,39 @@
 
   'use strict';
 
-  function MenuBarController($scope, $rootScope, $timeout, $uibModal, MenuBarService, Events) {
+  function MenuBarController($scope, $rootScope, $uibModal, MenuBarService, Events) {
 
     var self = this;
 
-    self.settings = MenuBarService.initSettings();
+    self.eventId = MenuBarService.initEvent();
+    self.sessionId = MenuBarService.initSession();
     self.sessions = MenuBarService.initSessions();
-    self.session = MenuBarService.initSession();
+    self.settings = MenuBarService.initSettings();
     self.events = Events.getEvents();
-    self.event = { eventId: self.session.eventId, event: Events.getEvent(self.session.eventId) };
-    self.sessionId = self.session.sessionId;
-    self.eventId = self.session.eventId;
+    self.event = { eventId: self.eventId, event: Events.getEvent(self.eventId) };
 
+    // show glyphicons instead of text on reset and settings buttons if window size is less than 500px
     self.showDetails = window.innerWidth > 500;
     $(window).resize(function(){
       self.showDetails = window.innerWidth > 500;
       $scope.$apply();
     });
 
-    // TODO - find a better solution to waiting for controllers to initialize before broadcasting
-    // The cutoff for successful broadcast is ~15-20ms, so 50 should be sufficient for now.
-    $timeout(function() {
-      $rootScope.$broadcast('new scramble', self.eventId);
-    }, 50);
-
     self.changeSession = function(sessionId) {
-      self.session = MenuBarService.changeSession(sessionId);
       self.sessionId = sessionId;
-      self.eventId = self.session.eventId;
-      $rootScope.$broadcast('refresh results', sessionId);
-      if (self.event.eventId !== self.session.eventId) {
-        $rootScope.$broadcast('new scramble', self.eventId);
+      var eventId = MenuBarService.changeSession(sessionId);
+      if (eventId !== self.eventId) {
+        $rootScope.$broadcast('new scramble', eventId);
       }
+      self.eventId = eventId;
+      $rootScope.$broadcast('refresh results', sessionId);
       self.event = { eventId: self.eventId, event: Events.getEvent(self.eventId) };
     };
 
     self.changeEvent = function(event) {
-      self.eventId = MenuBarService.changeEvent(self.sessionId, Events.getEventId(event));
-      self.session.eventId = self.eventId;
+      self.eventId = Events.getEventId(event);
       self.event = { eventId: self.eventId, event: Events.getEvent(self.eventId) };
+      MenuBarService.changeEvent(self.sessionId, self.eventId);
       $rootScope.$broadcast('new scramble', self.eventId);
     };
 
@@ -61,14 +55,13 @@
 
     self.resetSession = function() {
       if (confirm('Are you sure you want to reset ' + self.sessionId + '?')) {
-        MenuBarService.resetSession(self.sessionId);
-        self.session.results = [];
         self.results = [];
+        MenuBarService.resetSessionAsync(self.sessionId);
       }
     };
 
   }
 
-  angular.module('menuBar').controller('MenuBarController', ['$scope', '$rootScope', '$timeout', '$uibModal', 'MenuBarService', 'Events', MenuBarController]);
+  angular.module('menuBar').controller('MenuBarController', ['$scope', '$rootScope', '$uibModal', 'MenuBarService', 'Events', MenuBarController]);
 
 })();

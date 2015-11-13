@@ -2,17 +2,37 @@
 
   'use strict';
 
-  function ResultsController($scope, $uibModal, ResultsService) {
+  function ResultsController($scope, $rootScope, $uibModal, ResultsService, Constants) {
 
     var self = this;
 
-    self.results = ResultsService.getResults(self.sessionId, self.settings.resultsPrecision);
+    self.NUM_RESULTS_DISPLAYED = Constants.NUM_RESULTS_DISPLAYED;
+
+    refreshResults();
 
     $scope.$on('refresh results', function($event, sessionId) {
-      self.results = ResultsService.getResults(sessionId || self.sessionId, self.settings.resultsPrecision);
+
+      refreshResults(sessionId);
+
     });
 
+    function refreshResults(sessionId) {
+
+      self.loaded = false;
+      ResultsService.getResultsAsync(sessionId || self.sessionId, self.settings.resultsPrecision)
+        .then(function(results) {
+          self.NUM_RESULTS_DISPLAYED = Constants.NUM_RESULTS_DISPLAYED;
+          self.loaded = true;
+          self.results = results;
+          self.loaded = true;
+          $rootScope.$broadcast('refresh statistics', results);
+          $rootScope.$broadcast('refresh charts', results);
+        });
+
+    }
+
     self.openModal = function(index, numberOfResults) {
+
       if (index >= numberOfResults) {
         $uibModal.open({
           animation: true,
@@ -30,10 +50,11 @@
           }
         });
       }
+
     };
 
   }
 
-  angular.module('results').controller('ResultsController', ['$scope', '$uibModal', 'ResultsService', ResultsController]);
+  angular.module('results').controller('ResultsController', ['$scope', '$rootScope', '$uibModal', 'ResultsService', 'Constants', ResultsController]);
 
 })();

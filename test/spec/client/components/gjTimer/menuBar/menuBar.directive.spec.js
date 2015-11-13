@@ -2,7 +2,7 @@
 
   'use strict';
 
-  describe('The statistics controller', function() {
+  describe('the menuBar directive', function() {
 
     beforeEach(module('gjTimer'));
 

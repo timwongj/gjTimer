@@ -10,26 +10,29 @@
 
     ChartsService.setChartDefaults();
 
-    lineChart = ChartsService.initLineChartData(self.results);
-    barChart = ChartsService.initBarChartData(self.results);
+    $scope.$on('refresh results', function() {
+      self.loaded = false;
+    });
+
+    $scope.$on('refresh charts', function($event, results) {
+
+      self.loaded = false;
+      lineChart = ChartsService.initLineChartData(results);
+      barChart = ChartsService.initBarChartData(results);
+      updateCharts();
+      self.loaded = true;
+
+    });
 
     $scope.$on('new result', function($event, result) {
 
       lineChart =  ChartsService.addLineChartData(lineChart, result);
       barChart = ChartsService.addBarChartData(barChart, result);
-      self.updateCharts();
+      updateCharts();
 
     });
 
-    $scope.$on('refresh results', function() {
-
-      lineChart = ChartsService.initLineChartData(self.results);
-      barChart = ChartsService.initBarChartData(self.results);
-      self.updateCharts();
-
-    });
-
-    self.updateCharts = function() {
+    function updateCharts() {
 
       self.lineChartSeries = lineChart.series;
       self.lineChartLabels = lineChart.labels;
@@ -38,9 +41,7 @@
       self.barChartLabels = barChart.labels;
       self.barChartData = barChart.data;
 
-    };
-
-    self.updateCharts();
+    }
 
   }
 

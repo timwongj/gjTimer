@@ -6,10 +6,17 @@
 
     var self = this;
 
-    $scope.$watchCollection(function() {
-      return self.results;
-    }, function() {
-      self.statistics = StatisticsService.getStatistics(self.results, self.settings.statisticsPrecision);
+    $scope.$on('refresh results', function() {
+      self.loaded = false;
+    });
+
+    $scope.$on('refresh statistics', function($event, results) {
+      self.loaded = false;
+      StatisticsService.getStatisticsAsync(results, self.settings.statisticsPrecision)
+        .then(function(statistics) {
+          self.statistics = statistics;
+          self.loaded = true;
+        });
     });
 
     self.openModal = function(format, $index) {

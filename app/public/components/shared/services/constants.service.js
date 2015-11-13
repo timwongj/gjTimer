@@ -6,7 +6,13 @@
 
     var self = this;
 
+    self.DEFAULT_NUMBER_OF_SESSIONS = 15;
+
+    self.NUM_RESULTS_DISPLAYED = 50;
+
     self.DNF = 864000000;
+
+    self.TIMER_REFRESH_INTERVAL = 50;
 
     self.KEY_CODES = {
       ENTER: 13,
@@ -38,10 +44,6 @@
       }
     };
 
-    self.SESSIONS = {
-      DEFAULT_NUMBER_OF_SESSIONS: 15
-    };
-
     var colorOptions = [
       { value: { 'background-color': '#FFFFFF'} }, // white
       { value: { 'background-color': '#EEEEEE'} }, // grey
@@ -61,7 +63,6 @@
       bldMode: false,
       timerPrecision: 3,
       timerStartDelay: 0,
-      timerRefreshInterval: 50,
       showScramble: true,
       showCharts: true,
       saveScramble: true,
@@ -104,15 +105,8 @@
         title: 'Timer Start Delay',
         options: [
           { value: 0, text: '0' },
-          { value: 100, text: '0.1' },
-          { value: 500, text: '0.5' },
-          { value: 1000, text: '1' }
-        ]
-      }, { id: 'timerRefreshInterval',
-        title: 'Timer Refresh',
-        options: [
-          { value: 50, text: '0.05' },
-          { value: 100, text: '0.1' }
+          { value: 300, text: '0.3' },
+          { value: 550, text: '0.55' }
         ]
       }, { id: 'showScramble',
         title: 'Show Scramble',

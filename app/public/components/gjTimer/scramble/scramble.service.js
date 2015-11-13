@@ -2,7 +2,7 @@
 
   'use strict';
 
-  function ScrambleService() {
+  function ScrambleService($q, $timeout) {
 
     var self = this;
 
@@ -22,20 +22,28 @@
      * @param eventId
      * @returns {string}
      */
-    self.getNewScramble = function(eventId) {
+    self.getNewScrambleAsync = function(eventId) {
 
-      self.scramble = scramblers[eventId].getRandomScramble();
+      return $q(function(resolve) {
 
-      if (self.scramble.scramble_string.substring(self.scramble.scramble_string.length - 1, self.scramble.scramble_string.length) === ' ') {
-        return self.scramble.scramble_string.substring(0, self.scramble.scramble_string.length - 1);
-      } else {
-        return self.scramble.scramble_string;
-      }
+        $timeout(function() {
+
+          self.scramble = scramblers[eventId].getRandomScramble();
+
+          if (self.scramble.scramble_string.substring(self.scramble.scramble_string.length - 1, self.scramble.scramble_string.length) === ' ') {
+            resolve(self.scramble.scramble_string.substring(0, self.scramble.scramble_string.length - 1));
+          } else {
+            resolve(self.scramble.scramble_string);
+          }
+
+        }, 0);
+
+      });
 
     };
 
   }
 
-  angular.module('scramble').service('ScrambleService', ScrambleService);
+  angular.module('scramble').service('ScrambleService', ['$q', '$timeout', ScrambleService]);
 
 })();

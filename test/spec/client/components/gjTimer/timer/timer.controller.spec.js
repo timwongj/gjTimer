@@ -37,17 +37,9 @@
 
     describe('keydown event', function() {
 
-      it('should dose gj', function() {
-
-      });
-
     });
 
     describe('keyup event', function() {
-
-      it('should dose gj', function() {
-
-      });
 
     });
 
