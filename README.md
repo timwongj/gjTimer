@@ -14,7 +14,7 @@ This is an angular app for a client side Rubik's Cube timer that uses local stor
   
     $ http-server
   
-Navigate to localhost:8080 on your browser
+Navigate to localhost:8080 on your browser.
   
 #### To build and run the app:
 
@@ -29,6 +29,8 @@ Navigate to localhost:8080 on your browser
 #### To run the tests:
 
     $ grunt karma
+    
+Coverage reports are located in the ./coverage directory.
   
 #### To run in development mode:
   
