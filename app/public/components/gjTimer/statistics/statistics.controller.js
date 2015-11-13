@@ -6,10 +6,8 @@
 
     var self = this;
 
-    $scope.$watchCollection(function() {
-      return self.results;
-    }, function() {
-      self.statistics = StatisticsService.getStatistics(self.results, self.settings.statisticsPrecision);
+    $scope.$on('refresh statistics', function($event, results) {
+      self.statistics = StatisticsService.getStatistics(results, self.settings.statisticsPrecision);
     });
 
     self.openModal = function(format, $index) {

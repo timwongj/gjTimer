@@ -6,11 +6,19 @@
 
     var self = this;
 
-    self.results = ResultsService.getResults(self.sessionId, self.settings.resultsPrecision);
+    self.refreshResults = function(sessionId) {
+      ResultsService.getResultsAsync(sessionId || self.sessionId, self.settings.resultsPrecision)
+        .then(function(results) {
+          self.results = results;
+          $rootScope.$broadcast('refresh statistics', results);
+          $rootScope.$broadcast('refresh charts', results);
+        });
+    };
+
+    self.refreshResults();
 
     $scope.$on('refresh results', function($event, sessionId) {
-      self.results = ResultsService.getResults(sessionId || self.sessionId, self.settings.resultsPrecision);
-      $rootScope.$broadcast('refresh charts', self.results);
+      self.refreshResults(sessionId);
     });
 
     self.openModal = function(index, numberOfResults) {

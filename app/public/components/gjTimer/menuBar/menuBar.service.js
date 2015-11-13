@@ -57,7 +57,7 @@
         sessions.push('Session ' + i);
         session = LocalStorage.getJSON('Session ' + i);
         if (session === null) {
-          LocalStorage.setJSON('Session ' + i, { sessionId: 'Session ' + i , eventId: '333', results: [] });
+          LocalStorage.setJSON('Session ' + i, { results: [] });
         }
       }
 
@@ -67,55 +67,62 @@
 
     /**
      * Initializes or gets session number from local storage.
-     * @returns {object} - session
+     * @returns {string}
      */
     self.initSession = function() {
 
-      var sessionId;
+      var sessionId = LocalStorage.get('sessionId');
 
-      if (LocalStorage.get('sessionId') !== null) {
-        sessionId = LocalStorage.get('sessionId');
+      if (sessionId) {
+        return sessionId;
       } else {
-        sessionId = 'Session 1';
         LocalStorage.set('sessionId', 'Session 1');
+        return 'Session 1';
       }
 
-      return LocalStorage.getJSON(sessionId);
-
     };
 
     /**
-     * Gets session data from local storage.
-     * @param sessionId
-     * @returns {object} session
+     * Initializes or gets the eventId from local storage.
+     * @returns {string}
      */
-    self.getSession = function(sessionId) {
+    self.initEvent = function() {
 
-      return LocalStorage.getJSON(sessionId);
+      var eventId = LocalStorage.get('eventId');
+      if (eventId) {
+        return eventId;
+      } else {
+        LocalStorage.set('eventId', '333');
+        return '333';
+      }
 
     };
 
     /**
-     * Saves the new session in local storage and returns the new session.
+     * Saves the new sessionId and returns the new eventId.
      * @param sessionId
-     * @returns {object} session
+     * @returns {string} - eventId
      */
     self.changeSession = function(sessionId) {
 
       LocalStorage.set('sessionId', sessionId);
-      return LocalStorage.getJSON(sessionId);
-
-    };
-
-    /**
-     * Resets the session in local storage by clearing the results list.
-     * @param sessionId
-     */
-    self.resetSession = function(sessionId) {
-
-      var session = LocalStorage.getJSON(sessionId);
-      session.results = [];
-      LocalStorage.setJSON(sessionId, session);
+      var events = LocalStorage.getJSON('events');
+      if (events) {
+        if (events.hasOwnProperty(sessionId)) {
+          return events[sessionId];
+        } else {
+          events[sessionId] = '333';
+          LocalStorage.setJSON('events', events);
+          return '333';
+        }
+      } else {
+        events = {};
+        for (var i = 1; i < Constants.DEFAULT_NUMBER_OF_SESSIONS; i++) {
+          events['Session ' + i] = '333';
+        }
+        LocalStorage.setJSON('events', events);
+        return '333';
+      }
 
     };
 
@@ -127,10 +134,32 @@
      */
     self.changeEvent = function(sessionId, eventId) {
 
-      var session = LocalStorage.getJSON(sessionId);
-      session.eventId = eventId;
-      LocalStorage.setJSON(sessionId, session);
-      return session.eventId;
+      var events = LocalStorage.getJSON('events');
+
+      if (!events) {
+        events = {};
+        for (var i = 1; i < Constants.DEFAULT_NUMBER_OF_SESSIONS; i++) {
+          events['Session ' + i] = '333';
+        }
+      }
+
+      events[sessionId] = eventId;
+      LocalStorage.setJSON('events', events);
+      LocalStorage.set('eventId', eventId);
+
+    };
+
+    /**
+     * Resets the session in local storage by clearing the results list.
+     * @param sessionId
+     */
+    self.resetSessionAsync = function(sessionId) {
+
+      return LocalStorage.getJSONAsync(sessionId)
+        .then(function(session) {
+          session.results = [];
+          LocalStorage.setJSONAsync(sessionId, session);
+        });
 
     };
 

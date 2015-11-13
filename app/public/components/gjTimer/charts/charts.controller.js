@@ -10,10 +10,6 @@
 
     ChartsService.setChartDefaults();
 
-    lineChart = ChartsService.initLineChartData(self.results);
-    barChart = ChartsService.initBarChartData(self.results);
-    updateCharts();
-
     $scope.$on('new result', function($event, result) {
 
       lineChart =  ChartsService.addLineChartData(lineChart, result);

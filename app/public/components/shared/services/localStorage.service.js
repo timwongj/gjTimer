@@ -2,7 +2,7 @@
 
   'use strict';
 
-  function LocalStorage() {
+  function LocalStorage($q, $timeout) {
 
     var self = this;
 
@@ -24,7 +24,7 @@
       try {
         localStorage.setItem(key, value);
         return true;
-      } catch(e) {
+      } catch(err) {
         return false;
       }
     };
@@ -44,6 +44,30 @@
     };
 
     /**
+     * Get a localStorage value as JSON given a key asynchronously.
+     * @param key
+     * @returns {null}
+     */
+    self.getJSONAsync = function(key) {
+
+      return $q(function(resolve) {
+
+        $timeout(function() {
+
+          var value = localStorage.getItem(key);
+          if (value !== null) {
+            resolve(JSON.parse(value));
+          } else {
+            resolve(null);
+          }
+
+        }, 0);
+
+      });
+
+    };
+
+    /**
      * Set a localStorage (key, value) pair as a JSON string in local storage with error handling.
      * @param key
      * @param value
@@ -53,26 +77,51 @@
       try {
         localStorage.setItem(key, JSON.stringify(value));
         return true;
-      } catch(e) {
+      } catch(err) {
         return false;
       }
     };
 
     /**
-     * Clears localStorage
+     * Set a localStorage (key, value) pair as a JSON string in local storage with error handling asynchronously.
+     * @param key
+     * @param value
+     * @returns {boolean}
+     */
+    self.setJSONAsync = function(key, value) {
+
+      return $q(function(resolve, reject) {
+
+        $timeout(function() {
+
+          try {
+            localStorage.setItem(key, JSON.stringify(value));
+            resolve();
+          } catch(err) {
+            reject(err);
+          }
+
+        }, 0);
+
+      });
+
+    };
+
+    /**
+     * Clears localStorage.
      * @returns {boolean}
      */
     self.clear = function() {
       try {
         localStorage.clear();
         return true;
-      } catch(e) {
+      } catch(err) {
         return false;
       }
     };
 
   }
 
-  angular.module('gjTimer.services').service('LocalStorage', LocalStorage);
+  angular.module('gjTimer.services').service('LocalStorage', ['$q', '$timeout', LocalStorage]);
 
 })();
