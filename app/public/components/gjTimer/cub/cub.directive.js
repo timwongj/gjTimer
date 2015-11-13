@@ -9,9 +9,7 @@
       controller: 'CubController',
       controllerAs: 'ctrl',
       scope: {
-        eventId: '=',
-        settings: '=',
-        state: '='
+        settings: '='
       },
       bindToController: true
     };

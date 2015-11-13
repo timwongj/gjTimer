@@ -7,6 +7,7 @@
     var self = this;
 
     self.refreshResults = function(sessionId) {
+
       self.loaded = false;
       ResultsService.getResultsAsync(sessionId || self.sessionId, self.settings.resultsPrecision)
         .then(function(results) {
@@ -16,15 +17,19 @@
           $rootScope.$broadcast('refresh statistics', results);
           $rootScope.$broadcast('refresh charts', results);
         });
+
     };
 
     self.refreshResults();
 
     $scope.$on('refresh results', function($event, sessionId) {
+
       self.refreshResults(sessionId);
+
     });
 
     self.openModal = function(index, numberOfResults) {
+
       if (index >= numberOfResults) {
         $uibModal.open({
           animation: true,
@@ -42,6 +47,7 @@
           }
         });
       }
+
     };
 
   }

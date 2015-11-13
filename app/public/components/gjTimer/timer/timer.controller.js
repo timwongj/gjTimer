@@ -102,6 +102,7 @@
           $rootScope.$broadcast('refresh statistics', self.results);
         });
       $rootScope.$broadcast('new scramble', self.eventId);
+
     };
 
     self.prepareInspection = function() {

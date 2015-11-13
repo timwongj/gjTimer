@@ -981,9 +981,7 @@
       controller: 'CubController',
       controllerAs: 'ctrl',
       scope: {
-        eventId: '=',
-        settings: '=',
-        state: '='
+        settings: '='
       },
       bindToController: true
     };
@@ -1000,8 +998,6 @@
   function CubController($scope, CubService) {
 
     var self = this;
-
-    self.cub = CubService.drawScramble(self.eventId, self.state);
 
     $scope.$on('draw scramble', function($event, eventId, state) {
 
@@ -1352,6 +1348,7 @@
     var self = this;
 
     self.refreshResults = function(sessionId) {
+
       self.loaded = false;
       ResultsService.getResultsAsync(sessionId || self.sessionId, self.settings.resultsPrecision)
         .then(function(results) {
@@ -1361,15 +1358,19 @@
           $rootScope.$broadcast('refresh statistics', results);
           $rootScope.$broadcast('refresh charts', results);
         });
+
     };
 
     self.refreshResults();
 
     $scope.$on('refresh results', function($event, sessionId) {
+
       self.refreshResults(sessionId);
+
     });
 
     self.openModal = function(index, numberOfResults) {
+
       if (index >= numberOfResults) {
         $uibModal.open({
           animation: true,
@@ -1387,6 +1388,7 @@
           }
         });
       }
+
     };
 
   }
@@ -1887,8 +1889,7 @@
       controllerAs: 'ctrl',
       scope: {
         eventId: '=',
-        scramble: '=',
-        state: '='
+        scramble: '='
       },
       bindToController: true
     };
@@ -1916,11 +1917,13 @@
 
     function newScramble(eventId) {
 
-      self.scramble = ScrambleService.getNewScramble(eventId);
-      self.displayedScramble = $sce.trustAsHtml(self.scramble);
-      self.scrambleStyle = Events.getEventStyle(eventId);
-      self.state = ScrambleService.getScrambleState();
-      $rootScope.$broadcast('draw scramble', eventId, ScrambleService.getScrambleState());
+      ScrambleService.getNewScrambleAsync(eventId)
+        .then(function(scramble) {
+          self.scramble = scramble;
+          self.displayedScramble = $sce.trustAsHtml(self.scramble);
+          self.scrambleStyle = Events.getEventStyle(eventId);
+          $rootScope.$broadcast('draw scramble', eventId, ScrambleService.getScrambleState());
+        });
 
     }
 
@@ -1934,7 +1937,7 @@
 
   'use strict';
 
-  function ScrambleService() {
+  function ScrambleService($q, $timeout) {
 
     var self = this;
 
@@ -1954,21 +1957,29 @@
      * @param eventId
      * @returns {string}
      */
-    self.getNewScramble = function(eventId) {
+    self.getNewScrambleAsync = function(eventId) {
 
-      self.scramble = scramblers[eventId].getRandomScramble();
+      return $q(function(resolve) {
 
-      if (self.scramble.scramble_string.substring(self.scramble.scramble_string.length - 1, self.scramble.scramble_string.length) === ' ') {
-        return self.scramble.scramble_string.substring(0, self.scramble.scramble_string.length - 1);
-      } else {
-        return self.scramble.scramble_string;
-      }
+        $timeout(function() {
+
+          self.scramble = scramblers[eventId].getRandomScramble();
+
+          if (self.scramble.scramble_string.substring(self.scramble.scramble_string.length - 1, self.scramble.scramble_string.length) === ' ') {
+            resolve(self.scramble.scramble_string.substring(0, self.scramble.scramble_string.length - 1));
+          } else {
+            resolve(self.scramble.scramble_string);
+          }
+
+        }, 0);
+
+      });
 
     };
 
   }
 
-  angular.module('scramble').service('ScrambleService', ScrambleService);
+  angular.module('scramble').service('ScrambleService', ['$q', '$timeout', ScrambleService]);
 
 })();
 
@@ -2060,8 +2071,11 @@
 
     $scope.$on('refresh statistics', function($event, results) {
       self.loaded = false;
-      self.statistics = StatisticsService.getStatistics(results, self.settings.statisticsPrecision);
-      self.loaded = true;
+      StatisticsService.getStatisticsAsync(results, self.settings.statisticsPrecision)
+        .then(function(statistics) {
+          self.statistics = statistics;
+          self.loaded = true;
+        });
     });
 
     self.openModal = function(format, $index) {
@@ -2094,7 +2108,7 @@
 
   'use strict';
 
-  function StatisticsService(Calculator) {
+  function StatisticsService($q, $timeout, Calculator) {
 
     var self = this;
 
@@ -2104,60 +2118,68 @@
      * @param precision
      * @returns {{solves: {attempted: number, solved: number, best: string, worst: string}, sessionMean: ({mean, stDev}|string), sessionAvg: {avg: string, stDev: string}, averages: Array}}
      */
-    self.getStatistics = function(results, precision) {
+    self.getStatisticsAsync = function(results, precision) {
 
-      var rawTimes = Calculator.extractRawTimes(results);
+      return $q(function(resolve) {
 
-      var statistics = {
-        solves: {
-          attempted: rawTimes.length,
-          solved: Calculator.countNonDNFs(rawTimes),
-          best: Calculator.convertTimeFromMillisecondsToString(Math.min.apply(null, rawTimes), precision),
-          worst: Calculator.convertTimeFromMillisecondsToString(Math.max.apply(null, rawTimes), precision)
-        },
-        sessionMean: Calculator.calculateSessionMeanAndStandardDeviationString(rawTimes, precision),
-        sessionAvg: {
-          avg: Calculator.calculateAverageString(rawTimes, true, precision),
-          stDev: Calculator.calculateStandardDeviationString(rawTimes, true, precision)
-        },
-        averages: []
-      };
+        $timeout(function() {
 
-      if (rawTimes.length >= 3) {
-        statistics.averages.push({
-          type: 'm',
-          length: 3,
-          current: {
-            avg: Calculator.calculateAverageString(rawTimes.slice(rawTimes.length - 3, rawTimes.length), false, precision),
-            stDev: Calculator.calculateStandardDeviationString(rawTimes.slice(rawTimes.length - 3, rawTimes.length), false, precision)
-          },
-          best: Calculator.calculateBestAverageAndStandardDeviationString(rawTimes, false, 3, precision)
-        });
-      }
+          var rawTimes = Calculator.extractRawTimes(results);
 
-      var typesOfAverages = [5, 12, 50, 100];
-
-      for (var i = 0; i < typesOfAverages.length; i++) {
-        if (rawTimes.length >= typesOfAverages[i]) {
-          statistics.averages.push({
-            type: 'a',
-            length: typesOfAverages[i],
-            current: {
-              avg: Calculator.calculateAverageString(rawTimes.slice(rawTimes.length - typesOfAverages[i], rawTimes.length), true, precision),
-              stDev: Calculator.calculateStandardDeviationString(rawTimes.slice(rawTimes.length - typesOfAverages[i], rawTimes.length), true, precision)
+          var statistics = {
+            solves: {
+              attempted: rawTimes.length,
+              solved: Calculator.countNonDNFs(rawTimes),
+              best: Calculator.convertTimeFromMillisecondsToString(Math.min.apply(null, rawTimes), precision),
+              worst: Calculator.convertTimeFromMillisecondsToString(Math.max.apply(null, rawTimes), precision)
             },
-            best: Calculator.calculateBestAverageAndStandardDeviationString(rawTimes, true, typesOfAverages[i], precision)
-          });
-        }
-      }
+            sessionMean: Calculator.calculateSessionMeanAndStandardDeviationString(rawTimes, precision),
+            sessionAvg: {
+              avg: Calculator.calculateAverageString(rawTimes, true, precision),
+              stDev: Calculator.calculateStandardDeviationString(rawTimes, true, precision)
+            },
+            averages: []
+          };
 
-      return statistics;
+          if (rawTimes.length >= 3) {
+            statistics.averages.push({
+              type: 'm',
+              length: 3,
+              current: {
+                avg: Calculator.calculateAverageString(rawTimes.slice(rawTimes.length - 3, rawTimes.length), false, precision),
+                stDev: Calculator.calculateStandardDeviationString(rawTimes.slice(rawTimes.length - 3, rawTimes.length), false, precision)
+              },
+              best: Calculator.calculateBestAverageAndStandardDeviationString(rawTimes, false, 3, precision)
+            });
+          }
+
+          var typesOfAverages = [5, 12, 50, 100];
+
+          for (var i = 0; i < typesOfAverages.length; i++) {
+            if (rawTimes.length >= typesOfAverages[i]) {
+              statistics.averages.push({
+                type: 'a',
+                length: typesOfAverages[i],
+                current: {
+                  avg: Calculator.calculateAverageString(rawTimes.slice(rawTimes.length - typesOfAverages[i], rawTimes.length), true, precision),
+                  stDev: Calculator.calculateStandardDeviationString(rawTimes.slice(rawTimes.length - typesOfAverages[i], rawTimes.length), true, precision)
+                },
+                best: Calculator.calculateBestAverageAndStandardDeviationString(rawTimes, true, typesOfAverages[i], precision)
+              });
+            }
+          }
+
+          resolve(statistics);
+
+        }, 0);
+
+      });
 
     };
     
   }
 
-  angular.module('statistics').service('StatisticsService', ['Calculator', StatisticsService]);
+  angular.module('statistics').service('StatisticsService', ['$q', '$timeout', 'Calculator', StatisticsService]);
 
 })();
 
@@ -2290,6 +2312,7 @@
           $rootScope.$broadcast('refresh statistics', self.results);
         });
       $rootScope.$broadcast('new scramble', self.eventId);
+
     };
 
     self.prepareInspection = function() {

@@ -16,11 +16,13 @@
 
     function newScramble(eventId) {
 
-      self.scramble = ScrambleService.getNewScramble(eventId);
-      self.displayedScramble = $sce.trustAsHtml(self.scramble);
-      self.scrambleStyle = Events.getEventStyle(eventId);
-      self.state = ScrambleService.getScrambleState();
-      $rootScope.$broadcast('draw scramble', eventId, ScrambleService.getScrambleState());
+      ScrambleService.getNewScrambleAsync(eventId)
+        .then(function(scramble) {
+          self.scramble = scramble;
+          self.displayedScramble = $sce.trustAsHtml(self.scramble);
+          self.scrambleStyle = Events.getEventStyle(eventId);
+          $rootScope.$broadcast('draw scramble', eventId, ScrambleService.getScrambleState());
+        });
 
     }
 
