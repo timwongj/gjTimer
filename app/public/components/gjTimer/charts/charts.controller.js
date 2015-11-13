@@ -14,14 +14,6 @@
       self.loaded = false;
     });
 
-    $scope.$on('new result', function($event, result) {
-
-      lineChart =  ChartsService.addLineChartData(lineChart, result);
-      barChart = ChartsService.addBarChartData(barChart, result);
-      updateCharts();
-
-    });
-
     $scope.$on('refresh charts', function($event, results) {
 
       self.loaded = false;
@@ -29,6 +21,14 @@
       barChart = ChartsService.initBarChartData(results);
       updateCharts();
       self.loaded = true;
+
+    });
+
+    $scope.$on('new result', function($event, result) {
+
+      lineChart =  ChartsService.addLineChartData(lineChart, result);
+      barChart = ChartsService.addBarChartData(barChart, result);
+      updateCharts();
 
     });
 

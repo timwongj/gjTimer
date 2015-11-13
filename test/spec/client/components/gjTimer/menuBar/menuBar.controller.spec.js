@@ -10,16 +10,19 @@
     MenuBarController,
     MenuBarService,
     Events,
+    eventId,
     sessionId,
-    eventId;
+    sessions,
+    settings,
+    events,
+    event;
 
-  xdescribe('The menuBar controller', function() {
+  describe('The menuBar controller', function() {
 
     beforeEach(module('ui.bootstrap'));
     beforeEach(module('gjTimer'));
 
     beforeEach(inject(function($injector) {
-
       $rootScope = $injector.get('$rootScope');
       $scope = $rootScope.$new();
       $controller = $injector.get('$controller');
@@ -28,18 +31,23 @@
       MenuBarService = $injector.get('MenuBarService');
       Events = $injector.get('Events');
 
-      sessionId = 'Session 1';
       eventId = '333';
+      sessionId = 'Session 1';
+      sessions = [ 'Session 1', 'Session 2', 'Session 3' ];
+      settings = { setting1: 'yw', setting2: 'dw' };
+      events = ['333', '444'];
 
       spyOn($uibModal, 'open');
-      spyOn(MenuBarService, 'initSettings').and.returnValue({ setting1: 'yw', setting2: 'dw' });
-      spyOn(MenuBarService, 'initSessions').and.returnValue([ 'session1', 'session2', 'session3' ]);
-      spyOn(MenuBarService, 'initSession').and.returnValue({ sessionId: sessionId, eventId: eventId, results: [] });
-      spyOn(MenuBarService, 'changeSession').and.returnValue({ sessionId: sessionId, eventId: eventId, results: [] });
+      spyOn(MenuBarService, 'initEvent').and.returnValue(eventId);
+      spyOn(MenuBarService, 'initSession').and.returnValue(sessionId);
+      spyOn(MenuBarService, 'initSessions').and.returnValue(sessions);
+      spyOn(MenuBarService, 'initSettings').and.returnValue(settings);
+      spyOn(MenuBarService, 'changeSession');
       spyOn(MenuBarService, 'changeEvent');
-      spyOn(MenuBarService, 'resetSession');
-      spyOn(Events, 'getEvents');
+      spyOn(MenuBarService, 'resetSessionAsync');
+      spyOn(Events, 'getEvents').and.returnValue(events);
       spyOn(Events, 'getEventId').and.returnValue(eventId);
+      spyOn($rootScope, '$broadcast');
 
       MenuBarController = $controller('MenuBarController', {
         $scope: $scope,
@@ -51,110 +59,87 @@
       });
 
       $scope.$digest();
-
     }));
 
-    it('should call the getSettings function from the MenuBarService', function() {
-
-      expect(MenuBarService.initSettings).toHaveBeenCalled();
-
-    });
-
-    it('should call the initSession function from the MenuBarService', function() {
-
-      expect(MenuBarService.initSession).toHaveBeenCalled();
-
-    });
-
-    it('should call the initSessions function from the MenuBarService', function() {
-
-      expect(MenuBarService.initSessions).toHaveBeenCalled();
-
-    });
-
-    it('should call the getEvents function from the Events service', function() {
-
-      expect(Events.getEvents).toHaveBeenCalled();
-
+    it('should initialize the event, events, session, sessions, and settings', function() {
+      expect(MenuBarService.initEvent).toHaveBeenCalledWith();
+      expect(MenuBarController.eventId).toEqual(eventId);
+      expect(MenuBarService.initSession).toHaveBeenCalledWith();
+      expect(MenuBarController.sessionId).toEqual(sessionId);
+      expect(MenuBarService.initSessions).toHaveBeenCalledWith();
+      expect(MenuBarController.sessions).toEqual(sessions);
+      expect(MenuBarService.initSettings).toHaveBeenCalledWith();
+      expect(MenuBarController.settings).toEqual(settings);
+      expect(Events.getEvents).toHaveBeenCalledWith();
+      expect(MenuBarController.events).toEqual(events);
+      expect(MenuBarController.event.eventId).toEqual(eventId);
     });
 
     describe('changeSession function', function() {
-
-      it('should call the changeSession function from the MenuBarService with the sessionId', function() {
-
-        MenuBarController.changeSession(sessionId);
-        expect(MenuBarService.changeSession).toHaveBeenCalledWith(sessionId);
-
+      describe('when the new session\'s event is the same as that of the current session', function() {
+        it('should call the changeSession function from the MenuBarService with the sessionId', function() {
+          MenuBarService.changeSession.and.returnValue(eventId);
+          MenuBarController.changeSession(sessionId);
+          expect(MenuBarController.sessionId).toEqual(sessionId);
+          expect(MenuBarController.eventId).toEqual(eventId);
+          expect(MenuBarService.changeSession).toHaveBeenCalledWith(sessionId);
+          expect($rootScope.$broadcast).toHaveBeenCalledWith('refresh results', sessionId);
+        });
       });
 
+      describe('when the new session\'s event is different than that of the current session', function() {
+        it('should call the changeSession function from the MenuBarService with the sessionId', function() {
+          eventId = '444';
+          MenuBarService.changeSession.and.returnValue(eventId);
+          MenuBarController.changeSession(sessionId);
+          expect(MenuBarController.sessionId).toEqual(sessionId);
+          expect(MenuBarController.eventId).toEqual(eventId);
+          expect(MenuBarService.changeSession).toHaveBeenCalledWith(sessionId);
+          expect($rootScope.$broadcast).toHaveBeenCalledWith('new scramble', eventId);
+          expect($rootScope.$broadcast).toHaveBeenCalledWith('refresh results', sessionId);
+        });
+      });
     });
 
     describe('changeEvent function', function() {
-
       it('should call the changeEvent function from the MenuBarService with the eventId', function() {
-
-        MenuBarController.changeEvent(eventId);
+        event = 'Rubik\'s Cube';
+        MenuBarController.changeEvent(event);
+        expect(Events.getEventId).toHaveBeenCalledWith(event);
+        expect(MenuBarController.eventId).toEqual(eventId);
+        expect(MenuBarController.event.eventId).toEqual(eventId);
+        expect(MenuBarController.event.event).toEqual(event);
         expect(MenuBarService.changeEvent).toHaveBeenCalledWith(sessionId, eventId);
-
+        expect($rootScope.$broadcast).toHaveBeenCalledWith('new scramble', eventId);
       });
-
     });
 
     describe('openSettings function', function() {
-
       it('should call the open function from the $uibModal service', function() {
-
         MenuBarController.openSettings();
         expect($uibModal.open).toHaveBeenCalled();
-
       });
-
     });
 
     describe('resetSession function', function() {
-
       describe('when the user confirms', function() {
-
-        beforeEach(function() {
-
+        it('should call the resetSession function with the sessionId and empty the results array', function() {
           spyOn(window, 'confirm').and.returnValue(true);
-
-        });
-
-        it('should call the resetSession function from the MenuBarService with the sessionId', function() {
-
           MenuBarController.resetSession();
-          expect(MenuBarService.resetSession).toHaveBeenCalledWith(sessionId);
-
-        });
-
-        it('should empty the session results and results arrays', function() {
-
-          MenuBarController.resetSession();
-          expect(MenuBarController.session.results).toEqual([]);
           expect(MenuBarController.results).toEqual([]);
-
+          expect(MenuBarService.resetSessionAsync).toHaveBeenCalledWith(sessionId);
         });
-
       });
 
       describe('when the user does not confirm', function() {
-
-        beforeEach(function() {
-
-          spyOn(window, 'confirm').and.returnValue(false);
-
-        });
-
         it('should not call the resetSession function from the MenuBarService with the sessionId', function() {
-
+          spyOn(window, 'confirm').and.returnValue(false);
+          MenuBarController.results = [1, 2, 3];
           MenuBarController.resetSession();
-          expect(MenuBarService.resetSession).not.toHaveBeenCalledWith(sessionId);
-
+          expect(MenuBarController.results).toEqual([1, 2, 3]);
+          expect(MenuBarService.resetSessionAsync).not.toHaveBeenCalledWith(sessionId);
         });
-
       });
-
     });
 
   });

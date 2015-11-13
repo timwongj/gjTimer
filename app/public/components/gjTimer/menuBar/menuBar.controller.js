@@ -8,8 +8,8 @@
 
     self.eventId = MenuBarService.initEvent();
     self.sessionId = MenuBarService.initSession();
-    self.settings = MenuBarService.initSettings();
     self.sessions = MenuBarService.initSessions();
+    self.settings = MenuBarService.initSettings();
     self.events = Events.getEvents();
     self.event = { eventId: self.eventId, event: Events.getEvent(self.eventId) };
 
@@ -33,8 +33,8 @@
 
     self.changeEvent = function(event) {
       self.eventId = Events.getEventId(event);
-      MenuBarService.changeEvent(self.sessionId, self.eventId);
       self.event = { eventId: self.eventId, event: Events.getEvent(self.eventId) };
+      MenuBarService.changeEvent(self.sessionId, self.eventId);
       $rootScope.$broadcast('new scramble', self.eventId);
     };
 

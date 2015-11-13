@@ -15,7 +15,6 @@
     beforeEach(module('gjTimer'));
 
     beforeEach(inject(function($injector) {
-
       $rootScope = $injector.get('$rootScope');
       $scope = $rootScope.$new();
       $controller = $injector.get('$controller');
@@ -35,19 +34,14 @@
       });
 
       $scope.$digest();
-
     }));
 
 
     describe('draw scramble event', function() {
-
       it('should call the drawScramble function from the CubService with the eventId and state', function() {
-
         $rootScope.$broadcast('draw scramble', eventId, state);
         expect(CubService.drawScramble).toHaveBeenCalledWith(eventId, state);
-
       });
-
     });
 
   });

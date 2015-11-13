@@ -6,6 +6,8 @@
     LocalStorage,
     Calculator,
     Constants,
+    $q,
+    $timeout,
     results,
     time,
     penalty,
@@ -17,7 +19,7 @@
     session,
     now;
 
-  xdescribe('The results service', function() {
+  describe('The results service', function() {
 
     beforeEach(module('gjTimer'));
 
@@ -27,6 +29,8 @@
       LocalStorage = $injector.get('LocalStorage');
       Calculator = $injector.get('Calculator');
       Constants = $injector.get('Constants');
+      $q = $injector.get('$q');
+      $timeout = $injector.get('$timeout');
 
       results = [];
       scramble = 'scramble';
@@ -39,114 +43,97 @@
       now = 'now';
 
       spyOn(LocalStorage, 'getJSON');
+      spyOn(LocalStorage, 'getJSONAsync').and.returnValue($q.resolve({ results: [] }));
       spyOn(LocalStorage, 'setJSON');
+      spyOn(LocalStorage, 'setJSONAsync').and.returnValue($q.resolve());
       spyOn(Calculator, 'convertTimeFromMillisecondsToString').and.returnValue(time);
       spyOn(Calculator, 'convertTimeFromStringToMilliseconds').and.returnValue(Number(time) * 100);
       spyOn(Date, 'now').and.returnValue(now);
 
     }));
 
-    describe('getResults function', function() {
-
-      beforeEach(function() {
-
-        LocalStorage.getJSON.and.returnValue({ results: [] });
-
+    describe('getResultsAsync function', function() {
+      it('should get the rawResults from the LocalStorage service', function(done) {
+        ResultsService.getResultsAsync(sessionId, precision)
+          .then(function(results) {
+            expect(LocalStorage.getJSONAsync).toHaveBeenCalledWith(sessionId);
+            done();
+          });
+        $timeout.flush();
+        $timeout.verifyNoPendingTasks();
       });
-
-      it('should get the rawResults from the LocalStorage service', function() {
-
-        ResultsService.getResults(sessionId, precision);
-        expect(LocalStorage.getJSON).toHaveBeenCalledWith(sessionId);
-
-      });
-
     });
 
-    describe('saveResult function', function() {
-
-      beforeEach(function() {
-
-        LocalStorage.getJSON.and.returnValue({ results: [] });
-
+    describe('saveResultAsync function', function() {
+      it('should save the result using the LocalStorage service', function(done) {
+        session = { results: [ '625|scramble|' + now ] };
+        ResultsService.saveResultAsync(results, time, penalty, comment, scramble, sessionId, precision, saveScramble)
+          .then(function() {
+            expect(LocalStorage.getJSONAsync).toHaveBeenCalledWith(sessionId);
+            expect(Calculator.convertTimeFromStringToMilliseconds).toHaveBeenCalledWith(time);
+            expect(Calculator.convertTimeFromMillisecondsToString).toHaveBeenCalled();
+            expect(LocalStorage.setJSONAsync).toHaveBeenCalledWith(sessionId, session);
+            done();
+          });
+        $timeout.flush();
+        $timeout.verifyNoPendingTasks();
       });
 
-      it('should get the session from the LocalStorage service', function() {
-
-        ResultsService.saveResult(results, time, penalty, comment, scramble, sessionId, precision, saveScramble);
-        expect(LocalStorage.getJSON).toHaveBeenCalledWith(sessionId);
-
-      });
-
-      it('should call the convertTimeFromStringToMilliseconds function from the Calculator service with the time', function() {
-
-        ResultsService.saveResult(results, time, penalty, comment, scramble, sessionId, precision, saveScramble);
-        expect(Calculator.convertTimeFromStringToMilliseconds).toHaveBeenCalledWith(time);
-
-      });
-
-      it('should save the result using the LocalStorage service', function() {
-
-        session = {
-          results: [ '625|scramble|' + now ]
-        };
-
-        ResultsService.saveResult(results, time, penalty, comment, scramble, sessionId, precision, saveScramble);
-        expect(LocalStorage.setJSON).toHaveBeenCalledWith(sessionId, session);
-
-      });
-
-      it('should save the result with the penalty using the LocalStorage service', function() {
-
+      it('should save the result with the penalty using the LocalStorage service', function(done) {
+        session = { results: [ '625+|scramble|' + now ] };
         penalty = '+2';
-        session = {
-          results: [ '625+|scramble|' + now ]
-        };
-
-        ResultsService.saveResult(results, time, penalty, comment, scramble, sessionId, precision, saveScramble);
-        expect(LocalStorage.setJSON).toHaveBeenCalledWith(sessionId, session);
-
+        ResultsService.saveResultAsync(results, time, penalty, comment, scramble, sessionId, precision, saveScramble)
+          .then(function() {
+            expect(LocalStorage.getJSONAsync).toHaveBeenCalledWith(sessionId);
+            expect(Calculator.convertTimeFromStringToMilliseconds).toHaveBeenCalledWith(time);
+            expect(Calculator.convertTimeFromMillisecondsToString).toHaveBeenCalled();
+            expect(LocalStorage.setJSONAsync).toHaveBeenCalledWith(sessionId, session);
+            done();
+          });
+        $timeout.flush();
+        $timeout.verifyNoPendingTasks();
       });
 
-      it('should save the result with the comment using the LocalStorage service', function() {
-
+      it('should save the result with the comment using the LocalStorage service', function(done) {
+        session = { results: [ '625|scramble|' + now + '|yw' ] };
         comment = 'yw';
-        session = {
-          results: [ '625|scramble|' + now + '|yw' ]
-        };
-
-        ResultsService.saveResult(results, time, penalty, comment, scramble, sessionId, precision, saveScramble);
-        expect(LocalStorage.setJSON).toHaveBeenCalledWith(sessionId, session);
-
+        ResultsService.saveResultAsync(results, time, penalty, comment, scramble, sessionId, precision, saveScramble)
+          .then(function() {
+            expect(LocalStorage.getJSONAsync).toHaveBeenCalledWith(sessionId);
+            expect(Calculator.convertTimeFromStringToMilliseconds).toHaveBeenCalledWith(time);
+            expect(Calculator.convertTimeFromMillisecondsToString).toHaveBeenCalled();
+            expect(LocalStorage.setJSONAsync).toHaveBeenCalledWith(sessionId, session);
+            done();
+          });
+        $timeout.flush();
+        $timeout.verifyNoPendingTasks();
       });
 
-      it('should not save the scramble if saveScramble is false', function() {
-
+      it('should not save the scramble if saveScramble is false', function(done) {
+        session = session = { results: [ '625||' + now ] };
         saveScramble = false;
-        session = {
-          results: [ '625||' + now ]
-        };
-
-        ResultsService.saveResult(results, time, penalty, comment, scramble, sessionId, precision, saveScramble);
-        expect(LocalStorage.setJSON).toHaveBeenCalledWith(sessionId, session);
-
+        ResultsService.saveResultAsync(results, time, penalty, comment, scramble, sessionId, precision, saveScramble)
+          .then(function() {
+            expect(LocalStorage.getJSONAsync).toHaveBeenCalledWith(sessionId);
+            expect(Calculator.convertTimeFromStringToMilliseconds).toHaveBeenCalledWith(time);
+            expect(Calculator.convertTimeFromMillisecondsToString).toHaveBeenCalled();
+            expect(LocalStorage.setJSONAsync).toHaveBeenCalledWith(sessionId, session);
+            done();
+          });
+        $timeout.flush();
+        $timeout.verifyNoPendingTasks();
       });
+    });
+
+    describe('penaltyAsync function', function() {
 
     });
 
-    describe('populateAverages function', function() {
+    describe('removeAsync function', function() {
 
     });
 
-    describe('penalty function', function() {
-
-    });
-
-    describe('remove function', function() {
-
-    });
-
-    describe('comment function', function() {
+    describe('commentAsync function', function() {
 
     });
 

@@ -33,7 +33,7 @@
         expect(Events.getEvent(eventId)).toEqual(event);
       });
 
-      xit('should return null given an invalid eventId', function() {
+      it('should return null given an invalid eventId', function() {
         eventId = 'same';
         expect(Events.getEvent(eventId)).toBeNull();
       });
