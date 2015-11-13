@@ -7,9 +7,12 @@
     var self = this;
 
     self.refreshResults = function(sessionId) {
+      self.loaded = false;
       ResultsService.getResultsAsync(sessionId || self.sessionId, self.settings.resultsPrecision)
         .then(function(results) {
+          self.loaded = true;
           self.results = results;
+          self.loaded = true;
           $rootScope.$broadcast('refresh statistics', results);
           $rootScope.$broadcast('refresh charts', results);
         });

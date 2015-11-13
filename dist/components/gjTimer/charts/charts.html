@@ -1,11 +1,14 @@
 <div id="charts" ng-if="ctrl.settings.showCharts && ctrl.results.length > 0">
-  <canvas id="line"
-          class="chart chart-line"
-          chart-data="ctrl.lineChartData"
-          chart-labels="ctrl.lineChartLabels"
-          chart-series="ctrl.lineChartSeries"></canvas>
-  <canvas id="bar"
-          class="chart chart-bar"
-          chart-data="ctrl.barChartData"
-          chart-labels="ctrl.barChartLabels"></canvas>
+  <fading-circle-spinner ng-if="!ctrl.loaded"></fading-circle-spinner>
+  <div ng-if="ctrl.loaded">
+    <canvas id="line"
+            class="chart chart-line"
+            chart-data="ctrl.lineChartData"
+            chart-labels="ctrl.lineChartLabels"
+            chart-series="ctrl.lineChartSeries"></canvas>
+    <canvas id="bar"
+            class="chart chart-bar"
+            chart-data="ctrl.barChartData"
+            chart-labels="ctrl.barChartLabels"></canvas>
+  </div>
 </div>

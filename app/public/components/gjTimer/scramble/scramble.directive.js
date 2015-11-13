@@ -10,7 +10,8 @@
       controllerAs: 'ctrl',
       scope: {
         eventId: '=',
-        scramble: '='
+        scramble: '=',
+        state: '='
       },
       bindToController: true
     };

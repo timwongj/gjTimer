@@ -19,7 +19,7 @@
     // main angular modules
 
     // third-party (non-Angular modules)
-    'ui.bootstrap', 'chart.js',
+    'angular-spinkit', 'ui.bootstrap', 'chart.js',
     // gjTimer
     'gjTimer'
   ]);
@@ -780,6 +780,10 @@
 
     ChartsService.setChartDefaults();
 
+    $scope.$on('refresh results', function() {
+      self.loaded = false;
+    });
+
     $scope.$on('new result', function($event, result) {
 
       lineChart =  ChartsService.addLineChartData(lineChart, result);
@@ -790,9 +794,11 @@
 
     $scope.$on('refresh charts', function($event, results) {
 
+      self.loaded = false;
       lineChart = ChartsService.initLineChartData(results);
       barChart = ChartsService.initBarChartData(results);
       updateCharts();
+      self.loaded = true;
 
     });
 
@@ -975,7 +981,9 @@
       controller: 'CubController',
       controllerAs: 'ctrl',
       scope: {
-        settings: '='
+        eventId: '=',
+        settings: '=',
+        state: '='
       },
       bindToController: true
     };
@@ -992,6 +1000,8 @@
   function CubController($scope, CubService) {
 
     var self = this;
+
+    self.cub = CubService.drawScramble(self.eventId, self.state);
 
     $scope.$on('draw scramble', function($event, eventId, state) {
 
@@ -1342,9 +1352,12 @@
     var self = this;
 
     self.refreshResults = function(sessionId) {
+      self.loaded = false;
       ResultsService.getResultsAsync(sessionId || self.sessionId, self.settings.resultsPrecision)
         .then(function(results) {
+          self.loaded = true;
           self.results = results;
+          self.loaded = true;
           $rootScope.$broadcast('refresh statistics', results);
           $rootScope.$broadcast('refresh charts', results);
         });
@@ -1874,7 +1887,8 @@
       controllerAs: 'ctrl',
       scope: {
         eventId: '=',
-        scramble: '='
+        scramble: '=',
+        state: '='
       },
       bindToController: true
     };
@@ -1895,7 +1909,9 @@
     newScramble(self.eventId);
 
     $scope.$on('new scramble', function($event, eventId) {
+
       newScramble(eventId);
+
     });
 
     function newScramble(eventId) {
@@ -1903,6 +1919,7 @@
       self.scramble = ScrambleService.getNewScramble(eventId);
       self.displayedScramble = $sce.trustAsHtml(self.scramble);
       self.scrambleStyle = Events.getEventStyle(eventId);
+      self.state = ScrambleService.getScrambleState();
       $rootScope.$broadcast('draw scramble', eventId, ScrambleService.getScrambleState());
 
     }
@@ -2037,8 +2054,14 @@
 
     var self = this;
 
+    $scope.$on('refresh results', function() {
+      self.loaded = false;
+    });
+
     $scope.$on('refresh statistics', function($event, results) {
+      self.loaded = false;
       self.statistics = StatisticsService.getStatistics(results, self.settings.statisticsPrecision);
+      self.loaded = true;
     });
 
     self.openModal = function(format, $index) {

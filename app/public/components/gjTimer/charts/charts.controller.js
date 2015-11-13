@@ -10,6 +10,10 @@
 
     ChartsService.setChartDefaults();
 
+    $scope.$on('refresh results', function() {
+      self.loaded = false;
+    });
+
     $scope.$on('new result', function($event, result) {
 
       lineChart =  ChartsService.addLineChartData(lineChart, result);
@@ -20,9 +24,11 @@
 
     $scope.$on('refresh charts', function($event, results) {
 
+      self.loaded = false;
       lineChart = ChartsService.initLineChartData(results);
       barChart = ChartsService.initBarChartData(results);
       updateCharts();
+      self.loaded = true;
 
     });
 

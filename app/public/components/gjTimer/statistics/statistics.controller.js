@@ -6,8 +6,14 @@
 
     var self = this;
 
+    $scope.$on('refresh results', function() {
+      self.loaded = false;
+    });
+
     $scope.$on('refresh statistics', function($event, results) {
+      self.loaded = false;
       self.statistics = StatisticsService.getStatistics(results, self.settings.statisticsPrecision);
+      self.loaded = true;
     });
 
     self.openModal = function(format, $index) {

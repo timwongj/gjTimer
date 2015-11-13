@@ -1,5 +1,6 @@
 <div id="results">
-  <table class="table-hover">
+  <fading-circle-spinner ng-if="!ctrl.loaded"></fading-circle-spinner>
+  <table class="table-hover" ng-if="ctrl.loaded">
     <thead>
     <tr>
       <th class="index">#</th>
