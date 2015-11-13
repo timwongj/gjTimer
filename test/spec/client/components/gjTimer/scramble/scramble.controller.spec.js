@@ -14,7 +14,7 @@
     state,
     style;
 
-  describe('The scramble controller', function() {
+  xdescribe('The scramble controller', function() {
 
     beforeEach(module('gjTimer'));
 

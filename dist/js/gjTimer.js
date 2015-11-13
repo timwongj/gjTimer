@@ -360,11 +360,13 @@
 
     var self = this;
 
+    self.DEFAULT_NUMBER_OF_SESSIONS = 15;
+
+    self.NUM_RESULTS_DISPLAYED = 50;
+
     self.DNF = 864000000;
 
     self.TIMER_REFRESH_INTERVAL = 50;
-
-    self.NUM_RESULTS_DISPLAYED = 50;
 
     self.KEY_CODES = {
       ENTER: 13,
@@ -394,10 +396,6 @@
         GRAY: { 'background-color': self.COLORS.GRAY },
         WHITE: { 'background-color': self.COLORS.WHITE }
       }
-    };
-
-    self.SESSIONS = {
-      DEFAULT_NUMBER_OF_SESSIONS: 15
     };
 
     var colorOptions = [
@@ -1195,7 +1193,7 @@
 
       var session, sessions = [];
 
-      for (var i = 1; i <= Constants.SESSIONS.DEFAULT_NUMBER_OF_SESSIONS; i++) {
+      for (var i = 1; i <= Constants.DEFAULT_NUMBER_OF_SESSIONS; i++) {
         sessions.push('Session ' + i);
         session = LocalStorage.getJSON('Session ' + i);
         if (session === null) {
@@ -1300,7 +1298,7 @@
       return LocalStorage.getJSONAsync(sessionId)
         .then(function(session) {
           session.results = [];
-          LocalStorage.setJSONAsync(sessionId, session);
+          return LocalStorage.setJSONAsync(sessionId, session);
         });
 
     };

@@ -13,7 +13,7 @@
     sessionId,
     eventId;
 
-  describe('The menuBar controller', function() {
+  xdescribe('The menuBar controller', function() {
 
     beforeEach(module('ui.bootstrap'));
     beforeEach(module('gjTimer'));

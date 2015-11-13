@@ -8,7 +8,7 @@
     scramble_string,
     state;
 
-  describe('The scramble service', function() {
+  xdescribe('The scramble service', function() {
 
     beforeEach(module('gjTimer'));
 

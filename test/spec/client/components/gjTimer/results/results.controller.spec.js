@@ -12,7 +12,7 @@
     precision,
     results;
 
-  describe('The results controller', function() {
+  xdescribe('The results controller', function() {
 
     beforeEach(module('ui.bootstrap'));
     beforeEach(module('gjTimer'));

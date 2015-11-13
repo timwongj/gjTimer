@@ -53,7 +53,7 @@
 
       var session, sessions = [];
 
-      for (var i = 1; i <= Constants.SESSIONS.DEFAULT_NUMBER_OF_SESSIONS; i++) {
+      for (var i = 1; i <= Constants.DEFAULT_NUMBER_OF_SESSIONS; i++) {
         sessions.push('Session ' + i);
         session = LocalStorage.getJSON('Session ' + i);
         if (session === null) {
@@ -158,7 +158,7 @@
       return LocalStorage.getJSONAsync(sessionId)
         .then(function(session) {
           session.results = [];
-          LocalStorage.setJSONAsync(sessionId, session);
+          return LocalStorage.setJSONAsync(sessionId, session);
         });
 
     };
