@@ -869,33 +869,29 @@
      */
     self.addBarChartData = function(barChart, result) {
 
-      var rawTime, flooredTime, distribution = {}, labels = [], data = [];
+      var rawTime, flooredTime, index;
 
       rawTime = Calculator.extractRawTimes([result])[0];
 
       if (rawTime !== Constants.DNF) {
         flooredTime = Calculator.convertTimeFromMillisecondsToString(rawTime, 0);
-        for (var i = 0; i < barChart.labels.length; i++) {
-          distribution[barChart.labels[i]] = barChart.data[0][i];
-        }
-        if (!distribution.hasOwnProperty(flooredTime)) {
-          distribution[flooredTime] = 1;
+        index = barChart.labels.indexOf(flooredTime);
+        if (index < 0) {
+          for (var i = 0; i < barChart.labels.length; i++) {
+            if (rawTime < Calculator.convertTimeFromStringToMilliseconds(barChart.labels[i])) {
+              barChart.labels.splice(i, 0, flooredTime);
+              barChart.data[0].splice(i, 0, 1);
+              return barChart;
+            }
+          }
+          barChart.labels.push(flooredTime);
+          barChart.data[0].push(1);
+          return barChart;
         } else {
-          distribution[flooredTime] += 1;
+          barChart.data[0][index] += 1;
+          return barChart;
         }
       }
-
-      for (var key in distribution) {
-        if (distribution.hasOwnProperty(key)) {
-          labels.push(key);
-          data.push(distribution[key]);
-        }
-      }
-
-      return {
-        labels: labels,
-        data: [data]
-      };
 
     };
 
@@ -1152,11 +1148,11 @@
      */
     self.initSessions = function() {
 
-      var sessions = [];
+      var session, sessions = [];
 
       for (var i = 1; i <= Constants.SESSIONS.DEFAULT_NUMBER_OF_SESSIONS; i++) {
         sessions.push('Session ' + i);
-        var session = LocalStorage.getJSON('Session ' + i);
+        session = LocalStorage.getJSON('Session ' + i);
         if (session === null) {
           LocalStorage.setJSON('Session ' + i, { sessionId: 'Session ' + i , eventId: '333', results: [] });
         }
