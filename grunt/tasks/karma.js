@@ -44,6 +44,6 @@
 
     grunt.loadNpmTasks('grunt-karma');
 
-  }
+  };
 
 })();

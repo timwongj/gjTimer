@@ -32,6 +32,6 @@
 
     grunt.loadNpmTasks('grunt-contrib-concat');
 
-  }
+  };
 
 })();

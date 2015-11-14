@@ -14,6 +14,6 @@
 
     grunt.loadNpmTasks('grunt-contrib-clean');
 
-  }
+  };
 
 })();

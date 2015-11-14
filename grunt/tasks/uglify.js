@@ -23,6 +23,6 @@
 
     grunt.loadNpmTasks('grunt-contrib-uglify');
 
-  }
+  };
 
 })();

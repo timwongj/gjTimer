@@ -25,6 +25,6 @@
 
     grunt.loadNpmTasks('grunt-contrib-watch');
 
-  }
+  };
 
 })();
