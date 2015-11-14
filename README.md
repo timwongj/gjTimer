@@ -1,6 +1,9 @@
-# gjTimer
+[![Build Status](https://travis-ci.org/timwongj/gjTimer.svg?branch=master)](https://travis-ci.org/timwongj/gjTimer)
 
-This is an angular app for a client side Rubik's Cube timer that uses local storage to save results.
+gjTimer
+=========
+
+gjTimer is a client side Rubik's Cube timer built with angularJS that uses local storage to save results.
 
 ## Usage:
 
