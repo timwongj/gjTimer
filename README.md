@@ -28,7 +28,7 @@ Navigate to localhost:8080 on your browser.
   
 #### To run the tests:
 
-    $ grunt karma
+    $ npm test
     
 Coverage reports are located in the ./coverage directory.
   

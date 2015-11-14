@@ -50,6 +50,6 @@
 
     grunt.loadNpmTasks('grunt-contrib-copy');
 
-  }
+  };
 
 })();

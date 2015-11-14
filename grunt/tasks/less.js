@@ -26,6 +26,6 @@
 
     grunt.loadNpmTasks('grunt-contrib-less');
 
-  }
+  };
 
 })();
