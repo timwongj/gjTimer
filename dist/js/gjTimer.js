@@ -64,22 +64,22 @@
 
     $scope.keydown = function($event) {
 
-      if (event.keyCode === Constants.KEY_CODES.ENTER) {
-        if ($rootScope.isTypingComment) {
-          event.preventDefault();
-        } else if (!$rootScope.isTyping) {
+      if (!$rootScope.isTypingComment) {
+        if ((event.keyCode === Constants.KEY_CODES.ENTER) && !$rootScope.isTyping) {
           $rootScope.$broadcast('new scramble', $scope.eventId);
+        } else if (event.keyCode === Constants.KEY_CODES.SPACE_BAR) {
+          event.preventDefault();
         }
-      } else if (event.keyCode === Constants.KEY_CODES.SPACE_BAR) {
-        event.preventDefault();
+        $rootScope.$broadcast('keydown', $event);
       }
-      $rootScope.$broadcast('keydown', $event);
 
     };
 
     $scope.keyup = function($event) {
 
-      $rootScope.$broadcast('keyup', $event);
+      if (!$rootScope.isTypingComment) {
+        $rootScope.$broadcast('keyup', $event);
+      }
 
     };
 
@@ -1408,8 +1408,6 @@
 
     var self = this;
 
-    var DNF = Constants.DNF;
-
     /**
      * Gets results for the session.
      * @param sessionId
@@ -1444,7 +1442,7 @@
             } else if (pen === '-') {
               result.time = Number(res[0].substring(0, res[0].length - 1));
               result.penalty = 'DNF';
-              result.rawTime = DNF;
+              result.rawTime = Constants.DNF;
               result.displayedTime = 'DNF';
               result.detailedTime = 'DNF(' + Calculator.convertTimeFromMillisecondsToString(Number(res[0].substring(0, res[0].length - 1)), precision) + ')';
             } else {
@@ -1459,11 +1457,7 @@
 
           }
 
-          var rawTimes = Calculator.extractRawTimes(results);
-
-          for (var j = 0; j < results.length; j++) {
-            results[j] = populateAverages(rawTimes, results[j], j, precision);
-          }
+          populateAverages(results, precision);
 
           return results;
 
@@ -1504,10 +1498,6 @@
             time: timeMilliseconds
           };
 
-          var rawTimes = Calculator.extractRawTimes(results);
-          rawTimes.push(Calculator.extractRawTimes([result])[0]);
-          result = populateAverages(rawTimes, result, result.index, precision);
-
           var timeString = Calculator.convertTimeFromStringToMilliseconds(time);
           switch(penalty) {
             case '+2':
@@ -1523,6 +1513,8 @@
           }
 
           results.push(result);
+
+          populateAverages(results, precision);
 
           LocalStorage.getJSONAsync(sessionId)
             .then(function(session) {
@@ -1543,13 +1535,36 @@
 
     /**
      * Changes the penalty for a solve.
-     * @param result
-     * @param sessionId
+     * @param results
      * @param index
+     * @param sessionId
      * @param penalty
      * @param precision
+     * @returns {*}
      */
-    self.penaltyAsync = function(result, sessionId, index, penalty, precision) {
+    self.penaltyAsync = function(results, index, sessionId, penalty, precision) {
+
+      results[index].penalty = penalty;
+
+      switch(penalty) {
+        case '':
+          results[index].rawTime = results[index].time;
+          results[index].displayedTime = Calculator.convertTimeFromMillisecondsToString(results[index].time, precision);
+          results[index].detailedTime = results[index].displayedTime;
+          break;
+        case '+2':
+          results[index].rawTime = results[index].time + 2000;
+          results[index].displayedTime = Calculator.convertTimeFromMillisecondsToString(results[index].time + 2000, precision) + '+';
+          results[index].detailedTime = results[index].displayedTime;
+          break;
+        case 'DNF':
+          results[index].rawTime = Constants.DNF;
+          results[index].displayedTime = 'DNF';
+          results[index].detailedTime = 'DNF(' + Calculator.convertTimeFromMillisecondsToString(results[index].time, precision) + ')';
+          break;
+      }
+
+      populateAverages(results, precision);
 
       return LocalStorage.getJSONAsync(sessionId)
         .then(function(session) {
@@ -1559,19 +1574,11 @@
 
           switch(penalty) {
             case '':
-              result.penalty = '';
-              result.rawTime = result.time;
-              result.displayedTime = Calculator.convertTimeFromMillisecondsToString(result.time, precision);
-              result.detailedTime = result.displayedTime;
               if ((pen === '+') || (pen === '-')) {
                 res = res.substring(0, res.indexOf('|') - 1) + res.substring(res.indexOf('|'), res.length);
               }
               break;
             case '+2':
-              result.penalty = '+2';
-              result.rawTime = result.time + 2000;
-              result.displayedTime = Calculator.convertTimeFromMillisecondsToString(result.time + 2000, precision) + '+';
-              result.detailedTime = result.displayedTime;
               if ((pen === '+') || (pen === '-')) {
                 res = res.substring(0, res.indexOf('|') - 1) + '+' + res.substring(res.indexOf('|'), res.length);
               } else {
@@ -1579,10 +1586,6 @@
               }
               break;
             case 'DNF':
-              result.penalty = 'DNF';
-              result.rawTime = Constants.DNF;
-              result.displayedTime = 'DNF';
-              result.detailedTime = 'DNF(' + Calculator.convertTimeFromMillisecondsToString(result.time, precision) + ')';
               if ((pen === '+') || (pen === '-')) {
                 res = res.substring(0, res.indexOf('|') - 1) + '-' + res.substring(res.indexOf('|'), res.length);
               } else {
@@ -1593,24 +1596,29 @@
 
           session.results[index] = res;
 
-          LocalStorage.setJSONAsync(sessionId, session)
-            .catch(function(err) {
-              reject(err);
-            });
+          return LocalStorage.setJSONAsync(sessionId, session);
 
         });
 
     };
 
     /**
-     * Removes a solve.
+     * Removes a result from results.
      * @param results
-     * @param sessionId
      * @param index
+     * @param sessionId
+     * @param precision
+     * @returns {*}
      */
-    self.removeAsync = function(results, sessionId, index) {
+    self.removeAsync = function(results, index, sessionId, precision) {
 
       results.splice(index, 1);
+
+      for (var i = 0; i < results.length; i++) {
+        results[i].index = i;
+      }
+
+      populateAverages(results, precision);
 
       return LocalStorage.getJSONAsync(sessionId)
         .then(function(session) {
@@ -1628,14 +1636,15 @@
 
     /**
      * Adds or edits a comment for a solve.
-     * @param result
-     * @param sessionId
+     * @param results
      * @param index
+     * @param sessionId
      * @param comment
+     * @returns {*}
      */
-    self.commentAsync = function(result, sessionId, index, comment) {
+    self.commentAsync = function(results, index, sessionId, comment) {
 
-      result.comment = comment;
+      results[index].comment = comment;
 
       return LocalStorage.getJSONAsync(sessionId)
         .then(function(session) {
@@ -1664,29 +1673,20 @@
     };
 
     /**
-     * Populate avg5 and avg12 field
-     * @param rawTimes
-     * @param result
-     * @param index
+     * Populates the avg5 and avg12 for every result in results.
+     * @param results
      * @param precision
      * @returns {*}
      */
-    function populateAverages(rawTimes, result, index, precision) {
+    function populateAverages(results, precision) {
 
-      if (index >= 4) {
-        result.avg5 = Calculator.calculateAverageString(rawTimes.slice(index - 4, index + 1), true, precision);
-      } else {
-        result.avg5 = 'DNF';
+      var rawTimes = Calculator.extractRawTimes(results);
+
+      for (var i = 0; i < results.length; i++) {
+        results[i].avg5 = i > 5 ? Calculator.calculateAverageString(rawTimes.slice(i - 4, i + 1), true, precision) : 'DNF';
+        results[i].avg12 = i > 12 ? Calculator.calculateAverageString(rawTimes.slice(i - 11, i + 1), true, precision) : 'DNF';
       }
-
-      if (index >= 11) {
-        result.avg12 = Calculator.calculateAverageString(rawTimes.slice(index - 11, index + 1), true, precision);
-      } else {
-        result.avg12 = 'DNF';
-      }
-
-      return result;
-
+      
     }
 
   }
@@ -1699,7 +1699,7 @@
 
   'use strict';
 
-  function ResultsModalController($modalInstance, results, precision, ResultsModalService) {
+  function ResultsModalController($uibModalInstance, results, precision, ResultsModalService) {
 
     var self = this;
 
@@ -1708,12 +1708,12 @@
     self.type = results.length === 3 ? 'mean' : 'average';
 
     self.close = function() {
-      $modalInstance.dismiss();
+      $uibModalInstance.dismiss();
     };
 
   }
 
-  angular.module('results').controller('ResultsModalController', ['$modalInstance', 'results', 'precision', 'ResultsModalService', ResultsModalController]);
+  angular.module('results').controller('ResultsModalController', ['$uibModalInstance', 'results', 'precision', 'ResultsModalService', ResultsModalController]);
 
 })();
 
@@ -1765,7 +1765,6 @@
       scope: {
         index: '=',
         precision: '=',
-        result: '=',
         results: '=',
         sessionId: '='
       },
@@ -1782,7 +1781,7 @@
         content: $templateCache.get('resultsPopover.html'),
         html: true,
         placement: 'right',
-        title: scope.ctrl.result.detailedTime
+        title: scope.ctrl.results[scope.ctrl.index].detailedTime
       });
       $(element).bind('mouseenter', function () {
         scope.ctrl.insideDiv = scope.ctrl.index;
@@ -1809,7 +1808,7 @@
 
   'use strict';
 
-  function ResultsPopoverController($scope, $rootScope, $timeout, ResultsService, Constants) {
+  function ResultsPopoverController($rootScope, $timeout, ResultsService, Constants) {
 
     var self = this;
 
@@ -1827,34 +1826,44 @@
       });
 
       $('.popover-btn-penalty-ok').on('click', function() {
-        ResultsService.penaltyAsync(self.result, self.sessionId, self.index, '', self.precision)
-          .then(function() {
-            $rootScope.$broadcast('refresh results');
-          });
+        if (self.results[self.index].penalty !== '') {
+          ResultsService.penaltyAsync(self.results, self.index, self.sessionId, '', self.precision)
+            .then(function() {
+              $rootScope.$broadcast('refresh statistics', self.results);
+              $rootScope.$broadcast('refresh charts', self.results);
+            });
+        }
         $(element).popover('hide');
       });
 
       $('.popover-btn-penalty-plus').on('click', function() {
-        ResultsService.penaltyAsync(self.result, self.sessionId, self.index, '+2', self.precision)
-          .then(function() {
-            $rootScope.$broadcast('refresh results');
-          });
+        if (self.results[self.index].penalty !== '+2') {
+          ResultsService.penaltyAsync(self.results, self.index, self.sessionId, '+2', self.precision)
+            .then(function() {
+              $rootScope.$broadcast('refresh statistics', self.results);
+              $rootScope.$broadcast('refresh charts', self.results);
+            });
+        }
         $(element).popover('hide');
       });
 
       $('.popover-btn-penalty-dnf').on('click', function() {
-        ResultsService.penaltyAsync(self.result, self.sessionId, self.index, 'DNF', self.precision)
-          .then(function() {
-            $rootScope.$broadcast('refresh results');
-          });
+        if (self.results[self.index].penalty !== 'DNF') {
+          ResultsService.penaltyAsync(self.results, self.index, self.sessionId, 'DNF', self.precision)
+            .then(function() {
+              $rootScope.$broadcast('refresh statistics', self.results);
+              $rootScope.$broadcast('refresh charts', self.results);
+            });
+        }
         $(element).popover('hide');
       });
 
       $('.popover-btn-remove').on('click', function() {
         if (confirm('Are you sure you want to delete this time?')) {
-          ResultsService.removeAsync(self.results, self.sessionId, self.index)
+          ResultsService.removeAsync(self.results, self.index, self.sessionId, self.precision)
             .then(function() {
-              $rootScope.$broadcast('refresh results');
+              $rootScope.$broadcast('refresh statistics', self.results);
+              $rootScope.$broadcast('refresh charts', self.results);
             });
           $(element).popover('hide');
         }
@@ -1868,16 +1877,18 @@
         }, 1);
       }).on('keydown', function(event) {
         if (event.keyCode === Constants.KEY_CODES.ENTER) {
-          ResultsService.commentAsync(self.result, self.sessionId, self.index, $('.popover-input-comment')[0].value);
+          if ($('.popover-input-comment')[0].value !== self.results[self.index].comment) {
+            ResultsService.commentAsync(self.results, self.index, self.sessionId, $('.popover-input-comment')[0].value);
+          }
           $(element).popover('hide');
         }
-      })[0].value = self.result.comment;
+      })[0].value = self.results[self.index].comment;
 
     };
 
   }
 
-  angular.module('results').controller('ResultsPopoverController', ['$scope', '$rootScope', '$timeout', 'ResultsService', 'Constants', ResultsPopoverController]);
+  angular.module('results').controller('ResultsPopoverController', ['$rootScope', '$timeout', 'ResultsService', 'Constants', ResultsPopoverController]);
 
 })();
 

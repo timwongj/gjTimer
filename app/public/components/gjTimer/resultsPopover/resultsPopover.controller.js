@@ -2,7 +2,7 @@
 
   'use strict';
 
-  function ResultsPopoverController($scope, $rootScope, $timeout, ResultsService, Constants) {
+  function ResultsPopoverController($rootScope, $timeout, ResultsService, Constants) {
 
     var self = this;
 
@@ -20,34 +20,44 @@
       });
 
       $('.popover-btn-penalty-ok').on('click', function() {
-        ResultsService.penaltyAsync(self.result, self.sessionId, self.index, '', self.precision)
-          .then(function() {
-            $rootScope.$broadcast('refresh results');
-          });
+        if (self.results[self.index].penalty !== '') {
+          ResultsService.penaltyAsync(self.results, self.index, self.sessionId, '', self.precision)
+            .then(function() {
+              $rootScope.$broadcast('refresh statistics', self.results);
+              $rootScope.$broadcast('refresh charts', self.results);
+            });
+        }
         $(element).popover('hide');
       });
 
       $('.popover-btn-penalty-plus').on('click', function() {
-        ResultsService.penaltyAsync(self.result, self.sessionId, self.index, '+2', self.precision)
-          .then(function() {
-            $rootScope.$broadcast('refresh results');
-          });
+        if (self.results[self.index].penalty !== '+2') {
+          ResultsService.penaltyAsync(self.results, self.index, self.sessionId, '+2', self.precision)
+            .then(function() {
+              $rootScope.$broadcast('refresh statistics', self.results);
+              $rootScope.$broadcast('refresh charts', self.results);
+            });
+        }
         $(element).popover('hide');
       });
 
       $('.popover-btn-penalty-dnf').on('click', function() {
-        ResultsService.penaltyAsync(self.result, self.sessionId, self.index, 'DNF', self.precision)
-          .then(function() {
-            $rootScope.$broadcast('refresh results');
-          });
+        if (self.results[self.index].penalty !== 'DNF') {
+          ResultsService.penaltyAsync(self.results, self.index, self.sessionId, 'DNF', self.precision)
+            .then(function() {
+              $rootScope.$broadcast('refresh statistics', self.results);
+              $rootScope.$broadcast('refresh charts', self.results);
+            });
+        }
         $(element).popover('hide');
       });
 
       $('.popover-btn-remove').on('click', function() {
         if (confirm('Are you sure you want to delete this time?')) {
-          ResultsService.removeAsync(self.results, self.sessionId, self.index)
+          ResultsService.removeAsync(self.results, self.index, self.sessionId, self.precision)
             .then(function() {
-              $rootScope.$broadcast('refresh results');
+              $rootScope.$broadcast('refresh statistics', self.results);
+              $rootScope.$broadcast('refresh charts', self.results);
             });
           $(element).popover('hide');
         }
@@ -61,15 +71,17 @@
         }, 1);
       }).on('keydown', function(event) {
         if (event.keyCode === Constants.KEY_CODES.ENTER) {
-          ResultsService.commentAsync(self.result, self.sessionId, self.index, $('.popover-input-comment')[0].value);
+          if ($('.popover-input-comment')[0].value !== self.results[self.index].comment) {
+            ResultsService.commentAsync(self.results, self.index, self.sessionId, $('.popover-input-comment')[0].value);
+          }
           $(element).popover('hide');
         }
-      })[0].value = self.result.comment;
+      })[0].value = self.results[self.index].comment;
 
     };
 
   }
 
-  angular.module('results').controller('ResultsPopoverController', ['$scope', '$rootScope', '$timeout', 'ResultsService', 'Constants', ResultsPopoverController]);
+  angular.module('results').controller('ResultsPopoverController', ['$rootScope', '$timeout', 'ResultsService', 'Constants', ResultsPopoverController]);
 
 })();
