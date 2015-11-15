@@ -6,8 +6,6 @@
 
     var self = this;
 
-    var DNF = Constants.DNF;
-
     /**
      * Gets results for the session.
      * @param sessionId
@@ -42,7 +40,7 @@
             } else if (pen === '-') {
               result.time = Number(res[0].substring(0, res[0].length - 1));
               result.penalty = 'DNF';
-              result.rawTime = DNF;
+              result.rawTime = Constants.DNF;
               result.displayedTime = 'DNF';
               result.detailedTime = 'DNF(' + Calculator.convertTimeFromMillisecondsToString(Number(res[0].substring(0, res[0].length - 1)), precision) + ')';
             } else {
@@ -57,11 +55,7 @@
 
           }
 
-          var rawTimes = Calculator.extractRawTimes(results);
-
-          for (var j = 0; j < results.length; j++) {
-            results[j] = populateAverages(rawTimes, results[j], j, precision);
-          }
+          populateAverages(results, precision);
 
           return results;
 
@@ -102,10 +96,6 @@
             time: timeMilliseconds
           };
 
-          var rawTimes = Calculator.extractRawTimes(results);
-          rawTimes.push(Calculator.extractRawTimes([result])[0]);
-          result = populateAverages(rawTimes, result, result.index, precision);
-
           var timeString = Calculator.convertTimeFromStringToMilliseconds(time);
           switch(penalty) {
             case '+2':
@@ -121,6 +111,8 @@
           }
 
           results.push(result);
+
+          populateAverages(results, precision);
 
           LocalStorage.getJSONAsync(sessionId)
             .then(function(session) {
@@ -141,13 +133,36 @@
 
     /**
      * Changes the penalty for a solve.
-     * @param result
-     * @param sessionId
+     * @param results
      * @param index
+     * @param sessionId
      * @param penalty
      * @param precision
+     * @returns {*}
      */
-    self.penaltyAsync = function(result, sessionId, index, penalty, precision) {
+    self.penaltyAsync = function(results, index, sessionId, penalty, precision) {
+
+      results[index].penalty = penalty;
+
+      switch(penalty) {
+        case '':
+          results[index].rawTime = results[index].time;
+          results[index].displayedTime = Calculator.convertTimeFromMillisecondsToString(results[index].time, precision);
+          results[index].detailedTime = results[index].displayedTime;
+          break;
+        case '+2':
+          results[index].rawTime = results[index].time + 2000;
+          results[index].displayedTime = Calculator.convertTimeFromMillisecondsToString(results[index].time + 2000, precision) + '+';
+          results[index].detailedTime = results[index].displayedTime;
+          break;
+        case 'DNF':
+          results[index].rawTime = Constants.DNF;
+          results[index].displayedTime = 'DNF';
+          results[index].detailedTime = 'DNF(' + Calculator.convertTimeFromMillisecondsToString(results[index].time, precision) + ')';
+          break;
+      }
+
+      populateAverages(results, precision);
 
       return LocalStorage.getJSONAsync(sessionId)
         .then(function(session) {
@@ -157,19 +172,11 @@
 
           switch(penalty) {
             case '':
-              result.penalty = '';
-              result.rawTime = result.time;
-              result.displayedTime = Calculator.convertTimeFromMillisecondsToString(result.time, precision);
-              result.detailedTime = result.displayedTime;
               if ((pen === '+') || (pen === '-')) {
                 res = res.substring(0, res.indexOf('|') - 1) + res.substring(res.indexOf('|'), res.length);
               }
               break;
             case '+2':
-              result.penalty = '+2';
-              result.rawTime = result.time + 2000;
-              result.displayedTime = Calculator.convertTimeFromMillisecondsToString(result.time + 2000, precision) + '+';
-              result.detailedTime = result.displayedTime;
               if ((pen === '+') || (pen === '-')) {
                 res = res.substring(0, res.indexOf('|') - 1) + '+' + res.substring(res.indexOf('|'), res.length);
               } else {
@@ -177,10 +184,6 @@
               }
               break;
             case 'DNF':
-              result.penalty = 'DNF';
-              result.rawTime = Constants.DNF;
-              result.displayedTime = 'DNF';
-              result.detailedTime = 'DNF(' + Calculator.convertTimeFromMillisecondsToString(result.time, precision) + ')';
               if ((pen === '+') || (pen === '-')) {
                 res = res.substring(0, res.indexOf('|') - 1) + '-' + res.substring(res.indexOf('|'), res.length);
               } else {
@@ -191,24 +194,29 @@
 
           session.results[index] = res;
 
-          LocalStorage.setJSONAsync(sessionId, session)
-            .catch(function(err) {
-              reject(err);
-            });
+          return LocalStorage.setJSONAsync(sessionId, session);
 
         });
 
     };
 
     /**
-     * Removes a solve.
+     * Removes a result from results.
      * @param results
-     * @param sessionId
      * @param index
+     * @param sessionId
+     * @param precision
+     * @returns {*}
      */
-    self.removeAsync = function(results, sessionId, index) {
+    self.removeAsync = function(results, index, sessionId, precision) {
 
       results.splice(index, 1);
+
+      for (var i = 0; i < results.length; i++) {
+        results[i].index = i;
+      }
+
+      populateAverages(results, precision);
 
       return LocalStorage.getJSONAsync(sessionId)
         .then(function(session) {
@@ -226,14 +234,15 @@
 
     /**
      * Adds or edits a comment for a solve.
-     * @param result
-     * @param sessionId
+     * @param results
      * @param index
+     * @param sessionId
      * @param comment
+     * @returns {*}
      */
-    self.commentAsync = function(result, sessionId, index, comment) {
+    self.commentAsync = function(results, index, sessionId, comment) {
 
-      result.comment = comment;
+      results[index].comment = comment;
 
       return LocalStorage.getJSONAsync(sessionId)
         .then(function(session) {
@@ -262,29 +271,20 @@
     };
 
     /**
-     * Populate avg5 and avg12 field
-     * @param rawTimes
-     * @param result
-     * @param index
+     * Populates the avg5 and avg12 for every result in results.
+     * @param results
      * @param precision
      * @returns {*}
      */
-    function populateAverages(rawTimes, result, index, precision) {
+    function populateAverages(results, precision) {
 
-      if (index >= 4) {
-        result.avg5 = Calculator.calculateAverageString(rawTimes.slice(index - 4, index + 1), true, precision);
-      } else {
-        result.avg5 = 'DNF';
+      var rawTimes = Calculator.extractRawTimes(results);
+
+      for (var i = 0; i < results.length; i++) {
+        results[i].avg5 = i > 5 ? Calculator.calculateAverageString(rawTimes.slice(i - 4, i + 1), true, precision) : 'DNF';
+        results[i].avg12 = i > 12 ? Calculator.calculateAverageString(rawTimes.slice(i - 11, i + 1), true, precision) : 'DNF';
       }
-
-      if (index >= 11) {
-        result.avg12 = Calculator.calculateAverageString(rawTimes.slice(index - 11, index + 1), true, precision);
-      } else {
-        result.avg12 = 'DNF';
-      }
-
-      return result;
-
+      
     }
 
   }

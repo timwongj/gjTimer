@@ -9,22 +9,22 @@
 
     $scope.keydown = function($event) {
 
-      if (event.keyCode === Constants.KEY_CODES.ENTER) {
-        if ($rootScope.isTypingComment) {
-          event.preventDefault();
-        } else if (!$rootScope.isTyping) {
+      if (!$rootScope.isTypingComment) {
+        if ((event.keyCode === Constants.KEY_CODES.ENTER) && !$rootScope.isTyping) {
           $rootScope.$broadcast('new scramble', $scope.eventId);
+        } else if (event.keyCode === Constants.KEY_CODES.SPACE_BAR) {
+          event.preventDefault();
         }
-      } else if (event.keyCode === Constants.KEY_CODES.SPACE_BAR) {
-        event.preventDefault();
+        $rootScope.$broadcast('keydown', $event);
       }
-      $rootScope.$broadcast('keydown', $event);
 
     };
 
     $scope.keyup = function($event) {
 
-      $rootScope.$broadcast('keyup', $event);
+      if (!$rootScope.isTypingComment) {
+        $rootScope.$broadcast('keyup', $event);
+      }
 
     };
 

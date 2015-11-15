@@ -2,7 +2,7 @@
 
   'use strict';
 
-  function ResultsModalController($modalInstance, results, precision, ResultsModalService) {
+  function ResultsModalController($uibModalInstance, results, precision, ResultsModalService) {
 
     var self = this;
 
@@ -11,11 +11,11 @@
     self.type = results.length === 3 ? 'mean' : 'average';
 
     self.close = function() {
-      $modalInstance.dismiss();
+      $uibModalInstance.dismiss();
     };
 
   }
 
-  angular.module('results').controller('ResultsModalController', ['$modalInstance', 'results', 'precision', 'ResultsModalService', ResultsModalController]);
+  angular.module('results').controller('ResultsModalController', ['$uibModalInstance', 'results', 'precision', 'ResultsModalService', ResultsModalController]);
 
 })();

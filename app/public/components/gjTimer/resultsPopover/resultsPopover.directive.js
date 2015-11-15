@@ -9,7 +9,6 @@
       scope: {
         index: '=',
         precision: '=',
-        result: '=',
         results: '=',
         sessionId: '='
       },
@@ -26,7 +25,7 @@
         content: $templateCache.get('resultsPopover.html'),
         html: true,
         placement: 'right',
-        title: scope.ctrl.result.detailedTime
+        title: scope.ctrl.results[scope.ctrl.index].detailedTime
       });
       $(element).bind('mouseenter', function () {
         scope.ctrl.insideDiv = scope.ctrl.index;
