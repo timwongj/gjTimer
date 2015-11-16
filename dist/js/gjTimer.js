@@ -360,7 +360,7 @@
 
     var self = this;
 
-    self.DEFAULT_NUMBER_OF_SESSIONS = 15;
+    self.DEFAULT_NUMBER_OF_SESSIONS = 20;
 
     self.NUM_RESULTS_DISPLAYED = 50;
 
@@ -1249,10 +1249,12 @@
       var events = LocalStorage.getJSON('events');
       if (events) {
         if (events.hasOwnProperty(sessionId)) {
+          LocalStorage.set('eventId', events[sessionId]);
           return events[sessionId];
         } else {
           events[sessionId] = '333';
           LocalStorage.setJSON('events', events);
+          LocalStorage.set('eventId', '333');
           return '333';
         }
       } else {
@@ -1261,6 +1263,7 @@
           events['Session ' + i] = '333';
         }
         LocalStorage.setJSON('events', events);
+        LocalStorage.set('eventId', '333');
         return '333';
       }
 
@@ -1859,7 +1862,7 @@
       });
 
       $('.popover-btn-remove').on('click', function() {
-        if (confirm('Are you sure you want to delete this time?')) {
+        if (confirm('How many times did you delete to get that average?')) {
           ResultsService.removeAsync(self.results, self.index, self.sessionId, self.precision)
             .then(function() {
               $rootScope.$broadcast('refresh statistics', self.results);

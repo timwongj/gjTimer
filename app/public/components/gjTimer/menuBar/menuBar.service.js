@@ -109,10 +109,12 @@
       var events = LocalStorage.getJSON('events');
       if (events) {
         if (events.hasOwnProperty(sessionId)) {
+          LocalStorage.set('eventId', events[sessionId]);
           return events[sessionId];
         } else {
           events[sessionId] = '333';
           LocalStorage.setJSON('events', events);
+          LocalStorage.set('eventId', '333');
           return '333';
         }
       } else {
@@ -121,6 +123,7 @@
           events['Session ' + i] = '333';
         }
         LocalStorage.setJSON('events', events);
+        LocalStorage.set('eventId', '333');
         return '333';
       }
 
