@@ -62,7 +62,7 @@
     $rootScope.isTyping = false;
     $scope.style = {};
 
-    $scope.keydown = function($event) {
+    $scope.keydown = function($event, event) {
 
       if (!$rootScope.isTypingComment) {
         if ((event.keyCode === Constants.KEY_CODES.ENTER) && !$rootScope.isTyping) {
@@ -631,7 +631,9 @@
      * @param key
      */
     self.get = function(key) {
+
       return localStorage.getItem(key);
+
     };
 
     /**
@@ -641,12 +643,14 @@
      * @returns {boolean}
      */
     self.set = function(key, value) {
+
       try {
         localStorage.setItem(key, value);
         return true;
       } catch(err) {
         return false;
       }
+
     };
 
     /**
@@ -655,12 +659,9 @@
      * @returns {null}
      */
     self.getJSON = function(key) {
-      var value = localStorage.getItem(key);
-      if (value !== null) {
-        return JSON.parse(value);
-      } else {
-        return null;
-      }
+
+      return JSON.parse(localStorage.getItem(key));
+
     };
 
     /**
@@ -694,12 +695,14 @@
      * @returns {boolean}
      */
     self.setJSON = function(key, value) {
+
       try {
         localStorage.setItem(key, JSON.stringify(value));
         return true;
       } catch(err) {
         return false;
       }
+
     };
 
     /**
@@ -732,12 +735,14 @@
      * @returns {boolean}
      */
     self.clear = function() {
+
       try {
         localStorage.clear();
         return true;
       } catch(err) {
         return false;
       }
+
     };
 
   }
@@ -942,6 +947,8 @@
           barChart.data[0][index] += 1;
           return barChart;
         }
+      } else {
+        return barChart;
       }
 
     };

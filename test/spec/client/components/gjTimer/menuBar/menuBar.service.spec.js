@@ -114,6 +114,22 @@
       });
     });
 
+    describe('initEvent function', function() {
+      describe('when eventId exists in local storage', function() {
+        it('should return the current event', function() {
+          LocalStorage.get.and.returnValue(eventId);
+          expect(MenuBarService.initEvent()).toEqual(eventId);
+        });
+      });
+
+      describe('when eventId does not exists in local storage', function() {
+        it('should return the default event', function() {
+          LocalStorage.get.and.returnValue(null);
+          expect(MenuBarService.initEvent()).toEqual('333');
+        });
+      });
+    });
+
     describe('changeSession function', function() {
       describe('when events exist in local storage', function() {
         describe('and sessionId is in events', function() {

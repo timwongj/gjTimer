@@ -45,6 +45,14 @@
       expect(ChartsService.setChartDefaults).toHaveBeenCalledWith();
     });
 
+    describe('refresh results event', function() {
+      it('should set self.loaded to false', function() {
+        ChartsController.loaded = true;
+        $rootScope.$broadcast('refresh results');
+        expect(ChartsController.loaded).toBeFalsy();
+      });
+    });
+
     describe('refresh charts event', function() {
       it('should call the ChartsService to initialize the line and bar chart data', function() {
         $rootScope.$broadcast('refresh charts', results);
@@ -55,6 +63,7 @@
         expect(ChartsController.lineChartData).toEqual(lineChart.data);
         expect(ChartsController.barChartLabels).toEqual(barChart.labels);
         expect(ChartsController.barChartData).toEqual(barChart.data);
+        expect(ChartsController.loaded).toBeTruthy();
       });
     });
 
