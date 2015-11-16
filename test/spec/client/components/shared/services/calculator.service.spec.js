@@ -423,14 +423,21 @@
 
       it('should convert the time from milliseconds to a string with the precision', function() {
         timeMilliseconds = 1058692;
-        precision = 3;
+        precision = 0;
         timeString = Calculator.convertTimeFromMillisecondsToString(timeMilliseconds, precision);
-        expect(timeString).toEqual('17:38.692');
+        expect(timeString).toEqual('17:38');
       });
 
       it('should convert the time from milliseconds to a string with the precision', function() {
         timeMilliseconds = 4209693;
-        precision = 2;
+        precision = 1;
+        timeString = Calculator.convertTimeFromMillisecondsToString(timeMilliseconds, precision);
+        expect(timeString).toEqual('1:10:09.6');
+      });
+
+      it('should convert the time from milliseconds to a string with the precision', function() {
+        timeMilliseconds = 4209693;
+        precision = null;
         timeString = Calculator.convertTimeFromMillisecondsToString(timeMilliseconds, precision);
         expect(timeString).toEqual('1:10:09.69');
       });

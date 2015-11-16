@@ -62,7 +62,7 @@
     $rootScope.isTyping = false;
     $scope.style = {};
 
-    $scope.keydown = function($event) {
+    $scope.keydown = function($event, event) {
 
       if (!$rootScope.isTypingComment) {
         if ((event.keyCode === Constants.KEY_CODES.ENTER) && !$rootScope.isTyping) {
@@ -360,7 +360,7 @@
 
     var self = this;
 
-    self.DEFAULT_NUMBER_OF_SESSIONS = 15;
+    self.DEFAULT_NUMBER_OF_SESSIONS = 20;
 
     self.NUM_RESULTS_DISPLAYED = 50;
 
@@ -631,7 +631,9 @@
      * @param key
      */
     self.get = function(key) {
+
       return localStorage.getItem(key);
+
     };
 
     /**
@@ -641,12 +643,14 @@
      * @returns {boolean}
      */
     self.set = function(key, value) {
+
       try {
         localStorage.setItem(key, value);
         return true;
       } catch(err) {
         return false;
       }
+
     };
 
     /**
@@ -655,12 +659,9 @@
      * @returns {null}
      */
     self.getJSON = function(key) {
-      var value = localStorage.getItem(key);
-      if (value !== null) {
-        return JSON.parse(value);
-      } else {
-        return null;
-      }
+
+      return JSON.parse(localStorage.getItem(key));
+
     };
 
     /**
@@ -694,12 +695,14 @@
      * @returns {boolean}
      */
     self.setJSON = function(key, value) {
+
       try {
         localStorage.setItem(key, JSON.stringify(value));
         return true;
       } catch(err) {
         return false;
       }
+
     };
 
     /**
@@ -732,12 +735,14 @@
      * @returns {boolean}
      */
     self.clear = function() {
+
       try {
         localStorage.clear();
         return true;
       } catch(err) {
         return false;
       }
+
     };
 
   }
@@ -942,6 +947,8 @@
           barChart.data[0][index] += 1;
           return barChart;
         }
+      } else {
+        return barChart;
       }
 
     };
@@ -1249,10 +1256,12 @@
       var events = LocalStorage.getJSON('events');
       if (events) {
         if (events.hasOwnProperty(sessionId)) {
+          LocalStorage.set('eventId', events[sessionId]);
           return events[sessionId];
         } else {
           events[sessionId] = '333';
           LocalStorage.setJSON('events', events);
+          LocalStorage.set('eventId', '333');
           return '333';
         }
       } else {
@@ -1261,6 +1270,7 @@
           events['Session ' + i] = '333';
         }
         LocalStorage.setJSON('events', events);
+        LocalStorage.set('eventId', '333');
         return '333';
       }
 
@@ -1859,7 +1869,7 @@
       });
 
       $('.popover-btn-remove').on('click', function() {
-        if (confirm('Are you sure you want to delete this time?')) {
+        if (confirm('How many times did you delete to get that average?')) {
           ResultsService.removeAsync(self.results, self.index, self.sessionId, self.precision)
             .then(function() {
               $rootScope.$broadcast('refresh statistics', self.results);

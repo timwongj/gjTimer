@@ -53,7 +53,7 @@
       });
 
       $('.popover-btn-remove').on('click', function() {
-        if (confirm('Are you sure you want to delete this time?')) {
+        if (confirm('How many times did you delete to get that average?')) {
           ResultsService.removeAsync(self.results, self.index, self.sessionId, self.precision)
             .then(function() {
               $rootScope.$broadcast('refresh statistics', self.results);

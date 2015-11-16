@@ -7,7 +7,7 @@
     $rootScope.isTyping = false;
     $scope.style = {};
 
-    $scope.keydown = function($event) {
+    $scope.keydown = function($event, event) {
 
       if (!$rootScope.isTypingComment) {
         if ((event.keyCode === Constants.KEY_CODES.ENTER) && !$rootScope.isTyping) {
