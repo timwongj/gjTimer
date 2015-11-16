@@ -1,0 +1,49 @@
+@screen-sm-min: 48em;
+@screen-md-min: 62em;
+@screen-lg-min: 75em;
+
+@height-section-md: calc(~"100vh - 4em");
+
+.section {
+  padding: .375em 0;
+  @media (min-width: @screen-sm-min) {
+    padding: .375em;
+  }
+}
+
+.jumbotron {
+  margin-bottom: 0;
+  border-radius: 0 !important;
+  background-color: #FFFFFF;
+  @media (min-width: @screen-md-min) {
+    height: @height-section-md;
+    border-radius: 2px !important;
+  }
+}
+
+.jumbotron-timer, .jumbotron-statistics {
+  padding: .5em !important;
+  overflow-y: auto;
+}
+
+.jumbotron-results {
+  padding: 0 !important;
+  overflow-y: hidden;
+}
+
+.btn {
+  border-radius: 2px;
+}
+
+.modal {
+  top: 5%;
+}
+
+.modal-content {
+  border-radius: 3px;
+}
+
+.fading-circle {
+  height: 150%;
+  width: 150%;
+}

@@ -1,0 +1,248 @@
+.section {
+  padding: .375em 0;
+}
+@media (min-width: 48em) {
+  .section {
+    padding: .375em;
+  }
+}
+.jumbotron {
+  margin-bottom: 0;
+  border-radius: 0 !important;
+  background-color: #FFFFFF;
+}
+@media (min-width: 62em) {
+  .jumbotron {
+    height: calc(100vh - 4em);
+    border-radius: 2px !important;
+  }
+}
+.jumbotron-timer,
+.jumbotron-statistics {
+  padding: .5em !important;
+  overflow-y: auto;
+}
+.jumbotron-results {
+  padding: 0 !important;
+  overflow-y: hidden;
+}
+.btn {
+  border-radius: 2px;
+}
+.modal {
+  top: 5%;
+}
+.modal-content {
+  border-radius: 3px;
+}
+.fading-circle {
+  height: 150%;
+  width: 150%;
+}
+#charts {
+  margin: .125em;
+  padding: .125em;
+}
+#cub {
+  margin: .25em;
+  padding: .25em;
+  text-align: center;
+}
+#menuBar {
+  margin: .125em 0;
+  padding: .125em 0;
+}
+#menuBar .title {
+  margin-right: .25em;
+  font-size: 150%;
+  font-weight: 400;
+}
+#menuBar .dropdown-menu {
+  min-width: 0;
+}
+#menuBar .btn-session {
+  -webkit-border-radius: 2px 0 0 2px;
+  -moz-border-radius: 2px 0 0 2px;
+  border-radius: 2px 0 0 2px;
+}
+#menuBar .btn-reset {
+  -webkit-border-radius: 0 2px 2px 0;
+  -moz-border-radius: 0 2px 2px 0;
+  border-radius: 0 2px 2px 0;
+}
+#results thead {
+  display: block;
+}
+#results tbody {
+  display: block;
+  overflow: auto;
+  height: 21.5em;
+}
+@media screen and (min-width: 62em) {
+  #results tbody {
+    height: calc(100vh - 5.875em);
+  }
+}
+#results tr {
+  height: 1.75em;
+}
+#results th {
+  border-bottom: 2px solid #ddd;
+}
+#results td {
+  border: 1px solid #ddd;
+}
+#results .index {
+  text-align: center;
+  width: 10em;
+}
+#results .time,
+#results .avg {
+  text-align: center;
+  width: 40em;
+}
+#resultsModal .modal-header {
+  padding: .5em;
+}
+#resultsModal .modal-body {
+  padding: .5em;
+  max-height: calc(100vh - 12em);
+  overflow-y: auto;
+}
+#resultsModal .modal-footer {
+  padding: .5em;
+}
+#resultsModal .modal-title {
+  margin-left: .25em;
+}
+#resultsModal .btn-close {
+  vertical-align: middle;
+}
+#resultsModal .ol-results {
+  margin: 0;
+  padding-left: 2.5em;
+}
+#resultsModal .li-results {
+  margin-bottom: .125em;
+}
+#resultsModal .date {
+  font-weight: 300;
+}
+.popover-title,
+.popover-content {
+  padding: .5em;
+  text-align: center;
+}
+#resultsPopover .form-group-buttons {
+  margin-bottom: .25em;
+}
+#resultsPopover .popover-input-comment {
+  margin-top: .25em;
+  padding: .25em .5em;
+  width: 8.5em;
+  height: 2em;
+}
+#scramble {
+  text-align: center;
+}
+#scramble .scramble {
+  margin: 4px 2px;
+  padding: 2px;
+  font-family: Courier New, Courier New, monospace;
+}
+#settings .modal-header,
+#settings .modal-body,
+#settings .modal-footer {
+  padding: .5em;
+}
+#settings .modal-title {
+  margin-left: .25em;
+}
+#settings .btn-close {
+  vertical-align: middle;
+}
+#settings .setting {
+  margin: .25em;
+}
+#settings .label-setting {
+  margin: 0 .125em;
+  min-width: 10em;
+  text-align: right;
+}
+#settings .btn-group {
+  margin: 0 .125em;
+}
+#settings .color-list {
+  margin: 0;
+  padding: 0;
+  display: inline-flex;
+  list-style-type: none;
+}
+#settings .color-list-item {
+  margin: 0;
+}
+#settings .color-option {
+  height: 1em;
+  width: 1em;
+  margin: .25em;
+  padding: 0;
+  border: 0.125em solid black;
+}
+#statistics {
+  margin: .125em;
+  padding: .125em;
+}
+#statistics .stat {
+  white-space: nowrap;
+  font-weight: 500;
+}
+#statistics table {
+  margin: .5em 0;
+}
+#statistics table td,
+#statistics table th {
+  padding: .25em;
+}
+#statistics table .type {
+  text-align: right;
+}
+#statistics table .data {
+  text-align: center;
+}
+#timer {
+  text-align: center;
+}
+#timer .time {
+  font-size: 600%;
+  margin: .03125em;
+  padding: .03125em;
+}
+@media screen and (min-width: 48em) {
+  #timer .time {
+    font-size: 800%;
+    margin: .0625em;
+    padding: .0625em;
+  }
+}
+#timer .input {
+  width: 70%;
+  font-size: 400%;
+  margin: .0625em;
+  padding: .0625em;
+  transition: 0.25s linear background;
+}
+@media screen and (min-width: 48em) {
+  #timer .input {
+    width: 60%;
+    font-size: 550%;
+  }
+}
+@media screen and (min-width: 62em) {
+  #timer .input {
+    width: 80%;
+    font-size: 700%;
+  }
+}
+#timer .input.ng-invalid {
+  background: #FFCCCC;
+}

@@ -1,0 +1,5 @@
+<div id="scramble">
+  <p class="scramble" ng-if="ctrl.displayedScramble === undefined">Generating Scramble...</p>
+  <p class="scramble" ng-if="ctrl.displayedScramble !== undefined"
+     ng-bind-html="ctrl.displayedScramble" ng-style="ctrl.scrambleStyle"></p>
+</div>

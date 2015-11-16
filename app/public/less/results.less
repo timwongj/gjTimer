@@ -1,0 +1,41 @@
+@height-results-md: calc(~"100vh - 5.875em");
+@height-results-sm: 21.5em;
+
+#results {
+
+  thead {
+    display: block;
+  }
+
+  tbody {
+    display: block;
+    overflow: auto;
+    height: @height-results-sm;
+    @media screen and (min-width: @screen-md-min) {
+      height: @height-results-md;
+    }
+  }
+
+  tr {
+    height: 1.75em;
+  }
+
+  th {
+    border-bottom: 2px solid #ddd;
+  }
+
+  td {
+    border: 1px solid #ddd;
+  }
+
+  .index {
+    text-align: center;
+    width: 10em;
+  }
+
+  .time, .avg {
+    text-align: center;
+    width: 40em;
+  }
+
+}

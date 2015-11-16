@@ -1,0 +1,41 @@
+<div id="results">
+  <fading-circle-spinner ng-if="!ctrl.loaded"></fading-circle-spinner>
+  <table class="table-hover" ng-if="ctrl.loaded">
+    <thead>
+    <tr>
+      <th class="index">#</th>
+      <th class="time">Time</th>
+      <th class="avg">Avg 5</th>
+      <th class="avg">Avg 12</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="result in ctrl.results | reverse" ng-if="result.index >= ctrl.results.length - ctrl.NUM_RESULTS_DISPLAYED">
+      <td class="index">
+        <div ng-bind="result.index + 1"></div>
+      </td>
+      <td class="time">
+        <results-popover index="result.index"
+                         precision="ctrl.settings.resultsPrecision"
+                         results="ctrl.results"
+                         session-id="ctrl.sessionId">
+          <div ng-bind="result.displayedTime"></div>
+        </results-popover>
+      </td>
+      <td class="avg">
+        <div ng-bind="result.avg5"
+             ng-click="ctrl.openModal(ctrl.results.length - $index, 5)"></div>
+      </td>
+      <td class="avg">
+        <div ng-bind="result.avg12"
+             ng-click="ctrl.openModal(ctrl.results.length - $index, 12)"></div>
+      </td>
+    </tr>
+    <tr ng-if="ctrl.NUM_RESULTS_DISPLAYED < ctrl.results.length">
+      <td colspan="4" style="text-align: center;">
+        <a ng-click="ctrl.NUM_RESULTS_DISPLAYED = ctrl.NUM_RESULTS_DISPLAYED + 50">Load More...</a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>

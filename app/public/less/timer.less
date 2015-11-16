@@ -1,0 +1,38 @@
+@invalid-input-color: #FFCCCC;
+
+#timer {
+
+  text-align: center;
+
+  .time {
+    font-size: 600%;
+    margin: .03125em;
+    padding: .03125em;
+    @media screen and (min-width: @screen-sm-min) {
+      font-size: 800%;
+      margin: .0625em;
+      padding: .0625em;
+    }
+  }
+
+  .input {
+    width: 70%;
+    font-size: 400%;
+    margin: .0625em;
+    padding: .0625em;
+    transition: 0.25s linear background;
+    @media screen and (min-width: @screen-sm-min) {
+      width: 60%;
+      font-size: 550%;
+    }
+    @media screen and (min-width: @screen-md-min) {
+      width: 80%;
+      font-size: 700%;
+    }
+  }
+
+  .input.ng-invalid {
+    background: @invalid-input-color;
+  }
+
+}

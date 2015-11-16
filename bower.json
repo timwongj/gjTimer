@@ -1,0 +1,29 @@
+{
+  "name": "gjTimer",
+  "version": "0.0.0",
+  "homepage": "http://gjtimer.com",
+  "authors": [
+    "timwongj <wong.t@husky.neu.edu>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "angular-mocks": "~1.4.7"
+  },
+  "dependencies": {
+    "angular-bootstrap": "~0.14.2",
+    "angular": "~1.4.7",
+    "bootstrap": "~3.3.5",
+    "jquery": "~2.1.4",
+    "moment": "~2.10.6",
+    "jsss": "https://github.com/cubing/jsss.git",
+    "angular-chart.js": "~0.8.5",
+    "angular-spinkit": "~0.3.3"
+  }
+}

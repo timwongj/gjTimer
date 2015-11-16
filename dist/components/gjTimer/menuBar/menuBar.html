@@ -1,0 +1,43 @@
+<div id="menuBar">
+  <span class="title">gjTimer</span>
+  <div class="btn-group" uib-dropdown uib-keyboard-nav>
+    <button type="button" class="btn btn-default btn-sm btn-session" uib-dropdown-toggle>
+      {{ctrl.sessionId}}&nbsp;<span class="caret"></span>
+    </button>
+    <ul class="uib-dropdown-menu" role="menu" aria-labelledby="simple-btn-keyboard-nav">
+      <li role="presentation" ng-repeat="sessionId in ctrl.sessions">
+        <a role="menuitem" tabindex="-1" href="" ng-bind="sessionId" ng-click="ctrl.changeSession(sessionId)"></a>
+      </li>
+    </ul>
+    <button type="button"
+            class="btn btn-warning btn-sm btn-reset"
+            ng-click="ctrl.resetSession()"
+            uib-tooltip="Reset"
+            tooltip-placement="bottom"
+            onclick="this.blur()">
+      <span ng-if="!ctrl.showDetails" class="glyphicon glyphicon-trash"></span>
+      <span ng-if="ctrl.showDetails">&nbsp;Reset</span>
+    </button>
+  </div>
+  <div class="btn-group" uib-dropdown uib-keyboard-nav>
+    <button type="button" class="btn btn-default btn-sm" uib-dropdown-toggle>
+      {{ctrl.event.event}}&nbsp;<span class="caret"></span>
+    </button>
+    <ul class="uib-dropdown-menu" role="menu" aria-labelledby="simple-btn-keyboard-nav">
+      <li role="presentation" ng-repeat="event in ctrl.events">
+        <a role="menuitem" tabindex="-1" href="" ng-bind="event" ng-click="ctrl.changeEvent(event)"></a>
+      </li>
+    </ul>
+  </div>
+  <div class="btn-group">
+    <button type="button"
+            class="btn btn-primary btn-sm"
+            ng-click="ctrl.openSettings()"
+            uib-tooltip="Settings"
+            tooltip-placement="bottom"
+            onclick="this.blur()">
+      <span ng-if="!ctrl.showDetails" class="glyphicon glyphicon-cog"></span>
+      <span ng-if="ctrl.showDetails">&nbsp;Settings</span>
+    </button>
+  </div>
+</div>

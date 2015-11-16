@@ -1,0 +1,44 @@
+<div id="settings">
+  <div class="modal-header">
+    <button type="button" class="close" ng-click="ctrl.close()">
+      <span aria-hidden="true" class="btn-close">&times;</span>
+    </button>
+    <h4 class="modal-title">Settings</h4>
+  </div>
+  <div class="modal-body">
+    <div class="setting" ng-repeat="setting in ctrl.settings track by $index"
+         ng-if="$index < ctrl.settings.length - 2">
+      <label class="label-setting" ng-bind="setting.title"></label>
+      <div class="btn-group">
+        <label class="btn btn-default btn-sm" ng-repeat="option in setting.options track by $index"
+               ng-model="setting.value" uib-btn-radio="option.value" ng-bind="option.text"></label>
+      </div>
+    </div>
+    <div class="setting" ng-repeat="setting in ctrl.settings track by $index"
+         ng-if="$index >= ctrl.settings.length - 2">
+      <label class="label-setting" ng-bind="setting.title"></label>
+      <div class="btn-group">
+        <button class="color-option" ng-style="setting.value" disabled></button>
+        <span>|</span>
+        <ul class="color-list">
+          <li class="color-list-item" ng-repeat="option in setting.options track by $index">
+            <button class="color-option" ng-style="option.value" ng-click="setting.value=option.value" onclick="this.blur()"></button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <div class="pull-left">
+      <button class="btn btn-danger btn-sm" ng-click="ctrl.resetSettings()">
+        <span class="glyphicon glyphicon-trash"></span>&nbsp;Reset Settings
+      </button>
+    </div>
+    <div class="pull-right">
+      <button class="btn btn-default btn-sm" ng-click="ctrl.close()">Cancel</button>
+      <button class="btn btn-success btn-sm" ng-click="ctrl.save()">
+        <span class="glyphicon glyphicon-floppy-save"></span>&nbsp;Save
+      </button>
+    </div>
+  </div>
+</div>

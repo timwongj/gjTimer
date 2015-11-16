@@ -1,0 +1,322 @@
+@screen-sm-min: 48em;
+@screen-md-min: 62em;
+@screen-lg-min: 75em;
+
+@height-section-md: calc(~"100vh - 4em");
+
+.section {
+  padding: .375em 0;
+  @media (min-width: @screen-sm-min) {
+    padding: .375em;
+  }
+}
+
+.jumbotron {
+  margin-bottom: 0;
+  border-radius: 0 !important;
+  background-color: #FFFFFF;
+  @media (min-width: @screen-md-min) {
+    height: @height-section-md;
+    border-radius: 2px !important;
+  }
+}
+
+.jumbotron-timer, .jumbotron-statistics {
+  padding: .5em !important;
+  overflow-y: auto;
+}
+
+.jumbotron-results {
+  padding: 0 !important;
+  overflow-y: hidden;
+}
+
+.btn {
+  border-radius: 2px;
+}
+
+.modal {
+  top: 5%;
+}
+
+.modal-content {
+  border-radius: 3px;
+}
+
+.fading-circle {
+  height: 150%;
+  width: 150%;
+}
+
+#charts {
+
+  margin: .125em;
+  padding: .125em;
+
+}
+#cub {
+
+  margin: .25em;
+  padding: .25em;
+  text-align: center;
+
+}
+
+#menuBar {
+
+  margin: .125em 0;
+  padding: .125em 0;
+
+  .title {
+    margin-right: .25em;
+    font-size: 150%;
+    font-weight: 400;
+  }
+
+  .dropdown-menu {
+    min-width: 0;
+  }
+
+  .btn-session {
+    -webkit-border-radius: 2px 0 0 2px;
+    -moz-border-radius: 2px 0 0 2px;
+    border-radius: 2px 0 0 2px;
+  }
+
+  .btn-reset {
+    -webkit-border-radius: 0 2px 2px 0;
+    -moz-border-radius: 0 2px 2px 0;
+    border-radius: 0 2px 2px 0;
+  }
+
+}
+
+@height-results-md: calc(~"100vh - 5.875em");
+@height-results-sm: 21.5em;
+
+#results {
+
+  thead {
+    display: block;
+  }
+
+  tbody {
+    display: block;
+    overflow: auto;
+    height: @height-results-sm;
+    @media screen and (min-width: @screen-md-min) {
+      height: @height-results-md;
+    }
+  }
+
+  tr {
+    height: 1.75em;
+  }
+
+  th {
+    border-bottom: 2px solid #ddd;
+  }
+
+  td {
+    border: 1px solid #ddd;
+  }
+
+  .index {
+    text-align: center;
+    width: 10em;
+  }
+
+  .time, .avg {
+    text-align: center;
+    width: 40em;
+  }
+
+}
+
+@max-height-modal-body: calc(~"100vh - 12em");
+
+#resultsModal {
+
+  .modal-header {
+    padding: .5em;
+  }
+
+  .modal-body {
+    padding: .5em;
+    max-height: @max-height-modal-body;
+    overflow-y: auto;
+  }
+
+  .modal-footer {
+    padding: .5em;
+  }
+
+  .modal-title {
+    margin-left: .25em;
+  }
+
+  .btn-close {
+    vertical-align: middle;
+  }
+
+  .ol-results {
+    margin: 0;
+    padding-left: 2.5em;
+  }
+
+  .li-results {
+    margin-bottom: .125em;
+  }
+
+  .date {
+    font-weight: 300;
+  }
+
+}
+.popover-title, .popover-content {
+  padding: .5em;
+  text-align: center;
+}
+
+#resultsPopover {
+
+  .form-group-buttons {
+    margin-bottom: .25em;
+  }
+
+  .popover-input-comment {
+    margin-top: .25em;
+    padding: .25em .5em;
+    width: 8.5em;
+    height: 2em;
+  }
+
+}
+
+#scramble {
+
+  text-align: center;
+
+  .scramble {
+    margin: 4px 2px;
+    padding: 2px;
+    font-family: Courier New, Courier New, monospace;
+  }
+
+}
+
+#settings {
+
+  .modal-header, .modal-body, .modal-footer {
+    padding: .5em;
+  }
+
+  .modal-title {
+    margin-left: .25em;
+  }
+
+  .btn-close {
+    vertical-align: middle;
+  }
+
+  .setting {
+    margin: .25em;
+  }
+
+  .label-setting {
+    margin: 0 .125em;
+    min-width: 10em;
+    text-align: right;
+  }
+
+  .btn-group {
+    margin: 0 .125em;
+  }
+
+  .color-list {
+    margin: 0;
+    padding: 0;
+    display: inline-flex;
+    list-style-type: none;
+  }
+
+  .color-list-item {
+    margin: 0;
+  }
+
+  .color-option {
+    height: 1em;
+    width: 1em;
+    margin: .25em;
+    padding: 0;
+    border: 0.125em solid black;
+  }
+
+}
+
+#statistics {
+
+  margin: .125em;
+  padding: .125em;
+
+  .stat {
+    white-space: nowrap;
+    font-weight: 500;
+  }
+
+  table {
+    margin: .5em 0;
+  }
+
+  table td, table th {
+    padding: .25em;
+  }
+
+  table .type {
+    text-align: right;
+  }
+
+  table .data {
+    text-align: center;
+  }
+
+}
+
+@invalid-input-color: #FFCCCC;
+
+#timer {
+
+  text-align: center;
+
+  .time {
+    font-size: 600%;
+    margin: .03125em;
+    padding: .03125em;
+    @media screen and (min-width: @screen-sm-min) {
+      font-size: 800%;
+      margin: .0625em;
+      padding: .0625em;
+    }
+  }
+
+  .input {
+    width: 70%;
+    font-size: 400%;
+    margin: .0625em;
+    padding: .0625em;
+    transition: 0.25s linear background;
+    @media screen and (min-width: @screen-sm-min) {
+      width: 60%;
+      font-size: 550%;
+    }
+    @media screen and (min-width: @screen-md-min) {
+      width: 80%;
+      font-size: 700%;
+    }
+  }
+
+  .input.ng-invalid {
+    background: @invalid-input-color;
+  }
+
+}
