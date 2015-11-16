@@ -7,13 +7,13 @@
     $rootScope.isTyping = false;
     $scope.style = {};
 
-    $scope.keydown = function($event, event) {
+    $scope.keydown = function($event) {
 
       if (!$rootScope.isTypingComment) {
-        if ((event.keyCode === Constants.KEY_CODES.ENTER) && !$rootScope.isTyping) {
+        if (($event.keyCode === Constants.KEY_CODES.ENTER) && !$rootScope.isTyping) {
           $rootScope.$broadcast('new scramble', $scope.eventId);
-        } else if (event.keyCode === Constants.KEY_CODES.SPACE_BAR) {
-          event.preventDefault();
+        } else if ($event.keyCode === Constants.KEY_CODES.SPACE_BAR) {
+          $event.preventDefault();
         }
         $rootScope.$broadcast('keydown', $event);
       }

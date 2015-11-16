@@ -7,8 +7,7 @@
     $rootScope,
     GjTimerController,
     Constants,
-    $event,
-    event;
+    $event;
 
   describe('The scramble controller', function() {
 
@@ -24,13 +23,12 @@
       $scope.eventId = '333fm';
       $scope.settings = Constants.DEFAULT_SETTINGS;
 
-      $event = '$event';
-      event = {
+      $event = {
         preventDefault: function() {}
       };
 
       spyOn($rootScope, '$broadcast');
-      spyOn(event, 'preventDefault');
+      spyOn($event, 'preventDefault');
 
       GjTimerController = $controller('gjTimerController', {
         $scope: $scope,
@@ -46,22 +44,22 @@
       describe('when not typing a comment', function() {
         describe('when the key code is enter and the entry mode is not typing', function() {
           it('should broadcast a new scramble with the eventId', function() {
-            event.keyCode = Constants.KEY_CODES.ENTER;
+            $event.keyCode = Constants.KEY_CODES.ENTER;
             $rootScope.isTyping = false;
-            $scope.keydown($event, event);
+            $scope.keydown($event);
             expect($rootScope.$broadcast).toHaveBeenCalledWith('new scramble', $scope.eventId);
             expect($rootScope.$broadcast).toHaveBeenCalledWith('keydown', $event);
-            expect(event.preventDefault).not.toHaveBeenCalled();
+            expect($event.preventDefault).not.toHaveBeenCalled();
           });
         });
 
         describe('when the key code is spacebar', function() {
           it('should prevent the default behavior', function() {
-            event.keyCode = Constants.KEY_CODES.SPACE_BAR;
-            $scope.keydown($event, event);
+            $event.keyCode = Constants.KEY_CODES.SPACE_BAR;
+            $scope.keydown($event);
             expect($rootScope.$broadcast).not.toHaveBeenCalledWith('new scramble', $scope.eventId);
             expect($rootScope.$broadcast).toHaveBeenCalledWith('keydown', $event);
-            expect(event.preventDefault).toHaveBeenCalledWith();
+            expect($event.preventDefault).toHaveBeenCalledWith();
           });
         });
       });
