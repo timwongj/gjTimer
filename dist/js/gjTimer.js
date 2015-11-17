@@ -1693,8 +1693,8 @@
       var rawTimes = Calculator.extractRawTimes(results);
 
       for (var i = 0; i < results.length; i++) {
-        results[i].avg5 = i > 5 ? Calculator.calculateAverageString(rawTimes.slice(i - 4, i + 1), true, precision) : 'DNF';
-        results[i].avg12 = i > 12 ? Calculator.calculateAverageString(rawTimes.slice(i - 11, i + 1), true, precision) : 'DNF';
+        results[i].avg5 = i > 3 ? Calculator.calculateAverageString(rawTimes.slice(i - 4, i + 1), true, precision) : 'DNF';
+        results[i].avg12 = i > 10 ? Calculator.calculateAverageString(rawTimes.slice(i - 11, i + 1), true, precision) : 'DNF';
       }
       
     }

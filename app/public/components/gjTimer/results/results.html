@@ -24,11 +24,11 @@
       </td>
       <td class="avg">
         <div ng-bind="result.avg5"
-             ng-click="ctrl.openModal(ctrl.results.length - $index, 5)"></div>
+             ng-click="ctrl.openModal(result.index + 1, 5)"></div>
       </td>
       <td class="avg">
         <div ng-bind="result.avg12"
-             ng-click="ctrl.openModal(ctrl.results.length - $index, 12)"></div>
+             ng-click="ctrl.openModal(result.index + 1, 12)"></div>
       </td>
     </tr>
     <tr ng-if="ctrl.NUM_RESULTS_DISPLAYED < ctrl.results.length">
