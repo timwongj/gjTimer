@@ -6,10 +6,7 @@
 
     var self = this;
 
-    self.eventId = MenuBarService.initEvent();
-    self.sessionId = MenuBarService.initSession();
     self.sessions = MenuBarService.initSessions();
-    self.settings = MenuBarService.initSettings();
     self.events = Events.getEvents();
     self.event = { eventId: self.eventId, event: Events.getEvent(self.eventId) };
 

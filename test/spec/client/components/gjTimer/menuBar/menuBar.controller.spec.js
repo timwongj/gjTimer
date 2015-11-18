@@ -33,15 +33,12 @@
 
       eventId = '333';
       sessionId = 'Session 1';
-      sessions = [ 'Session 1', 'Session 2', 'Session 3' ];
       settings = { setting1: 'yw', setting2: 'dw' };
+      sessions = [ 'Session 1', 'Session 2', 'Session 3' ];
       events = ['333', '444'];
 
       spyOn($uibModal, 'open');
-      spyOn(MenuBarService, 'initEvent').and.returnValue(eventId);
-      spyOn(MenuBarService, 'initSession').and.returnValue(sessionId);
       spyOn(MenuBarService, 'initSessions').and.returnValue(sessions);
-      spyOn(MenuBarService, 'initSettings').and.returnValue(settings);
       spyOn(MenuBarService, 'changeSession');
       spyOn(MenuBarService, 'changeEvent');
       spyOn(MenuBarService, 'resetSessionAsync');
@@ -56,20 +53,17 @@
         $uibModal: $uibModal,
         MenuBarService: MenuBarService,
         Events: Events
+      }, {
+        eventId: eventId,
+        sessionId: sessionId
       });
 
       $scope.$digest();
     }));
 
-    it('should initialize the event, events, session, sessions, and settings', function() {
-      expect(MenuBarService.initEvent).toHaveBeenCalledWith();
-      expect(MenuBarController.eventId).toEqual(eventId);
-      expect(MenuBarService.initSession).toHaveBeenCalledWith();
-      expect(MenuBarController.sessionId).toEqual(sessionId);
+    it('should initialize the sessions and events', function() {
       expect(MenuBarService.initSessions).toHaveBeenCalledWith();
       expect(MenuBarController.sessions).toEqual(sessions);
-      expect(MenuBarService.initSettings).toHaveBeenCalledWith();
-      expect(MenuBarController.settings).toEqual(settings);
       expect(Events.getEvents).toHaveBeenCalledWith();
       expect(MenuBarController.events).toEqual(events);
       expect(MenuBarController.event.eventId).toEqual(eventId);

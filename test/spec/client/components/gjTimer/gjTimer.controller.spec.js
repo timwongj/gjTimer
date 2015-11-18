@@ -6,10 +6,13 @@
     $scope,
     $rootScope,
     GjTimerController,
+    GjTimerService,
     Constants,
+    eventId,
+    sessionId,
     $event;
 
-  describe('The scramble controller', function() {
+  describe('The gjTimer controller', function() {
 
     beforeEach(module('gjTimer'));
 
@@ -18,15 +21,22 @@
       $rootScope = $injector.get('$rootScope');
       $scope = $rootScope.$new();
       $controller = $injector.get('$controller');
+      GjTimerService = $injector.get('gjTimerService');
       Constants = $injector.get('Constants');
 
       $scope.eventId = '333fm';
       $scope.settings = Constants.DEFAULT_SETTINGS;
 
+      eventId = '333';
+      sessionId = 'Session 1';
+
       $event = {
         preventDefault: function() {}
       };
-
+      
+      spyOn(GjTimerService, 'initEvent').and.returnValue(eventId);
+      spyOn(GjTimerService, 'initSession').and.returnValue(sessionId);
+      spyOn(GjTimerService, 'initSettings').and.returnValue(Constants.DEFAULT_SETTINGS);
       spyOn($rootScope, '$broadcast');
       spyOn($event, 'preventDefault');
 
@@ -39,6 +49,15 @@
       $scope.$digest();
 
     }));
+
+    it('should initialize the event, session, and settings', function() {
+      expect(GjTimerService.initEvent).toHaveBeenCalledWith();
+      expect($scope.eventId).toEqual(eventId);
+      expect(GjTimerService.initSession).toHaveBeenCalledWith();
+      expect($scope.sessionId).toEqual(sessionId);
+      expect(GjTimerService.initSettings).toHaveBeenCalledWith();
+      expect($scope.settings).toEqual(Constants.DEFAULT_SETTINGS);
+    });
 
     describe('keydown function', function() {
       describe('when not typing a comment', function() {
