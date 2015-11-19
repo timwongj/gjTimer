@@ -121,6 +121,8 @@
           barChart.data[0][index] += 1;
           return barChart;
         }
+      } else {
+        return barChart;
       }
 
     };

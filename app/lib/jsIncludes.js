@@ -49,6 +49,7 @@ module.exports = (function() {
     // gjTimer
     'app/public/components/gjTimer/gjTimer.directive.js',
     'app/public/components/gjTimer/gjTimer.controller.js',
+    'app/public/components/gjTimer/gjTimer.service.js',
 
     // filters
     'app/public/components/shared/filters/reverse.filter.js',

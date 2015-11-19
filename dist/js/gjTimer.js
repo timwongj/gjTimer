@@ -57,7 +57,11 @@
 
   'use strict';
 
-  function GjTimerController($scope, $rootScope, Constants) {
+  function GjTimerController($scope, $rootScope, gjTimerService, Constants) {
+
+    $scope.eventId = gjTimerService.initEvent();
+    $scope.sessionId = gjTimerService.initSession();
+    $scope.settings = gjTimerService.initSettings();
 
     $rootScope.isTyping = false;
     $scope.style = {};
@@ -65,10 +69,10 @@
     $scope.keydown = function($event) {
 
       if (!$rootScope.isTypingComment) {
-        if ((event.keyCode === Constants.KEY_CODES.ENTER) && !$rootScope.isTyping) {
+        if (($event.keyCode === Constants.KEY_CODES.ENTER) && !$rootScope.isTyping) {
           $rootScope.$broadcast('new scramble', $scope.eventId);
-        } else if (event.keyCode === Constants.KEY_CODES.SPACE_BAR) {
-          event.preventDefault();
+        } else if ($event.keyCode === Constants.KEY_CODES.SPACE_BAR) {
+          $event.preventDefault();
         }
         $rootScope.$broadcast('keydown', $event);
       }
@@ -104,7 +108,76 @@
 
   }
 
-  angular.module('gjTimer').controller('gjTimerController', ['$scope', '$rootScope', 'Constants', GjTimerController]);
+  angular.module('gjTimer').controller('gjTimerController', ['$scope', '$rootScope', 'gjTimerService', 'Constants', GjTimerController]);
+
+})();
+
+(function() {
+
+  'use strict';
+
+  function GjTimerService(LocalStorage, Constants) {
+
+    var self = this;
+
+    /**
+     * Initializes or gets the eventId from local storage.
+     * @returns {string}
+     */
+    self.initEvent = function() {
+
+      var eventId = LocalStorage.get('eventId');
+      if (eventId) {
+        return eventId;
+      } else {
+        LocalStorage.set('eventId', '333');
+        return '333';
+      }
+
+    };
+
+    /**
+     * Initializes or gets session number from local storage.
+     * @returns {string}
+     */
+    self.initSession = function() {
+
+      var sessionId = LocalStorage.get('sessionId');
+
+      if (sessionId) {
+        return sessionId;
+      } else {
+        LocalStorage.set('sessionId', 'Session 1');
+        return 'Session 1';
+      }
+
+    };
+
+    /**
+     * Gets settings from local storage or initializes it if it doesn't exist.
+     * @returns {*}
+     */
+    self.initSettings = function() {
+      var settings = LocalStorage.getJSON('settings');
+      if (settings === null) {
+        LocalStorage.setJSON('settings', Constants.DEFAULT_SETTINGS);
+        return Constants.DEFAULT_SETTINGS;
+      } else {
+        for (var key in Constants.DEFAULT_SETTINGS) {
+          if (Constants.DEFAULT_SETTINGS.hasOwnProperty(key)) {
+            if (!settings.hasOwnProperty(key)) {
+              settings[key] = Constants.DEFAULT_SETTINGS[key];
+              LocalStorage.setJSON('settings', settings);
+            }
+          }
+        }
+        return settings;
+      }
+    };
+
+  }
+
+  angular.module('gjTimer').service('gjTimerService', ['LocalStorage', 'Constants', GjTimerService]);
 
 })();
 
@@ -360,7 +433,7 @@
 
     var self = this;
 
-    self.DEFAULT_NUMBER_OF_SESSIONS = 15;
+    self.DEFAULT_NUMBER_OF_SESSIONS = 20;
 
     self.NUM_RESULTS_DISPLAYED = 50;
 
@@ -631,7 +704,9 @@
      * @param key
      */
     self.get = function(key) {
+
       return localStorage.getItem(key);
+
     };
 
     /**
@@ -641,12 +716,14 @@
      * @returns {boolean}
      */
     self.set = function(key, value) {
+
       try {
         localStorage.setItem(key, value);
         return true;
       } catch(err) {
         return false;
       }
+
     };
 
     /**
@@ -655,12 +732,9 @@
      * @returns {null}
      */
     self.getJSON = function(key) {
-      var value = localStorage.getItem(key);
-      if (value !== null) {
-        return JSON.parse(value);
-      } else {
-        return null;
-      }
+
+      return JSON.parse(localStorage.getItem(key));
+
     };
 
     /**
@@ -694,12 +768,14 @@
      * @returns {boolean}
      */
     self.setJSON = function(key, value) {
+
       try {
         localStorage.setItem(key, JSON.stringify(value));
         return true;
       } catch(err) {
         return false;
       }
+
     };
 
     /**
@@ -732,12 +808,14 @@
      * @returns {boolean}
      */
     self.clear = function() {
+
       try {
         localStorage.clear();
         return true;
       } catch(err) {
         return false;
       }
+
     };
 
   }
@@ -942,6 +1020,8 @@
           barChart.data[0][index] += 1;
           return barChart;
         }
+      } else {
+        return barChart;
       }
 
     };
@@ -1078,10 +1158,7 @@
 
     var self = this;
 
-    self.eventId = MenuBarService.initEvent();
-    self.sessionId = MenuBarService.initSession();
     self.sessions = MenuBarService.initSessions();
-    self.settings = MenuBarService.initSettings();
     self.events = Events.getEvents();
     self.event = { eventId: self.eventId, event: Events.getEvent(self.eventId) };
 
@@ -1147,45 +1224,6 @@
     var self = this;
 
     /**
-     * Gets settings from local storage or initializes it if it doesn't exist.
-     * @returns {*}
-     */
-    self.initSettings = function() {
-      var settings = LocalStorage.getJSON('settings');
-      if (settings === null) {
-        LocalStorage.setJSON('settings', Constants.DEFAULT_SETTINGS);
-        return Constants.DEFAULT_SETTINGS;
-      } else {
-        for (var key in Constants.DEFAULT_SETTINGS) {
-          if (Constants.DEFAULT_SETTINGS.hasOwnProperty(key)) {
-            if (!settings.hasOwnProperty(key)) {
-              settings[key] = Constants.DEFAULT_SETTINGS[key];
-              LocalStorage.setJSON('settings', settings);
-            }
-          }
-        }
-        return settings;
-      }
-    };
-
-    /**
-     * Saves settings.
-     * @param settings
-     */
-    self.saveSettings = function(settings) {
-      LocalStorage.setJSON('settings', settings);
-    };
-
-    /**
-     * Reset settings.
-     * @returns {*}
-     */
-    self.resetSettings = function() {
-      LocalStorage.setJSON('settings', Constants.DEFAULT_SETTINGS);
-      return Constants.DEFAULT_SETTINGS;
-    };
-
-    /**
      * Initializes sessions in local storage if they do not exist.
      * @returns [String] - sessionId
      */
@@ -1206,39 +1244,6 @@
     };
 
     /**
-     * Initializes or gets session number from local storage.
-     * @returns {string}
-     */
-    self.initSession = function() {
-
-      var sessionId = LocalStorage.get('sessionId');
-
-      if (sessionId) {
-        return sessionId;
-      } else {
-        LocalStorage.set('sessionId', 'Session 1');
-        return 'Session 1';
-      }
-
-    };
-
-    /**
-     * Initializes or gets the eventId from local storage.
-     * @returns {string}
-     */
-    self.initEvent = function() {
-
-      var eventId = LocalStorage.get('eventId');
-      if (eventId) {
-        return eventId;
-      } else {
-        LocalStorage.set('eventId', '333');
-        return '333';
-      }
-
-    };
-
-    /**
      * Saves the new sessionId and returns the new eventId.
      * @param sessionId
      * @returns {string} - eventId
@@ -1249,10 +1254,12 @@
       var events = LocalStorage.getJSON('events');
       if (events) {
         if (events.hasOwnProperty(sessionId)) {
+          LocalStorage.set('eventId', events[sessionId]);
           return events[sessionId];
         } else {
           events[sessionId] = '333';
           LocalStorage.setJSON('events', events);
+          LocalStorage.set('eventId', '333');
           return '333';
         }
       } else {
@@ -1261,6 +1268,7 @@
           events['Session ' + i] = '333';
         }
         LocalStorage.setJSON('events', events);
+        LocalStorage.set('eventId', '333');
         return '333';
       }
 
@@ -1301,6 +1309,23 @@
           return LocalStorage.setJSONAsync(sessionId, session);
         });
 
+    };
+
+    /**
+     * Saves settings.
+     * @param settings
+     */
+    self.saveSettings = function(settings) {
+      LocalStorage.setJSON('settings', settings);
+    };
+
+    /**
+     * Reset settings.
+     * @returns {*}
+     */
+    self.resetSettings = function() {
+      LocalStorage.setJSON('settings', Constants.DEFAULT_SETTINGS);
+      return Constants.DEFAULT_SETTINGS;
     };
 
     /**
@@ -1683,8 +1708,8 @@
       var rawTimes = Calculator.extractRawTimes(results);
 
       for (var i = 0; i < results.length; i++) {
-        results[i].avg5 = i > 5 ? Calculator.calculateAverageString(rawTimes.slice(i - 4, i + 1), true, precision) : 'DNF';
-        results[i].avg12 = i > 12 ? Calculator.calculateAverageString(rawTimes.slice(i - 11, i + 1), true, precision) : 'DNF';
+        results[i].avg5 = i > 3 ? Calculator.calculateAverageString(rawTimes.slice(i - 4, i + 1), true, precision) : 'DNF';
+        results[i].avg12 = i > 10 ? Calculator.calculateAverageString(rawTimes.slice(i - 11, i + 1), true, precision) : 'DNF';
       }
       
     }
@@ -1859,7 +1884,7 @@
       });
 
       $('.popover-btn-remove').on('click', function() {
-        if (confirm('Are you sure you want to delete this time?')) {
+        if (confirm('How many times did you delete to get that average?')) {
           ResultsService.removeAsync(self.results, self.index, self.sessionId, self.precision)
             .then(function() {
               $rootScope.$broadcast('refresh statistics', self.results);

@@ -2,7 +2,11 @@
 
   'use strict';
 
-  function GjTimerController($scope, $rootScope, Constants) {
+  function GjTimerController($scope, $rootScope, gjTimerService, Constants) {
+
+    $scope.eventId = gjTimerService.initEvent();
+    $scope.sessionId = gjTimerService.initSession();
+    $scope.settings = gjTimerService.initSettings();
 
     $rootScope.isTyping = false;
     $scope.style = {};
@@ -10,10 +14,10 @@
     $scope.keydown = function($event) {
 
       if (!$rootScope.isTypingComment) {
-        if ((event.keyCode === Constants.KEY_CODES.ENTER) && !$rootScope.isTyping) {
+        if (($event.keyCode === Constants.KEY_CODES.ENTER) && !$rootScope.isTyping) {
           $rootScope.$broadcast('new scramble', $scope.eventId);
-        } else if (event.keyCode === Constants.KEY_CODES.SPACE_BAR) {
-          event.preventDefault();
+        } else if ($event.keyCode === Constants.KEY_CODES.SPACE_BAR) {
+          $event.preventDefault();
         }
         $rootScope.$broadcast('keydown', $event);
       }
@@ -49,6 +53,6 @@
 
   }
 
-  angular.module('gjTimer').controller('gjTimerController', ['$scope', '$rootScope', 'Constants', GjTimerController]);
+  angular.module('gjTimer').controller('gjTimerController', ['$scope', '$rootScope', 'gjTimerService', 'Constants', GjTimerController]);
 
 })();

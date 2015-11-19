@@ -6,7 +6,7 @@
 
     var self = this;
 
-    self.DEFAULT_NUMBER_OF_SESSIONS = 15;
+    self.DEFAULT_NUMBER_OF_SESSIONS = 20;
 
     self.NUM_RESULTS_DISPLAYED = 50;
 
