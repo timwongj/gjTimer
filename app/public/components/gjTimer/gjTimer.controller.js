@@ -2,7 +2,11 @@
 
   'use strict';
 
-  function GjTimerController($scope, $rootScope, Constants) {
+  function GjTimerController($scope, $rootScope, gjTimerService, Constants) {
+
+    $scope.eventId = gjTimerService.initEvent();
+    $scope.sessionId = gjTimerService.initSession();
+    $scope.settings = gjTimerService.initSettings();
 
     $rootScope.isTyping = false;
     $scope.style = {};
@@ -49,6 +53,6 @@
 
   }
 
-  angular.module('gjTimer').controller('gjTimerController', ['$scope', '$rootScope', 'Constants', GjTimerController]);
+  angular.module('gjTimer').controller('gjTimerController', ['$scope', '$rootScope', 'gjTimerService', 'Constants', GjTimerController]);
 
 })();

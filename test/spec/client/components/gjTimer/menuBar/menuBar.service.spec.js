@@ -35,44 +35,6 @@
       spyOn(LocalStorage, 'clear');
     }));
 
-    describe('initSettings function', function() {
-      it('should get the settings from the LocalStorage service', function() {
-        MenuBarService.initSettings();
-        expect(LocalStorage.getJSON).toHaveBeenCalled();
-      });
-
-      describe('when the settings are null', function() {
-        it('should set the settings in LocalStorage to the default settings and return them', function() {
-          LocalStorage.getJSON.and.returnValue(null);
-          settings = MenuBarService.initSettings();
-          expect(LocalStorage.setJSON).toHaveBeenCalledWith('settings', Constants.DEFAULT_SETTINGS);
-          expect(settings).toEqual(Constants.DEFAULT_SETTINGS);
-        });
-      });
-
-      describe('when the settings are not null', function() {
-        it('should populate any setting that has a default value', function() {
-          settings = MenuBarService.initSettings();
-          expect(settings).toEqual(Constants.DEFAULT_SETTINGS);
-        });
-      });
-    });
-
-    describe('saveSettings function', function() {
-      it('should call the setJSON function from the LocalStorage service with the given settings', function() {
-        settings = { setting1: 'value1' };
-        MenuBarService.saveSettings(settings);
-        expect(LocalStorage.setJSON).toHaveBeenCalledWith('settings', settings);
-      });
-    });
-
-    describe('resetSettings function', function() {
-      it('should call the setJSON function from the LocalStorage service with the default settings', function() {
-        MenuBarService.resetSettings();
-        expect(LocalStorage.setJSON).toHaveBeenCalledWith('settings', Constants.DEFAULT_SETTINGS);
-      });
-    });
-
     describe('initSessions function', function() {
       describe('when the sessions are not null', function() {
         it('should call the getJSON function from the LocalStorage service for each session', function() {
@@ -90,42 +52,6 @@
           expect(LocalStorage.getJSON).toHaveBeenCalledWith('Session 1');
           expect(LocalStorage.setJSON.calls.count()).toEqual(Constants.DEFAULT_NUMBER_OF_SESSIONS);
           expect(sessions.length).toEqual(Constants.DEFAULT_NUMBER_OF_SESSIONS);
-        });
-      });
-    });
-
-    describe('initSession function', function() {
-      describe('when the current sessionId exists in local storage', function() {
-        it('should get the session for that sessionId from the LocalStorage service', function() {
-          sessionId = MenuBarService.initSession();
-          expect(LocalStorage.get).toHaveBeenCalledWith('sessionId');
-          expect(sessionId).toEqual('Session 69');
-        });
-      });
-
-      describe('when the current sessionId does not exist in local storage', function() {
-        it('should get the session for Session 1 from the LocalStorage service', function() {
-          LocalStorage.get.and.returnValue(null);
-          sessionId = MenuBarService.initSession();
-          expect(LocalStorage.get).toHaveBeenCalledWith('sessionId');
-          expect(LocalStorage.set).toHaveBeenCalledWith('sessionId', 'Session 1');
-          expect(sessionId).toEqual('Session 1');
-        });
-      });
-    });
-
-    describe('initEvent function', function() {
-      describe('when eventId exists in local storage', function() {
-        it('should return the current event', function() {
-          LocalStorage.get.and.returnValue(eventId);
-          expect(MenuBarService.initEvent()).toEqual(eventId);
-        });
-      });
-
-      describe('when eventId does not exists in local storage', function() {
-        it('should return the default event', function() {
-          LocalStorage.get.and.returnValue(null);
-          expect(MenuBarService.initEvent()).toEqual('333');
         });
       });
     });
@@ -195,6 +121,21 @@
           });
         $timeout.flush();
         $timeout.verifyNoPendingTasks();
+      });
+    });
+
+    describe('saveSettings function', function() {
+      it('should call the setJSON function from the LocalStorage service with the given settings', function() {
+        settings = { setting1: 'value1' };
+        MenuBarService.saveSettings(settings);
+        expect(LocalStorage.setJSON).toHaveBeenCalledWith('settings', settings);
+      });
+    });
+
+    describe('resetSettings function', function() {
+      it('should call the setJSON function from the LocalStorage service with the default settings', function() {
+        MenuBarService.resetSettings();
+        expect(LocalStorage.setJSON).toHaveBeenCalledWith('settings', Constants.DEFAULT_SETTINGS);
       });
     });
 
