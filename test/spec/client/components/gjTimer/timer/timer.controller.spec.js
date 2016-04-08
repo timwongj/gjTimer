@@ -8,7 +8,8 @@
     TimerController,
     TimerService,
     $interval,
-    $timeout;
+    $timeout,
+      Constants;
 
   describe('The scramble controller', function() {
 
@@ -22,6 +23,9 @@
       $interval = $injector.get('$interval');
       $timeout = $injector.get('$timeout');
       TimerService = $injector.get('TimerService');
+      Constants = $injector.get('Constants');
+
+      $scope.settings = Constants.DEFAULT_SETTINGS;
 
       TimerController = $controller('ScrambleController', {
         $scope: $scope,
@@ -36,7 +40,9 @@
     }));
 
     describe('keydown event', function() {
+      it('should call the refreshSettings functions if the key is enter', function() {
 
+      });
     });
 
     describe('keyup event', function() {
