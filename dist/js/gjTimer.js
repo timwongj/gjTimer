@@ -2257,6 +2257,7 @@
     var self = this;
 
     var timer, inspection, state = 'reset', penalty = '', comment = '', memo = '', result, precision = self.settings.timerPrecision;
+    self.timerState = 'Ready';
 
     $scope.$on('refresh settings', function () {
 
@@ -2272,6 +2273,8 @@
             self.prepareInspection();
           } else if ((state === 'inspecting') && (event.keyCode === Constants.KEY_CODES.SPACE_BAR)) {
             self.prepareTimerWIthInspection();
+          } else if (state == 'timing') {
+            self.stopTimer();
           }
         } else if ((state === 'reset') && (event.keyCode === Constants.KEY_CODES.SPACE_BAR)) {
           self.prepareTimer();
@@ -2279,6 +2282,9 @@
           self.saveMemorizationTime();
         } else if (state === 'timing') {
           self.stopTimer();
+        }
+        if ((state === 'reset') && (event.keyCode === Constants.KEY_CODES.ENTER)) {
+          self.refreshSettings();
         }
       }
 
@@ -2335,9 +2341,11 @@
 
       if (self.settings.bldMode && !self.settings.inspection) {
         state = 'memorizing';
+        self.timerState = 'Memorizing';
         self.timerStyle = Constants.STYLES.COLOR.BLUE;
       } else {
         state = 'timing';
+        self.timerState = 'Timing';
         self.timerStyle = Constants.STYLES.COLOR.BLACK;
       }
       TimerService.startTimer();
@@ -2350,9 +2358,10 @@
     self.stopTimer = function() {
 
       state = 'stopped';
+      self.timerState = 'Ready';
       self.time = TimerService.getTime(precision);
       $interval.cancel(timer);
-      comment = self.settings.bldMode ? TimerService.createCommentForBldMode(self.time, memo) : '';
+      comment = (self.settings.bldMode && !self.settings.inspection) ? TimerService.createCommentForBldMode(self.time, memo) : '';
       ResultsService.saveResultAsync(self.results, self.time, penalty, comment, self.scramble, self.sessionId, self.settings.resultsPrecision, self.settings.saveScramble)
         .then(function(result) {
           $rootScope.$broadcast('new result', result);
@@ -2374,6 +2383,7 @@
     self.startInspection = function() {
 
       state = 'inspecting';
+      self.timerState = 'Inspecting';
       self.timerStyle = Constants.STYLES.COLOR.BLUE;
       TimerService.startInspection();
       inspection = $interval(function() {
@@ -2410,6 +2420,7 @@
     self.saveMemorizationTime = function() {
 
       state = 'execution';
+      self.timerState = 'Executing';
       self.timerStyle = Constants.STYLES.COLOR.BLACK;
       memo = self.time;
 
@@ -2453,7 +2464,7 @@
     self.refreshSettings = function() {
 
       if (self.settings.input === 'Timer') {
-        self.time = !self.settings.inspection ? (precision === 2 ? '0.00' : '0.000') : '15';
+        self.time = precision === 2 ? '0.00' : '0.000';
       } else if (self.settings.input === 'Typing') {
         self.time = '';
       }
