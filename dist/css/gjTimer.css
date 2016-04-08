@@ -214,14 +214,24 @@
 }
 #timer .time {
   font-size: 600%;
-  margin: .03125em;
-  padding: .03125em;
+  margin: .03125em .03125em 0;
+  padding: .03125em .03125em 0;
 }
 @media screen and (min-width: 48em) {
   #timer .time {
     font-size: 800%;
-    margin: .0625em;
-    padding: .0625em;
+    margin: .0625em .0625em 0;
+    padding: .0625em .0625em 0;
+  }
+}
+#timer .state {
+  margin: 0 .5em .5em;
+  padding: 0 .5em .5em;
+}
+@media screen and (min-width: 48em) {
+  #timer .state {
+    margin: 0 .75em .75em;
+    padding: 0 .75em .75em;
   }
 }
 #timer .input {
