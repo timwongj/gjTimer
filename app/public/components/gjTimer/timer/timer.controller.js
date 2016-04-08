@@ -64,14 +64,21 @@
       if (self.settings.timerStartDelay !== 0) {
         self.timerStyle = Constants.STYLES.COLOR.ORANGE;
       }
-      $timeout(function () {
+      if (self.settings.timerStartDelay !== 0) {
+        $timeout(function () {
+          if (state === 'keydown') {
+            state = 'ready';
+            self.timerStyle = Constants.STYLES.COLOR.GREEN;
+            $rootScope.$broadcast('timer focus');
+          }
+        }, self.settings.timerStartDelay);
+      } else {
         if (state === 'keydown') {
           state = 'ready';
           self.timerStyle = Constants.STYLES.COLOR.GREEN;
           $rootScope.$broadcast('timer focus');
         }
-      }, self.settings.timerStartDelay);
-
+      }
     };
 
     self.startTimer = function() {
